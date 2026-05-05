@@ -1,0 +1,51 @@
+name: Build static HTML on content change
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_pages/**'
+      - '_data/**'
+      - 'scripts/build.py'
+      - 'styles.css'
+      - '.github/workflows/build.yml'
+  # Also allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'  # don't loop on our own commits
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Build pages
+        run: python3 scripts/build.py
+
+      - name: Commit regenerated HTML
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add *.html
+          if git diff --cached --quiet; then
+            echo "No HTML changes to commit."
+          else
+            git commit -m "build: regenerate HTML from content [skip ci]"
+            git push
+          fi

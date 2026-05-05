@@ -1,0 +1,56 @@
+backend:
+  name: github
+  repo: pauldesmond/blossom-bakery
+  branch: main
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+
+# Helen uploads photos here — they land in /images/ in the repo
+media_folder: "images"
+public_folder: "/images"
+
+# Open the editor at /admin/?branch=main if you want to test against a feature branch
+publish_mode: simple
+
+# Friendly site name in the CMS chrome
+site_url: https://pauldesmond.github.io/blossom-bakery/
+display_url: https://pauldesmond.github.io/blossom-bakery/
+logo_url: https://pauldesmond.github.io/blossom-bakery/images/blossom_logo.png
+
+collections:
+  # Each YAML page becomes an editable form
+  - name: "pages"
+    label: "Pages"
+    description: "Edit the text and photo gallery on each page of the website."
+    folder: "_pages"
+    extension: "yml"
+    format: "yml"
+    create: false
+    delete: false
+    slug: "{{slug}}"
+    identifier_field: title
+    fields:
+      - { name: "slug",   label: "URL slug",         widget: "string", required: true, hint: "Don't change this — it controls the page URL." }
+      - { name: "title",  label: "Page title",       widget: "string", required: true, hint: "Shown at the top of the page and in the browser tab." }
+      - { name: "intro",  label: "Intro paragraph",  widget: "text",   required: false, hint: "The text shown under the title. Plain prose, a paragraph or two." }
+      - name: "images"
+        label: "Photo gallery"
+        widget: "list"
+        summary: "{{fields.image}}"
+        hint: "Drag photos into the order you want them shown. Click + to add new ones."
+        field: { name: "image", label: "Photo", widget: "image" }
+
+  # Static text blocks Helen might want to update — phone, email, hours
+  - name: "settings"
+    label: "Site settings"
+    description: "Contact details and hours shown across the site."
+    files:
+      - name: "contact"
+        label: "Contact details"
+        file: "_data/site.yml"
+        fields:
+          - { name: "email",  label: "Email",  widget: "string" }
+          - { name: "phone",  label: "Phone",  widget: "string" }
+          - { name: "hours_weekday", label: "Weekday hours", widget: "string", hint: "e.g. Mon-Fri 9am-5pm" }
+          - { name: "hours_saturday", label: "Saturday hours", widget: "string", hint: "e.g. Sat 9am-2pm" }
+          - { name: "address",  label: "Address",  widget: "string", hint: "e.g. Great Baddow, Chelmsford, Essex" }
