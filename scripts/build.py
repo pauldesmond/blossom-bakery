@@ -37,41 +37,28 @@ PAGE_META = {
 }
 
 NAV_HTML = '''<nav class="site-nav">
-    <div class="container">
-      <ul class="site-nav__list">
-        <li><a href="index.html"{HOME_ACTIVE}>Home</a></li>
-        <li><a href="about.html"{ABOUT_ACTIVE}>About</a></li>
-        <li><a href="wedding-cakes.html"{WC_ACTIVE}>Wedding Cakes</a></li>
-        <li><a href="weddings.html"{W_ACTIVE}>Weddings</a></li>
-        <li><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
-        <li><a href="childrens-cakes.html"{KIDS_ACTIVE}>Children's Cakes</a></li>
-        <li><a href="ganache-drip-cakes.html"{GD_ACTIVE}>Ganache Drip</a></li>
-        <li><a href="numbered-birthday-cakes.html"{NUM_ACTIVE}>Numbered Cakes</a></li>
-        <li><a href="buttercream-flower-cakes.html"{BFC_ACTIVE}>Flower Cakes</a></li>
-        <li><a href="speciality-and-everyday-cakes.html"{SE_ACTIVE}>Everyday Cakes</a></li>
-        <li><a href="handmade-biscuits.html"{HB_ACTIVE}>Biscuits</a></li>
-        <li><a href="giant-cookies.html"{GC_ACTIVE}>Giant Cookies</a></li>
-        <li><a href="traybakes.html"{TB_ACTIVE}>Traybakes</a></li>
-        <li><a href="scones.html"{SC_ACTIVE}>Scones</a></li>
-        <li><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon Teas</a></li>
-        <li><a href="catering-packages.html"{CP_ACTIVE}>Catering</a></li>
-        <li><a href="customer-reviews.html"{CR_ACTIVE}>Reviews</a></li>
-        <li><a href="contact.html"{CONTACT_ACTIVE}>Contact</a></li>
-      </ul>
-    </div>
-  </nav>'''
+        <ul class="site-nav__list">
+          <li><a href="cakes.html"{CAKES_ACTIVE}>Cakes</a></li>
+          <li><a href="weddings.html"{WED_ACTIVE}>Weddings</a></li>
+          <li><a href="handmade-biscuits.html"{BIS_ACTIVE}>Biscuits</a></li>
+          <li><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
+          <li><a href="traybakes.html"{TB_ACTIVE}>Tray bakes</a></li>
+          <li><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon tea</a></li>
+          <li><a href="customer-reviews.html"{CR_ACTIVE}>Testimonials</a></li>
+        </ul>
+      </nav>'''
 
+# Map of page filename → active-flag key. Helen's nav is intentionally slim:
+# only the 7 items are highlightable. Pages outside the list (giant cookies,
+# scones, contact, etc.) still render with the nav, just no highlighted item.
 NAV_KEY = {
-    'index.html':                         'HOME', 'about.html': 'ABOUT',
-    'wedding-cakes.html':                 'WC',   'weddings.html':                 'W',
-    'cupcakes.html':                      'CC',   'childrens-cakes.html':          'KIDS',
-    'ganache-drip-cakes.html':            'GD',   'numbered-birthday-cakes.html':  'NUM',
-    'buttercream-flower-cakes.html':      'BFC',  'speciality-and-everyday-cakes.html': 'SE',
-    'handmade-biscuits.html':             'HB',   'giant-cookies.html':            'GC',
-    'traybakes.html':                     'TB',
-    'scones.html':                        'SC',   'afternoon-teas.html':           'AT',
-    'catering-packages.html':             'CP',   'customer-reviews.html':         'CR',
-    'contact.html':                       'CONTACT',
+    'cakes.html':              'CAKES',
+    'weddings.html':           'WED',
+    'handmade-biscuits.html':  'BIS',
+    'cupcakes.html':           'CC',
+    'traybakes.html':          'TB',
+    'afternoon-teas.html':     'AT',
+    'customer-reviews.html':   'CR',
 }
 
 def render_nav(active_filename):
@@ -133,19 +120,15 @@ HEADER_TPL = '''<!DOCTYPE html>
   <header class="site-header">
     <div class="container">
       <div class="site-header__inner">
-        <a href="index.html" class="site-header__logo">
-          <img src="images/blossom_logo.png" alt="Blossom Bakery logo" />
-          <div>
-            <div class="site-header__name">Blossom Bakery</div>
-            <div class="site-header__tagline">Chelmsford · Essex</div>
-          </div>
+        <a href="index.html" class="site-header__brand">
+          <div class="site-header__name">Blossom Bakery</div>
+          <div class="site-header__tagline">Chelmsford · Essex</div>
         </a>
-        <a href="contact.html" class="btn btn--outline">Get in touch</a>
+        {nav}
+        <a href="contact.html" class="btn btn--outline btn--pill">Enquire</a>
       </div>
     </div>
   </header>
-
-  {nav}
 
   <main>'''
 

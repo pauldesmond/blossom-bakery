@@ -31,18 +31,23 @@ img { max-width: 100%; height: auto; display: block; }
 .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 .container--narrow { max-width: 760px; }
 
-/* Header */
-.site-header { padding: 24px 0 12px; border-bottom: 1px solid var(--border); background: var(--cream); }
-.site-header__inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-.site-header__logo { display: flex; align-items: center; gap: 14px; }
-.site-header__logo img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
-.site-header__name { font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: 1.5rem; font-weight: 600; letter-spacing: 0.5px; }
-.site-header__tagline { font-size: 0.78rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+/* Header — single-bar layout with wordmark, nav and Enquire button inline */
+.site-header { padding: 22px 0; border-bottom: 1px solid var(--border); background: var(--cream); position: sticky; top: 0; z-index: 10; }
+.site-header__inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px 32px; }
+.site-header__brand { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--ink); }
+.site-header__name { font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: 1.75rem; font-weight: 500; font-style: italic; letter-spacing: -0.2px; line-height: 1; }
+.site-header__tagline { font-size: 0.7rem; color: var(--muted); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 4px; }
 
-.site-nav { padding: 14px 0; border-bottom: 1px solid var(--border); background: var(--cream); position: sticky; top: 0; z-index: 10; }
-.site-nav__list { display: flex; flex-wrap: wrap; gap: 4px 22px; list-style: none; justify-content: center; }
-.site-nav__list a { color: var(--ink); font-size: 0.92rem; font-weight: 500; padding: 6px 0; transition: color 0.15s; }
+.site-nav { flex: 1; }
+.site-nav__list { display: flex; flex-wrap: wrap; gap: 6px 28px; list-style: none; justify-content: flex-end; padding: 0; margin: 0; }
+.site-nav__list a { color: var(--ink); font-size: 0.95rem; font-weight: 400; padding: 6px 0; transition: color 0.15s; }
 .site-nav__list a:hover, .site-nav__list a.active { color: var(--rose-dark); }
+.btn--pill { padding: 9px 22px; border-width: 1px; border-radius: 999px; font-size: 0.82rem; letter-spacing: 0.5px; }
+@media (max-width: 880px) {
+  .site-header__inner { gap: 14px 18px; }
+  .site-nav__list { justify-content: center; gap: 4px 18px; }
+  .site-nav__list a { font-size: 0.88rem; }
+}
 
 /* Hero */
 .hero { padding: 64px 0 48px; text-align: center; }
