@@ -4,10 +4,6 @@
 User-agent: *
 Allow: /
 
-# v2/ is a design preview, not the public site. Keep it out of search indexes
-# until promotion to root.
-Disallow: /v2/
-
 # Decap CMS admin shell — not for indexing.
 Disallow: /admin/
 
