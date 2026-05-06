@@ -15,52 +15,106 @@
   <meta property="og:image" content="https://myblossombakery.co.uk/images/img_2674.jpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..700,30..100&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-screen-label="Afternoon Tea">
-  <div id="site-header"></div>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="index.html" class="site-header__logo">
+          <img src="images/blossom_logo.png" alt="Blossom Bakery logo" />
+          <div>
+            <div class="site-header__name">Blossom Bakery</div>
+            <div class="site-header__tagline">Chelmsford · Essex</div>
+          </div>
+        </a>
+        <a href="contact.html" class="btn btn--outline">Get in touch</a>
+      </div>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <div class="container">
+      <ul class="site-nav__list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="wedding-cakes.html">Wedding Cakes</a></li>
+        <li><a href="weddings.html">Weddings</a></li>
+        <li><a href="cupcakes.html">Cupcakes</a></li>
+        <li><a href="childrens-cakes.html">Children's Cakes</a></li>
+        <li><a href="ganache-drip-cakes.html">Ganache Drip</a></li>
+        <li><a href="numbered-birthday-cakes.html">Numbered Cakes</a></li>
+        <li><a href="buttercream-flower-cakes.html">Flower Cakes</a></li>
+        <li><a href="speciality-and-everyday-cakes.html">Everyday Cakes</a></li>
+        <li><a href="handmade-biscuits.html">Biscuits</a></li>
+        <li><a href="giant-cookies.html">Giant Cookies</a></li>
+        <li><a href="traybakes.html">Traybakes</a></li>
+        <li><a href="scones.html">Scones</a></li>
+        <li><a href="afternoon-teas.html" class="active">Afternoon Teas</a></li>
+        <li><a href="catering-packages.html">Catering</a></li>
+        <li><a href="customer-reviews.html">Reviews</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
 
   <main>
-    <section class="page-hero">
+<section class="page-hero">
       <div class="container container--narrow">
-        <p class="eyebrow center">Pre-order · 48h notice</p>
-        <h1>Afternoon<br/><em class="accent">Tea.</em></h1>
-        <p class="lede">Our afternoon teas are perfect for all types of celebrations.</p>
+        <p class="eyebrow">Catering</p>
+        <h1>Afternoon Tea</h1>
       </div>
     </section>
-
-    <section class="section section--sm">
+<section>
       <div class="container container--narrow">
-        <p class="prose">They are perfect to share with friends and family and make perfect picnics. We can also cater for larger functions and parties and add additional savoury options.</p>
-        <p class="prose">We offer a wide range of different types of Afternoon Teas. Traditional, personalised, savoury, Vegetarian, gluten free and Vegan afternoon tea. We also make a lovely Children’s afternoon tea.</p>
-        <p class="prose">Our sweet treat boxes, cake boxes and cream teas are also very popular. Please pre-order with 48 hours notice. We offer a local CM2 delivery for afternoon teas for 2 People or more.</p>
+        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">Afternoon Tea – Blossom Bakery Skip to content Screenshot Our afternoon teas are perfect for all types of celebrations. They are perfect to share with friends and family and make perfect picnics. We can also cater for larger functions and parties and add additional savoury options. We offer a wide range of different types of Afternoon Teas. Traditional, personalised, savoury, Vegetarian, gluten free and Vegan afternoon tea. We also make a lovely Children’s afternoon tea. Our sweet treat boxes, cake boxes and cream teas are also very popular. Please pre-order with 48 hours notice. We offer a local CM2 delivery for afternoon teas for 2 People or more.</p>
       </div>
     </section>
-
-    <section class="section">
+<section>
       <div class="container">
-        <div class="cake-grid" data-lightbox-group>
-          <div class="cake-card span-7 tall" data-lightbox><div class="photo"><img src="images/img_2674.jpeg" alt="" loading="lazy" /></div></div>
+        <div class="photo-grid">
+          <img src="images/img_2674.jpeg" alt="" loading="lazy" />
         </div>
       </div>
     </section>
-
-    <section class="section ink">
-      <div class="container container--narrow cta-block">
-        <p class="eyebrow center">Order yours</p>
-        <h2>Let's bake<br/><em class="accent--light">something good.</em></h2>
-        <p class="lede-prose">Drop me a message and I'll be back in touch within a day. Replies Mon–Sat.</p>
-        <div class="actions center">
-          <a href="contact.html" class="btn btn--rose">Send a message</a>
-          <a href="tel:07939618787" class="btn btn--outline">07939 618787</a>
-        </div>
+<section class="alt">
+      <div class="container container--narrow" style="text-align:center;">
+        <p class="section-eyebrow">Order yours</p>
+        <h2 class="section-title">Let's bake something for you</h2>
+        <p style="margin: 24px 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
+        <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-2pm</p>
+        <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
       </div>
     </section>
   </main>
 
-  <div id="site-footer"></div>
-  <script src="site.js"></script>
-  <script>BB.init({ active: "afternoon-teas.html" });</script>
+  <footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__grid">
+        <div>
+          <h4>Blossom Bakery</h4>
+          <p>Homemade cakes and bakes for weddings, celebrations and every-day moments. Based in Great Baddow, Chelmsford, Essex.</p>
+        </div>
+        <div>
+          <h4>Quick links</h4>
+          <ul>
+            <li><a href="about.html">About Helen</a></li>
+            <li><a href="wedding-cakes.html">Wedding Cakes</a></li>
+            <li><a href="customer-reviews.html">Customer Reviews</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <p>blossombakedgoods@gmail.com<br />07939 618787</p>
+          <p style="margin-top: 12px;">Monday-Friday 9am-5pm<br />Saturday 9am-2pm</p>
+        </div>
+      </div>
+      <div class="site-footer__bottom">
+        © 2026 Blossom Bakery · Helen Victors · Great Baddow, Chelmsford
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

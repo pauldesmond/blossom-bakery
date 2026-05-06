@@ -1,157 +1,115 @@
 #!/usr/bin/env python3
-"""Build / preview pages from /_pages/*.yml content files.
+"""Build static HTML pages from /_pages/*.yml content files.
 
-Writes generated category pages into / alongside the four hand-crafted
-pages already in / (index, wedding-cakes, cupcakes, contact). The live
-root site is untouched.
-
-When ready to promote / to live, copy /* to the repo root and update
-OUT in this script back to ROOT.
-
-Reads /_pages/<slug>.yml — same shape Decap CMS already writes:
-  title:  <page heading>
-  intro:  <body copy>
-  images: [<image filename relative to /images>, ...]
+This is the build step that runs automatically via GitHub Actions
+whenever Helen edits content in Decap CMS. Reads /_pages/<slug>.yml
+and writes /<slug>.html using the shared template.
 """
 
-import html as ihtml, sys, re, yaml as _y
+import re, html as ihtml, sys, yaml as _y
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGES_DIR = ROOT / '_pages'
 IMG_DIR = ROOT / 'images'
 OUT = ROOT
-OUT.mkdir(exist_ok=True)
 
-# Preview build: writes into / alongside the live root site.
-# The live root pages are NEVER touched by this script.
-
-# slug → (output filename, eyebrow shown above hero title, optional price hint)
+# slug → (filename, eyebrow shown above hero title)
 PAGE_META = {
-    'about':                          ('about.html',                          'Meet the baker'),
-    'weddings':                       ('weddings.html',                       'For your day'),
-    'handmade-biscuits':              ('handmade-biscuits.html',              'Personalised · stamped'),
-    'afternoon-teas':                 ('afternoon-teas.html',                 'Pre-order · 48h notice'),
-    'cakes':                          ('cakes.html',                          'All cakes'),
-    'childrens-cakes':                ("childrens-cakes.html",                'Birthdays & celebrations'),
-    'ganache-drip-cakes':             ('ganache-drip-cakes.html',             'Modern · glossy'),
-    'speciality-and-everyday-cakes':  ('speciality-and-everyday-cakes.html',  'Cakes for any reason'),
-    'catering-packages':              ('catering-packages.html',              'Events & functions'),
-    'numbered-birthday-cakes':        ('numbered-birthday-cakes.html',        'Big-number birthdays'),
-    'buttercream-flower-cakes':       ('buttercream-flower-cakes.html',       'Floral, by hand'),
-    'giant-cookies':                  ('giant-cookies.html',                  'Decorated · personalised'),
-    'traybakes':                      ('traybakes.html',                      'Catering & sharing'),
-    'scones':                         ('scones.html',                         'Sweet & savoury'),
-    'customer-reviews':               ('customer-reviews.html',               'In their own words'),
+    'weddings':                        ('weddings.html',                      'Weddings'),
+    'handmade-biscuits':               ('handmade-biscuits.html',             'Biscuits'),
+    'wedding-cakes':                   ('wedding-cakes.html',                 'For your day'),
+    'afternoon-teas':                  ('afternoon-teas.html',                'Catering'),
+    'cakes':                           ('cakes.html',                         'All cakes'),
+    'childrens-cakes':                 ("childrens-cakes.html",               'Birthdays & celebrations'),
+    'cupcakes':                        ('cupcakes.html',                      'Boxes from 6'),
+    'ganache-drip-cakes':              ('ganache-drip-cakes.html',            'Modern · glossy'),
+    'speciality-and-everyday-cakes':   ('speciality-and-everyday-cakes.html', 'Cakes for any reason'),
+    'catering-packages':               ('catering-packages.html',             'Events'),
+    'numbered-birthday-cakes':         ('numbered-birthday-cakes.html',       'Big-number birthdays'),
+    'buttercream-flower-cakes':        ('buttercream-flower-cakes.html',      'Floral, by hand'),
+    'giant-cookies':                   ('giant-cookies.html',                 'Decorated · personalised'),
+    'traybakes':                       ('traybakes.html',                     'Catering & sharing'),
+    'scones':                          ('scones.html',                        'Classic'),
+    'customer-reviews':                ('customer-reviews.html',              'In their own words'),
+    'contact':                         ('contact.html',                       'Send a message'),
+    'about':                           ('about.html',                         'Meet the baker'),
 }
 
+NAV_HTML = '''<nav class="site-nav">
+    <div class="container">
+      <ul class="site-nav__list">
+        <li><a href="index.html"{HOME_ACTIVE}>Home</a></li>
+        <li><a href="about.html"{ABOUT_ACTIVE}>About</a></li>
+        <li><a href="wedding-cakes.html"{WC_ACTIVE}>Wedding Cakes</a></li>
+        <li><a href="weddings.html"{W_ACTIVE}>Weddings</a></li>
+        <li><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
+        <li><a href="childrens-cakes.html"{KIDS_ACTIVE}>Children's Cakes</a></li>
+        <li><a href="ganache-drip-cakes.html"{GD_ACTIVE}>Ganache Drip</a></li>
+        <li><a href="numbered-birthday-cakes.html"{NUM_ACTIVE}>Numbered Cakes</a></li>
+        <li><a href="buttercream-flower-cakes.html"{BFC_ACTIVE}>Flower Cakes</a></li>
+        <li><a href="speciality-and-everyday-cakes.html"{SE_ACTIVE}>Everyday Cakes</a></li>
+        <li><a href="handmade-biscuits.html"{HB_ACTIVE}>Biscuits</a></li>
+        <li><a href="giant-cookies.html"{GC_ACTIVE}>Giant Cookies</a></li>
+        <li><a href="traybakes.html"{TB_ACTIVE}>Traybakes</a></li>
+        <li><a href="scones.html"{SC_ACTIVE}>Scones</a></li>
+        <li><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon Teas</a></li>
+        <li><a href="catering-packages.html"{CP_ACTIVE}>Catering</a></li>
+        <li><a href="customer-reviews.html"{CR_ACTIVE}>Reviews</a></li>
+        <li><a href="contact.html"{CONTACT_ACTIVE}>Contact</a></li>
+      </ul>
+    </div>
+  </nav>'''
 
-# ---------- copy clean-up ----------
+NAV_KEY = {
+    'index.html':                         'HOME', 'about.html': 'ABOUT',
+    'wedding-cakes.html':                 'WC',   'weddings.html':                 'W',
+    'cupcakes.html':                      'CC',   'childrens-cakes.html':          'KIDS',
+    'ganache-drip-cakes.html':            'GD',   'numbered-birthday-cakes.html':  'NUM',
+    'buttercream-flower-cakes.html':      'BFC',  'speciality-and-everyday-cakes.html': 'SE',
+    'handmade-biscuits.html':             'HB',   'giant-cookies.html':            'GC',
+    'traybakes.html':                     'TB',
+    'scones.html':                        'SC',   'afternoon-teas.html':           'AT',
+    'catering-packages.html':             'CP',   'customer-reviews.html':         'CR',
+    'contact.html':                       'CONTACT',
+}
 
-# Decap CMS often pastes intro copy that includes navigation crumbs from the
-# original WordPress source. Strip those before rendering.
-INTRO_NOISE = [
-    re.compile(r'^[^.]*?\bSkip to content\s*', re.IGNORECASE),
-    re.compile(r'\bScreenshot\b', re.IGNORECASE),
-    re.compile(r'\bPrivacy\s+Blossom Bakery\b', re.IGNORECASE),
-    re.compile(r'^[A-Z][^.]*?–\s*Blossom Bakery\s*', re.IGNORECASE),
-]
+def render_nav(active_filename):
+    nav = NAV_HTML
+    for fn, key in NAV_KEY.items():
+        replace = ' class="active"' if fn == active_filename else ''
+        nav = nav.replace('{' + key + '_ACTIVE}', replace)
+    return nav
 
-# Pricing is enquiry-driven on v2, so strip any sentence that mentions a
-# £-amount. Sentence-level removal (rather than just the price phrase)
-# avoids leaving orphan fragments like "Our biscuits start each" behind.
-def strip_prices(text):
-    if '£' not in text:
-        return text
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    kept = [s for s in sentences if '£' not in s]
-    return ' '.join(kept).strip()
-
-def clean_intro(text):
-    if not text:
-        return ''
-    out = text
-    for r in INTRO_NOISE:
-        out = r.sub('', out)
-    out = strip_prices(out)
-    return re.sub(r'\s+', ' ', out).strip()
-
-
-def split_paragraphs(text):
-    """Split a long intro into 2-3 sensible paragraphs at sentence boundaries."""
-    if not text:
-        return []
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    if len(sentences) <= 3:
-        return [text]
-    # Aim for paragraphs of 2-3 sentences each.
-    chunks, buf = [], []
-    target = max(2, len(sentences) // 3)
-    for s in sentences:
-        buf.append(s)
-        if len(buf) >= target:
-            chunks.append(' '.join(buf))
-            buf = []
-    if buf:
-        if chunks:
-            chunks[-1] += ' ' + ' '.join(buf)
-        else:
-            chunks.append(' '.join(buf))
-    return chunks[:3]
-
-
-# ---------- gallery layout ----------
-
-# Repeating bento pattern. Length 8 — page wraps if more images.
-SPAN_PATTERN = ['span-7 tall', 'span-5 tall', 'span-4', 'span-4', 'span-4',
-                'span-6', 'span-6', 'span-12 short']
-
-def gallery_html(filenames):
-    if not filenames:
-        return ''
-    items = []
-    for i, f in enumerate(filenames):
-        span = SPAN_PATTERN[i % len(SPAN_PATTERN)]
-        items.append(
-            f'          <div class="cake-card {span}" data-lightbox>'
-            f'<div class="photo"><img src="images/{ihtml.escape(f)}" alt="" loading="lazy" /></div></div>'
-        )
-    return ('<section class="section">\n'
-            '      <div class="container">\n'
-            '        <div class="cake-grid" data-lightbox-group>\n'
-            + '\n'.join(items) + '\n'
-            '        </div>\n'
-            '      </div>\n'
-            '    </section>')
-
-
-def intro_html(paragraphs):
-    if not paragraphs:
-        return ''
-    p_html = '\n        '.join(
-        f'<p class="prose">{ihtml.escape(p)}</p>' for p in paragraphs
-    )
-    return ('<section class="section section--sm">\n'
-            '      <div class="container container--narrow">\n'
-            f'        {p_html}\n'
-            '      </div>\n'
-            '    </section>')
-
-
-CTA_HTML = '''<section class="section ink">
-      <div class="container container--narrow cta-block">
-        <p class="eyebrow center">Order yours</p>
-        <h2>Let's bake<br/><em class="accent--light">something good.</em></h2>
-        <p class="lede-prose">Drop me a message and I'll be back in touch within a day. Replies Mon–Sat.</p>
-        <div class="actions center">
-          <a href="contact.html" class="btn btn--rose">Send a message</a>
-          <a href="tel:07939618787" class="btn btn--outline">07939 618787</a>
+FOOTER = '''<footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__grid">
+        <div>
+          <h4>Blossom Bakery</h4>
+          <p>Homemade cakes and bakes for weddings, celebrations and every-day moments. Based in Great Baddow, Chelmsford, Essex.</p>
+        </div>
+        <div>
+          <h4>Quick links</h4>
+          <ul>
+            <li><a href="about.html">About Helen</a></li>
+            <li><a href="wedding-cakes.html">Wedding Cakes</a></li>
+            <li><a href="customer-reviews.html">Customer Reviews</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <p>blossombakedgoods@gmail.com<br />07939 618787</p>
+          <p style="margin-top: 12px;">Monday-Friday 9am-5pm<br />Saturday 9am-2pm</p>
         </div>
       </div>
-    </section>'''
+      <div class="site-footer__bottom">
+        © 2026 Blossom Bakery · Helen Victors · Great Baddow, Chelmsford
+      </div>
+    </div>
+  </footer>'''
 
-
-PAGE_TPL = '''<!DOCTYPE html>
+HEADER_TPL = '''<!DOCTYPE html>
 <html lang="en-GB">
 <head>
   <meta charset="UTF-8" />
@@ -168,104 +126,94 @@ PAGE_TPL = '''<!DOCTYPE html>
   <meta property="og:image" content="https://myblossombakery.co.uk/{og_image}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..700,30..100&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-screen-label="{title}">
-  <div id="site-header"></div>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="index.html" class="site-header__logo">
+          <img src="images/blossom_logo.png" alt="Blossom Bakery logo" />
+          <div>
+            <div class="site-header__name">Blossom Bakery</div>
+            <div class="site-header__tagline">Chelmsford · Essex</div>
+          </div>
+        </a>
+        <a href="contact.html" class="btn btn--outline">Get in touch</a>
+      </div>
+    </div>
+  </header>
 
-  <main>
-    <section class="page-hero">
+  {nav}
+
+  <main>'''
+
+def hero_html(eyebrow, title):
+    return f'''<section class="page-hero">
       <div class="container container--narrow">
-        <p class="eyebrow center">{eyebrow}</p>
-        <h1>{title_html}</h1>
-{lede}      </div>
-    </section>
+        <p class="eyebrow">{ihtml.escape(eyebrow)}</p>
+        <h1>{ihtml.escape(title)}</h1>
+      </div>
+    </section>'''
 
-    {intro}
+def gallery_html(filenames):
+    if not filenames: return ''
+    items = '\n          '.join(
+        f'<img src="images/{f}" alt="" loading="lazy" />' for f in filenames
+    )
+    return f'''<section>
+      <div class="container">
+        <div class="photo-grid">
+          {items}
+        </div>
+      </div>
+    </section>'''
 
-    {gallery}
-
-    {cta}
-  </main>
-
-  <div id="site-footer"></div>
-  <script src="site.js"></script>
-  <script>BB.init({{ active: "{filename}" }});</script>
-</body>
-</html>
-'''
-
-
-def title_html(title):
-    """Italicise the last word of the title in rose-deep, for a softer hero."""
-    parts = title.rsplit(' ', 1)
-    if len(parts) == 2:
-        head, tail = parts
-        return (f'{ihtml.escape(head)}<br/>'
-                f'<em class="accent">{ihtml.escape(tail)}.</em>')
-    return f'<em class="accent">{ihtml.escape(title)}.</em>'
-
-
-def lede_html(paragraphs):
-    """Use the first sentence as a lede under the hero."""
-    if not paragraphs:
-        return ''
-    first = paragraphs[0]
-    sentence = re.split(r'(?<=[.!?])\s+', first, maxsplit=1)[0]
-    if len(sentence) < 30 or len(sentence) > 220:
-        return ''
-    return f'        <p class="lede">{ihtml.escape(sentence)}</p>\n'
-
-
-def intro_paragraphs_after_lede(paragraphs):
-    """If we lifted the first sentence as a lede, drop it from the body intro."""
-    if not paragraphs:
-        return []
-    first = paragraphs[0]
-    sentence = re.split(r'(?<=[.!?])\s+', first, maxsplit=1)[0]
-    if 30 <= len(sentence) <= 220:
-        rest = first[len(sentence):].strip()
-        out = ([rest] if rest else []) + paragraphs[1:]
-        return [p for p in out if p]
-    return paragraphs
-
+CTA = '''<section class="alt">
+      <div class="container container--narrow" style="text-align:center;">
+        <p class="section-eyebrow">Order yours</p>
+        <h2 class="section-title">Let's bake something for you</h2>
+        <p style="margin: 24px 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
+        <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-2pm</p>
+        <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
+      </div>
+    </section>'''
 
 def render_page(filename, title, eyebrow, intro, images):
     description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Victors.'
     og_image = f'images/{images[0]}' if images else 'images/blossom_logo.png'
-    paragraphs = split_paragraphs(clean_intro(intro))
-    lede = lede_html(paragraphs)
-    body_paragraphs = intro_paragraphs_after_lede(paragraphs)
-    return PAGE_TPL.format(
-        title=ihtml.escape(title),
-        title_html=title_html(title),
-        eyebrow=ihtml.escape(eyebrow),
-        description=ihtml.escape(description, quote=True),
-        filename=filename,
-        og_image=og_image,
-        lede=lede,
-        intro=intro_html(body_paragraphs),
-        gallery=gallery_html(images),
-        cta=CTA_HTML,
-    )
+    head = HEADER_TPL.format(title=title, description=description, filename=filename,
+                             og_image=og_image, nav=render_nav(filename))
+    blocks = [hero_html(eyebrow, title)]
+    if intro and len(intro.strip()) > 30:
+        blocks.append(f'''<section>
+      <div class="container container--narrow">
+        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">{ihtml.escape(intro)}</p>
+      </div>
+    </section>''')
+    if images:
+        blocks.append(gallery_html(images))
+    if filename != 'contact.html':
+        blocks.append(CTA)
+    return f"""{head}
+{chr(10).join(blocks)}
+  </main>
 
+  {FOOTER}
+</body>
+</html>
+"""
 
 def main():
-    built, skipped = 0, 0
+    built = 0
     for path in sorted(PAGES_DIR.glob('*.yml')):
         slug = path.stem
         if slug not in PAGE_META:
-            print(f'  ⚠ unknown slug: {slug}', file=sys.stderr)
-            continue
+            print(f'  ⚠ unknown slug: {slug}', file=sys.stderr); continue
         filename, eyebrow = PAGE_META[slug]
-        # Skip the four hand-crafted pages already in /.
-        if filename in {'index.html', 'wedding-cakes.html', 'cupcakes.html', 'contact.html'}:
-            skipped += 1
-            print(f'  ◦ {filename:<42} (hand-crafted, skipped)')
-            continue
         with open(path) as f:
-            data = _y.safe_load(f) or {}
+            data = _y.safe_load(f)
         title = data.get('title', slug)
         intro = data.get('intro', '')
         images = [i for i in (data.get('images') or []) if (IMG_DIR / i).exists()]
@@ -273,8 +221,7 @@ def main():
         (OUT / filename).write_text(page)
         built += 1
         print(f'  ✓ {filename:<42} ({len(images)} imgs)')
-    print(f'\nBuilt {built} pages, skipped {skipped} hand-crafted.')
-
+    print(f'\nBuilt {built} pages.')
 
 if __name__ == '__main__':
     main()

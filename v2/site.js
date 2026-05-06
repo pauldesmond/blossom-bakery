@@ -1,17 +1,7 @@
 // Shared header, nav (mega menu), footer, lightbox, density/dark tweaks
 (function () {
   const NAV = [
-    {
-      label: "Cakes",
-      items: [
-        { href: "cakes.html",                     title: "All cakes",            note: "Browse the gallery" },
-        { href: "wedding-cakes.html",             title: "Wedding cakes",        note: "For your day" },
-        { href: "ganache-drip-cakes.html",        title: "Drip cakes",           note: "Modern · glossy" },
-        { href: "buttercream-flower-cakes.html",  title: "Buttercream flower",   note: "Floral, by hand" },
-        { href: "numbered-birthday-cakes.html",   title: "Numbered birthday",    note: "Big-number" },
-        { href: "childrens-cakes.html",           title: "Children's cakes",     note: "Birthdays" },
-      ],
-    },
+    { label: "Cakes",         href: "cakes.html" },
     { label: "Weddings",      href: "weddings.html" },
     { label: "Biscuits",      href: "handmade-biscuits.html" },
     { label: "Cupcakes",      href: "cupcakes.html" },
@@ -20,9 +10,7 @@
     { label: "Testimonials",  href: "customer-reviews.html" },
   ];
 
-  const FEATURE = {
-    Cakes: { img: "images/wedding-cake-pearl-cascade.jpg", title: "The Pearl Cascade", eyebrow: "Featured" },
-  };
+  const FEATURE = {};
 
   function renderHeader(active) {
     const navLinks = NAV.map((n) => {
