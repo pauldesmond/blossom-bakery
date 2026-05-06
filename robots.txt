@@ -1,0 +1,14 @@
+# Blossom Bakery — myblossombakery.co.uk
+# Allow all search engines and AI assistants to index the site.
+
+User-agent: *
+Allow: /
+
+# v2/ is a design preview, not the public site. Keep it out of search indexes
+# until promotion to root.
+Disallow: /v2/
+
+# Decap CMS admin shell — not for indexing.
+Disallow: /admin/
+
+Sitemap: https://myblossombakery.co.uk/sitemap.xml
