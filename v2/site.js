@@ -59,8 +59,8 @@
       <div class="container">
         <div class="site-header__inner">
           <a href="index.html" class="site-header__logo">
-            <img src="images/blossom_logo_transparent.png" alt="Blossom Bakery" />
             <div>
+              <div class="site-header__name">Blossom Bakery</div>
               <div class="site-header__tagline">Chelmsford · Essex</div>
             </div>
           </a>
