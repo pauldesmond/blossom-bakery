@@ -1,44 +1,16 @@
 // Shared header, nav (mega menu), footer, lightbox, density/dark tweaks
 (function () {
   const NAV = [
-    {
-      label: "Cakes",
-      items: [
-        { href: "wedding-cakes.html", title: "Wedding Cakes", note: "For your day" },
-        { href: "cakes.html", title: "Speciality Cakes", note: "All occasions" },
-        { href: "ganache-drip-cakes.html", title: "Ganache Drip", note: "Modern · glossy" },
-        { href: "buttercream-flower-cakes.html", title: "Buttercream Flower", note: "Floral, by hand" },
-        { href: "numbered-birthday-cakes.html", title: "Numbered Birthday", note: "Big-number" },
-        { href: "childrens-cakes.html", title: "Children's Cakes", note: "Birthdays" },
-      ],
-    },
-    {
-      label: "Bakes",
-      items: [
-        { href: "cupcakes.html", title: "Cupcakes", note: "Boxes from 6" },
-        { href: "handmade-biscuits.html", title: "Handmade Biscuits", note: "All-butter" },
-        { href: "giant-cookies.html", title: "Giant Cookies", note: "Personalised" },
-        { href: "scones.html", title: "Scones", note: "Sweet & savoury" },
-        { href: "traybakes.html", title: "Traybakes", note: "Catering & sharing" },
-      ],
-    },
-    {
-      label: "Weddings",
-      items: [
-        { href: "wedding-cakes.html", title: "Wedding Cakes", note: "Bespoke design" },
-        { href: "weddings.html", title: "Wedding Bakes", note: "Favours & dessert tables" },
-      ],
-    },
-    { label: "Afternoon Tea", href: "afternoon-teas.html" },
-    { label: "About", href: "about.html" },
-    { label: "Reviews", href: "customer-reviews.html" },
+    { label: "Cakes",         href: "cakes.html" },
+    { label: "Weddings",      href: "weddings.html" },
+    { label: "Biscuits",      href: "handmade-biscuits.html" },
+    { label: "Cupcakes",      href: "cupcakes.html" },
+    { label: "Tray bakes",    href: "traybakes.html" },
+    { label: "Afternoon tea", href: "afternoon-teas.html" },
+    { label: "Testimonials",  href: "customer-reviews.html" },
   ];
 
-  const FEATURE = {
-    Cakes: { img: "images/wedding-cake-pearl-cascade.jpg", title: "The Pearl Cascade", eyebrow: "Featured" },
-    Bakes: { img: "images/cupcake-d34e.jpeg", title: "'Oh Baby' Cupcakes", eyebrow: "Featured" },
-    Weddings: { img: "images/wedding-cake-pink-garden-roses.jpg", title: "Garden Roses, hand-pressed", eyebrow: "Recently baked" },
-  };
+  const FEATURE = {};
 
   function renderHeader(active) {
     const navLinks = NAV.map((n) => {
