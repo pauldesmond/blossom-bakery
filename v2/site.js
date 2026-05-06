@@ -20,7 +20,6 @@
         { href: "giant-cookies.html", title: "Giant Cookies", note: "Personalised" },
         { href: "scones.html", title: "Scones", note: "Sweet & savoury" },
         { href: "traybakes.html", title: "Traybakes", note: "Catering & sharing" },
-        { href: "cakesicles.html", title: "Cakesicles", note: "Cake on a stick" },
       ],
     },
     {
@@ -30,13 +29,7 @@
         { href: "weddings.html", title: "Wedding Bakes", note: "Favours & dessert tables" },
       ],
     },
-    {
-      label: "Catering",
-      items: [
-        { href: "afternoon-teas.html", title: "Afternoon Teas", note: "Pre-order" },
-        { href: "catering-packages.html", title: "Catering Packages", note: "Events" },
-      ],
-    },
+    { label: "Afternoon Tea", href: "afternoon-teas.html" },
     { label: "About", href: "about.html" },
     { label: "Reviews", href: "customer-reviews.html" },
   ];
@@ -45,7 +38,6 @@
     Cakes: { img: "images/wedding-cake-pearl-cascade.jpg", title: "The Pearl Cascade", eyebrow: "Featured" },
     Bakes: { img: "images/cupcake-d34e.jpeg", title: "'Oh Baby' Cupcakes", eyebrow: "Featured" },
     Weddings: { img: "images/wedding-cake-pink-garden-roses.jpg", title: "Garden Roses, hand-pressed", eyebrow: "Recently baked" },
-    Catering: { img: "images/afternoon-tea.jpeg", title: "Afternoon tea tower", eyebrow: "Most loved" },
   };
 
   function renderHeader(active) {

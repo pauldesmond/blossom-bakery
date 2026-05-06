@@ -41,7 +41,6 @@ PAGE_META = {
     'buttercream-flower-cakes':       ('buttercream-flower-cakes.html',       'Floral, by hand'),
     'giant-cookies':                  ('giant-cookies.html',                  'Decorated · personalised'),
     'traybakes':                      ('traybakes.html',                      'Catering & sharing'),
-    'cakesicles':                     ('cakesicles.html',                     'Cake on a stick'),
     'scones':                         ('scones.html',                         'Sweet & savoury'),
     'customer-reviews':               ('customer-reviews.html',               'In their own words'),
 }

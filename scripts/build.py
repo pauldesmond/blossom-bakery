@@ -30,7 +30,6 @@ PAGE_META = {
     'buttercream-flower-cakes':        ('buttercream-flower-cakes.html',      'Floral, by hand'),
     'giant-cookies':                   ('giant-cookies.html',                 'Decorated · personalised'),
     'traybakes':                       ('traybakes.html',                     'Catering & sharing'),
-    'cakesicles':                      ('cakesicles.html',                    'Cake on a stick'),
     'scones':                          ('scones.html',                        'Classic'),
     'customer-reviews':                ('customer-reviews.html',              'In their own words'),
     'contact':                         ('contact.html',                       'Send a message'),
@@ -53,7 +52,6 @@ NAV_HTML = '''<nav class="site-nav">
         <li><a href="handmade-biscuits.html"{HB_ACTIVE}>Biscuits</a></li>
         <li><a href="giant-cookies.html"{GC_ACTIVE}>Giant Cookies</a></li>
         <li><a href="traybakes.html"{TB_ACTIVE}>Traybakes</a></li>
-        <li><a href="cakesicles.html"{CKS_ACTIVE}>Cakesicles</a></li>
         <li><a href="scones.html"{SC_ACTIVE}>Scones</a></li>
         <li><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon Teas</a></li>
         <li><a href="catering-packages.html"{CP_ACTIVE}>Catering</a></li>
@@ -70,7 +68,7 @@ NAV_KEY = {
     'ganache-drip-cakes.html':            'GD',   'numbered-birthday-cakes.html':  'NUM',
     'buttercream-flower-cakes.html':      'BFC',  'speciality-and-everyday-cakes.html': 'SE',
     'handmade-biscuits.html':             'HB',   'giant-cookies.html':            'GC',
-    'traybakes.html':                     'TB',   'cakesicles.html':               'CKS',
+    'traybakes.html':                     'TB',
     'scones.html':                        'SC',   'afternoon-teas.html':           'AT',
     'catering-packages.html':             'CP',   'customer-reviews.html':         'CR',
     'contact.html':                       'CONTACT',
