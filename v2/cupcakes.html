@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cupcakes — Blossom Bakery, Chelmsford</title>
-  <meta name="description" content="Hand-decorated cupcakes by Blossom Bakery — boxes of 6, 12, 18 or 24. From £20." />
+  <meta name="description" content="Hand-decorated cupcakes by Blossom Bakery in Chelmsford — boxes of 6, 12, 18 or 24." />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,12 +17,11 @@
   <main>
     <section class="page-hero">
       <div class="container container--narrow">
-        <p class="eyebrow" style="justify-content:center;">Boxes of 6, 12, 18 or 24</p>
-        <h1>Cupcakes,<br/>by the <em style="color:var(--rose-deep);font-style:italic;">box.</em></h1>
+        <p class="eyebrow center">Boxes of 6, 12, 18 or 24</p>
+        <h1>Cupcakes,<br/>by the <em class="accent">box.</em></h1>
         <p class="lede">Hand-piped, freshly baked the morning of collection. Perfect for party bags, baby showers, hen-dos, office surprises, and Tuesdays that need lifting.</p>
         <div style="margin-top:24px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
           <a href="contact.html" class="btn">Order yours</a>
-          <span style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">From <strong style="color:var(--ink);font-family:var(--serif);font-style:italic;font-size:22px;text-transform:none;letter-spacing:-0.01em;">£20</strong> a box</span>
         </div>
       </div>
     </section>
@@ -33,7 +32,7 @@
         <div style="background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;" id="boxConfig">
           <div>
             <p class="eyebrow">Quick estimate</p>
-            <h2 style="font-size:clamp(32px,4vw,48px);margin-bottom:18px;">Build your <em style="font-style:italic;color:var(--rose-deep);">box.</em></h2>
+            <h2 style="font-size:clamp(32px,4vw,48px);margin-bottom:18px;">Build your <em class="accent">box.</em></h2>
             <p style="color:var(--ink-soft);">Pick a size and a finish — we'll send you the exact quote.</p>
 
             <div style="margin:28px 0 18px;">
@@ -65,10 +64,10 @@
               </div>
             </div>
 
-            <div style="border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;align-items:flex-end;">
+            <div style="border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;align-items:flex-end;gap:18px;">
               <div>
-                <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">Estimated total</div>
-                <div style="font-family:var(--serif);font-size:48px;letter-spacing:-0.02em;line-height:1;">£<span id="total">38</span></div>
+                <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);">Your selection</div>
+                <div style="font-family:var(--serif);font-size:22px;font-style:italic;letter-spacing:-0.01em;line-height:1.2;margin-top:6px;"><span id="summary">12 cupcakes · Classic swirl</span></div>
               </div>
               <a href="contact.html" class="btn">Enquire</a>
             </div>
@@ -98,10 +97,11 @@
           "Iced topper":"images/cupcake-d34e.jpeg",
           "Bouquet style":"images/img_9856.jpeg",
         };
-        let size = 12, base = 38, finishAdd = 0, dietAdd = 0, finishLabel = "Classic swirl";
+        let size = 12, finishLabel = "Classic swirl", dietLabel = "";
         function calc(){
-          const total = base + (finishAdd * (size/6)) + (dietAdd * (size/6));
-          document.getElementById('total').textContent = Math.round(total);
+          const parts = [size + ' cupcakes', finishLabel];
+          if (dietLabel && dietLabel !== "Standard") parts.push(dietLabel);
+          document.getElementById('summary').textContent = parts.join(' · ');
           const img = BOX_IMAGES[finishLabel] || BOX_IMAGES["Classic swirl"];
           document.getElementById('boxPreview').src = img;
         }
@@ -114,9 +114,9 @@
             calc();
           }));
         }
-        wire('sizes', b => { size = parseInt(b.dataset.size); base = parseInt(b.dataset.base); });
-        wire('finish', b => { finishAdd = parseInt(b.dataset.add); finishLabel = b.textContent; });
-        wire('diet', b => { dietAdd = parseInt(b.dataset.add); });
+        wire('sizes', b => { size = parseInt(b.dataset.size); });
+        wire('finish', b => { finishLabel = b.textContent; });
+        wire('diet', b => { dietLabel = b.textContent; });
         calc();
       })();
     </script>
@@ -160,9 +160,9 @@
     </section>
 
     <section class="section ink">
-      <div class="container container--narrow" style="text-align:center;">
-        <p class="eyebrow" style="color:var(--rose);justify-content:center;">Boxes from £20</p>
-        <h2 style="color:var(--paper);">Order a <em style="font-style:italic;color:var(--rose);">box.</em></h2>
+      <div class="container container--narrow cta-block">
+        <p class="eyebrow center">Boxes of 6, 12, 18 or 24</p>
+        <h2>Order a <em class="accent--light">box.</em></h2>
         <a href="contact.html" class="btn btn--rose" style="margin-top:24px;">Send your order</a>
       </div>
     </section>

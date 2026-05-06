@@ -17,8 +17,8 @@
   <main>
     <section class="page-hero">
       <div class="container container--narrow">
-        <p class="eyebrow" style="justify-content:center;">For your day</p>
-        <h1>Your dream<br/><em style="color:var(--rose-deep);font-style:italic;">wedding cake.</em></h1>
+        <p class="eyebrow center">For your day</p>
+        <h1>Your dream<br/><em class="accent">wedding cake.</em></h1>
         <p class="lede">Having recently married myself in October 2024, I know how important this cake is. Let's design something that looks perfect, tastes delicious, and makes the planning bit a pleasure rather than a panic.</p>
         <div style="margin-top:32px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
           <a href="contact.html" class="btn">Start an enquiry</a>
@@ -89,39 +89,39 @@
       <div class="container">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Sizes &amp; pricing</p>
-            <h2>What you can<br/>expect to pay.</h2>
+            <p class="eyebrow">Sizes &amp; guest counts</p>
+            <h2>Picking the<br/>right tier.</h2>
           </div>
           <div class="section-head__num">02</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px;">
-          <div style="padding:36px;border:1px solid var(--line);border-radius:18px;background:var(--paper);">
-            <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--rose-deep);">2 tier</div>
-            <div style="font-family:var(--serif);font-size:54px;letter-spacing:-0.02em;margin:8px 0;">£280</div>
-            <p style="font-size:14px;color:var(--muted);">Serves 40–70 guests<br/>6&quot; + 8&quot; tiers</p>
+        <div class="tier-grid">
+          <div class="tier-card">
+            <div class="tier-card__label">2 tier</div>
+            <div class="tier-card__guests">40–70<small>guests</small></div>
+            <p class="note">6&quot; + 8&quot; tiers</p>
           </div>
-          <div style="padding:36px;border:1px solid var(--rose-deep);border-radius:18px;background:var(--paper);position:relative;">
-            <span style="position:absolute;top:-12px;right:24px;background:var(--rose-deep);color:white;font-size:10px;letter-spacing:.18em;text-transform:uppercase;padding:6px 12px;border-radius:999px;">Most chosen</span>
-            <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--rose-deep);">3 tier</div>
-            <div style="font-family:var(--serif);font-size:54px;letter-spacing:-0.02em;margin:8px 0;">£420</div>
-            <p style="font-size:14px;color:var(--muted);">Serves 70–110 guests<br/>6&quot; + 8&quot; + 10&quot; tiers</p>
+          <div class="tier-card tier-card--featured">
+            <span class="tier-card__badge">Most chosen</span>
+            <div class="tier-card__label">3 tier</div>
+            <div class="tier-card__guests">70–110<small>guests</small></div>
+            <p class="note">6&quot; + 8&quot; + 10&quot; tiers</p>
           </div>
-          <div style="padding:36px;border:1px solid var(--line);border-radius:18px;background:var(--paper);">
-            <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--rose-deep);">4 tier &amp; bespoke</div>
-            <div style="font-family:var(--serif);font-size:54px;letter-spacing:-0.02em;margin:8px 0;">POA</div>
-            <p style="font-size:14px;color:var(--muted);">Serves 120+<br/>Made to your spec</p>
+          <div class="tier-card">
+            <div class="tier-card__label">4 tier &amp; bespoke</div>
+            <div class="tier-card__guests">120+<small>guests</small></div>
+            <p class="note">Made to your spec</p>
           </div>
         </div>
-        <p style="margin-top:32px;font-size:14px;color:var(--muted);text-align:center;">Gluten-free and vegan options available across all tiers · Delivery from £25 across Essex</p>
+        <p class="note--center" style="margin-top:32px;">Gluten-free and vegan options available across all tiers · Delivery available across Essex</p>
       </div>
     </section>
 
     <!-- CTA -->
     <section class="section ink">
-      <div class="container container--narrow" style="text-align:center;">
-        <p class="eyebrow" style="color:var(--rose);justify-content:center;">Ready when you are</p>
-        <h2 style="color:var(--paper);">Let's talk about<br/><em style="font-style:italic;color:var(--rose);">your wedding.</em></h2>
-        <p style="color:rgba(255,253,251,.75);font-size:17px;margin:24px auto;max-width:520px;">Send the date, venue, rough numbers and any inspiration you've collected. I'll be back within a day.</p>
+      <div class="container container--narrow cta-block">
+        <p class="eyebrow center">Ready when you are</p>
+        <h2>Let's talk about<br/><em class="accent--light">your wedding.</em></h2>
+        <p class="lede-prose">Send the date, venue, rough numbers and any inspiration you've collected. I'll be back within a day.</p>
         <a href="contact.html" class="btn btn--rose">Start your enquiry</a>
       </div>
     </section>

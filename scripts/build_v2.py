@@ -30,7 +30,7 @@ OUT.mkdir(exist_ok=True)
 PAGE_META = {
     'about':                          ('about.html',                          'Meet the baker'),
     'weddings':                       ('weddings.html',                       'For your day'),
-    'handmade-biscuits':              ('handmade-biscuits.html',              'From £2.50'),
+    'handmade-biscuits':              ('handmade-biscuits.html',              'Personalised · stamped'),
     'afternoon-teas':                 ('afternoon-teas.html',                 'Pre-order · 48h notice'),
     'cakes':                          ('cakes.html',                          'All cakes'),
     'childrens-cakes':                ("childrens-cakes.html",                'Birthdays & celebrations'),
@@ -38,8 +38,8 @@ PAGE_META = {
     'speciality-and-everyday-cakes':  ('speciality-and-everyday-cakes.html',  'Cakes for any reason'),
     'catering-packages':              ('catering-packages.html',              'Events & functions'),
     'numbered-birthday-cakes':        ('numbered-birthday-cakes.html',        'Big-number birthdays'),
-    'buttercream-flower-cakes':       ('buttercream-flower-cakes.html',       'From £70'),
-    'giant-cookies':                  ('giant-cookies.html',                  'From £30'),
+    'buttercream-flower-cakes':       ('buttercream-flower-cakes.html',       'Floral, by hand'),
+    'giant-cookies':                  ('giant-cookies.html',                  'Decorated · personalised'),
     'traybakes':                      ('traybakes.html',                      'Catering & sharing'),
     'cakesicles':                     ('cakesicles.html',                     'Cake on a stick'),
     'scones':                         ('scones.html',                         'Sweet & savoury'),
@@ -58,12 +58,23 @@ INTRO_NOISE = [
     re.compile(r'^[A-Z][^.]*?–\s*Blossom Bakery\s*', re.IGNORECASE),
 ]
 
+# Pricing is enquiry-driven on v2, so strip any sentence that mentions a
+# £-amount. Sentence-level removal (rather than just the price phrase)
+# avoids leaving orphan fragments like "Our biscuits start each" behind.
+def strip_prices(text):
+    if '£' not in text:
+        return text
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    kept = [s for s in sentences if '£' not in s]
+    return ' '.join(kept).strip()
+
 def clean_intro(text):
     if not text:
         return ''
     out = text
     for r in INTRO_NOISE:
         out = r.sub('', out)
+    out = strip_prices(out)
     return re.sub(r'\s+', ' ', out).strip()
 
 
@@ -119,8 +130,7 @@ def intro_html(paragraphs):
     if not paragraphs:
         return ''
     p_html = '\n        '.join(
-        f'<p style="font-size:18px;line-height:1.7;color:var(--ink-soft);margin-bottom:1.2em;">{ihtml.escape(p)}</p>'
-        for p in paragraphs
+        f'<p class="prose">{ihtml.escape(p)}</p>' for p in paragraphs
     )
     return ('<section class="section section--sm">\n'
             '      <div class="container container--narrow">\n'
@@ -130,13 +140,13 @@ def intro_html(paragraphs):
 
 
 CTA_HTML = '''<section class="section ink">
-      <div class="container container--narrow" style="text-align:center;">
-        <p class="eyebrow" style="color:var(--rose);justify-content:center;">Order yours</p>
-        <h2 style="color:var(--paper);">Let's bake<br/><em style="font-style:italic;color:var(--rose);">something good.</em></h2>
-        <p style="color:rgba(255,253,251,.75);font-size:17px;margin:24px auto 32px;max-width:520px;">Drop me a message and I'll be back in touch within a day. Replies Mon–Sat.</p>
-        <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;">
+      <div class="container container--narrow cta-block">
+        <p class="eyebrow center">Order yours</p>
+        <h2>Let's bake<br/><em class="accent--light">something good.</em></h2>
+        <p class="lede-prose">Drop me a message and I'll be back in touch within a day. Replies Mon–Sat.</p>
+        <div class="actions center">
           <a href="contact.html" class="btn btn--rose">Send a message</a>
-          <a href="tel:07939618787" class="btn btn--outline" style="color:var(--paper);border-color:rgba(255,253,251,.4);">07939 618787</a>
+          <a href="tel:07939618787" class="btn btn--outline">07939 618787</a>
         </div>
       </div>
     </section>'''
@@ -168,7 +178,7 @@ PAGE_TPL = '''<!DOCTYPE html>
   <main>
     <section class="page-hero">
       <div class="container container--narrow">
-        <p class="eyebrow" style="justify-content:center;">{eyebrow}</p>
+        <p class="eyebrow center">{eyebrow}</p>
         <h1>{title_html}</h1>
 {lede}      </div>
     </section>
@@ -194,8 +204,8 @@ def title_html(title):
     if len(parts) == 2:
         head, tail = parts
         return (f'{ihtml.escape(head)}<br/>'
-                f'<em style="color:var(--rose-deep);font-style:italic;">{ihtml.escape(tail)}.</em>')
-    return f'<em style="color:var(--rose-deep);font-style:italic;">{ihtml.escape(title)}.</em>'
+                f'<em class="accent">{ihtml.escape(tail)}.</em>')
+    return f'<em class="accent">{ihtml.escape(title)}.</em>'
 
 
 def lede_html(paragraphs):

@@ -17,8 +17,8 @@
   <main>
     <section class="page-hero">
       <div class="container container--narrow">
-        <p class="eyebrow" style="justify-content:center;">Send a message</p>
-        <h1>Let's bake<br/><em style="color:var(--rose-deep);font-style:italic;">something good.</em></h1>
+        <p class="eyebrow center">Send a message</p>
+        <h1>Let's bake<br/><em class="accent">something good.</em></h1>
         <p class="lede">Tell me what you have in mind — the date, the rough numbers, and any pictures or boards you've been collecting. I'll be back within a day.</p>
       </div>
     </section>
@@ -31,12 +31,12 @@
             <p class="eyebrow">Enquiry form</p>
             <h2 style="font-size:clamp(28px,3.4vw,40px);margin-bottom:32px;">Tell me about it.</h2>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div class="field-row">
               <div class="field"><label>Your name</label><input type="text" name="name" required placeholder="Helen Smith"/></div>
               <div class="field"><label>Email</label><input type="email" name="email" required placeholder="you@example.com"/></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div class="field-row">
               <div class="field"><label>Phone (optional)</label><input type="tel" name="phone" placeholder="07…"/></div>
               <div class="field"><label>Date you need it</label><input type="date" name="date"/></div>
             </div>
@@ -139,7 +139,7 @@
       ["How far in advance should I order a wedding cake?", "I usually take wedding bookings 4–9 months out for peak summer dates, but I'll always try to fit you in if I can — even short notice. For celebration cakes, 2–3 weeks is ideal."],
       ["Can you do gluten-free or vegan?", "Yes — most of my cakes can be adapted. Just mention it in the enquiry and I'll send the GF/V options for that design."],
       ["Do you deliver?", "I deliver wedding cakes across Essex and surrounding counties — quoted by venue distance. Cupcakes and cakes for 2+ people can be delivered locally in CM2."],
-      ["Is there a tasting?", "Yes — I do tasting boxes for wedding cakes (sponges + fillings) so you can decide flavours with confidence. Included for confirmed weddings, otherwise £25."],
+      ["Is there a tasting?", "Yes — I do tasting boxes for wedding cakes (sponges + fillings) so you can decide flavours with confidence. Included for confirmed weddings; available separately on enquiry."],
       ["What about allergens?", "I bake from a domestic kitchen that handles nuts, dairy, eggs, gluten and soya. I follow strict separation but can't certify allergen-free — let me know in the enquiry."],
     ];
     const host = document.getElementById('faqs');

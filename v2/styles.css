@@ -553,3 +553,103 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
 
 /* tweaks panel additions */
 .tweaks-panel-host { z-index: 100; }
+
+/* ======= Utilities & shared components (extracted from inline styles) ======= */
+
+/* Body editorial paragraph — used on every category page intro. */
+.prose { font-size: 18px; line-height: 1.7; color: var(--ink-soft); margin-bottom: 1.2em; }
+.prose--sm { font-size: 17px; color: var(--ink-soft); }
+.note { font-size: 14px; color: var(--muted); }
+.note--center { font-size: 14px; color: var(--muted); text-align: center; }
+
+/* Centered eyebrow modifier (used on page-hero + CTA blocks) */
+.eyebrow.center { justify-content: center; }
+
+/* Centred container helper (used on intro hero blocks + CTA narrow sections) */
+.center { text-align: center; }
+
+/* Inline italic accent — rose-deep on light bg, rose on ink section */
+.accent { font-style: italic; color: var(--rose-deep); }
+.section.ink .accent, .accent--light { font-style: italic; color: var(--rose); }
+
+/* Action row (button group). `.center` centers it horizontally. */
+.actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.actions.center { justify-content: center; }
+
+/* Two-column field row for forms (collapses on narrow screens). */
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 720px) { .field-row { grid-template-columns: 1fr; } }
+
+/* Tier card (wedding cake price/size table) */
+.tier-card { padding: 36px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); position: relative; }
+.tier-card--featured { border-color: var(--rose-deep); }
+.tier-card__badge { position: absolute; top: -12px; right: 24px; background: var(--rose-deep); color: white; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; }
+.tier-card__label { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--rose-deep); }
+.tier-card__guests { font-family: var(--serif); font-size: 36px; letter-spacing: -0.02em; margin: 8px 0; line-height: 1.1; }
+.tier-card__guests small { display: block; font-size: 14px; color: var(--muted); font-style: normal; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+.tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+@media (max-width: 880px) { .tier-grid { grid-template-columns: 1fr; gap: 18px; } }
+
+/* CTA block on light + ink sections (intro/closing copy + button row). */
+.cta-block { text-align: center; }
+.cta-block .lede-prose { color: var(--ink-soft); font-size: 17px; max-width: 520px; margin: 24px auto 32px; }
+.section.ink .cta-block .lede-prose { color: rgba(255, 253, 251, .75); }
+.cta-block h2 { font-size: clamp(44px, 6vw, 84px); margin-bottom: 24px; }
+
+/* Dark-section overrides — replace inline color="var(--paper)" patterns. */
+.section.ink .step h3 { color: var(--paper); }
+.section.ink .section-head { border-bottom-color: rgba(255, 253, 251, .15); }
+.section.ink .section-head__num { color: rgba(255, 253, 251, .18); }
+.section.ink .eyebrow { color: var(--rose); }
+.section.ink .eyebrow::before { background: var(--rose); }
+.section.ink .btn--outline { color: var(--paper); border-color: rgba(255, 253, 251, .4); }
+.section.ink .btn--outline:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+
+/* Underlined inline link — used in customer-reviews tail link etc. */
+.link-rose { color: var(--ink); border-bottom: 1px solid var(--rose-deep); padding-bottom: 2px; }
+[data-theme="dark"] .link-rose { color: var(--paper); }
+
+/* Pill chip row (used for cupcake configurator sizes/finishes) */
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip-label { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+/* ======= Mobile sweep — section padding, hero, header, footer ======= */
+@media (max-width: 880px) {
+  .section { padding: calc(80px * var(--pad)) 0; }
+  .section--lg { padding: calc(100px * var(--pad)) 0; }
+  .section--sm { padding: calc(56px * var(--pad)) 0; }
+  .section-head { margin-bottom: 36px; padding-bottom: 18px; gap: 16px; }
+  .section-head__num { font-size: clamp(40px, 7vw, 64px); }
+  .site-header__inner { height: 96px; }
+  .site-header__logo img { width: 64px; height: 64px; }
+  .site-header__name { font-size: 18px; }
+  .site-header__tagline { font-size: 9px; }
+  .marquee { padding: 18px 0; }
+  .marquee__track { font-size: 18px; gap: 32px; }
+  .marquee__track span { gap: 32px; }
+  .hero__copy h1 { font-size: clamp(40px, 11vw, 60px); }
+  .hero__lede { font-size: 17px; margin-top: 24px; }
+  .hero__meta { gap: 24px; flex-wrap: wrap; margin: 24px 0; }
+  .hero__meta strong { font-size: 20px; }
+  .hero__visual .stamp { width: 84px; height: 84px; font-size: 12px; left: -4px; }
+  .review { padding: 24px; }
+  .review__quote { font-size: 17px; }
+}
+@media (max-width: 540px) {
+  .container { padding: 0 18px; }
+  .section { padding: calc(56px * var(--pad)) 0; }
+  .section--lg { padding: calc(72px * var(--pad)) 0; }
+  .section.ink, .section.alt { padding-top: calc(56px * var(--pad)); }
+  .hero { padding-top: 18px; padding-bottom: calc(48px * var(--pad)); }
+  .hero__cta-row { flex-direction: column; align-items: stretch; }
+  .hero__cta-row .btn { width: 100%; justify-content: center; }
+  .hero__cta-row .btn--ghost { padding: 12px 0; }
+  .actions { flex-direction: column; align-items: stretch; }
+  .actions.center .btn, .actions .btn { justify-content: center; }
+  .site-footer { padding: 56px 0 24px; }
+  .site-footer__grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 36px; }
+  .site-footer__brand { font-size: 28px; }
+}
+
+/* one-off helpers from index Helen section */
+.mb-28 { margin-bottom: 28px; }
