@@ -737,15 +737,18 @@ section.alt { background: #fff; }
   font-family: 'Cormorant Garamond', serif;
   font-size: 24px;
   font-weight: 500;
-  color: var(--cream);
+  color: var(--ink);
   margin-bottom: 12px;
   letter-spacing: -0.01em;
 }
 .step-v2 p {
-  color: rgba(250, 246, 240, 0.72);
+  color: var(--ink);
   font-size: 15px;
   line-height: 1.7;
 }
+/* Dark-background variant — when .step-v2 is wrapped in .section-ink, cream text returns */
+.section-ink .step-v2 h3 { color: var(--cream); }
+.section-ink .step-v2 p { color: rgba(250, 246, 240, 0.72); }
 .ink-section__cta {
   text-align: center;
   margin-top: var(--space-block);
