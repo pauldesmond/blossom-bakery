@@ -10,7 +10,7 @@
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -66,27 +66,28 @@
 
 <main>
 
-<section class="page-hero">
-  <div class="container container--narrow">
-    <p class="eyebrow">Boxes of 6, 12, 18 or 24</p>
-    <h1>Cupcakes,<br/><em>by the box.</em></h1>
-    <p class="page-hero__lede">Hand-piped, freshly baked the morning of collection. Perfect for party bags, baby showers, hen-dos, office surprises, and Tuesdays that need lifting.</p>
-    <a href="contact.html" class="btn">Order yours</a>
+<!-- HERO -->
+<section class="cup-hero">
+  <div class="container">
+    <p class="cup-eyebrow cup-eyebrow--center">Boxes of 6, 12, 18 or 24</p>
+    <h1 class="cup-hero__title">Cupcakes,<br/>by the <em>box.</em></h1>
+    <p class="cup-hero__lede">Hand-piped, freshly baked the morning of collection. Perfect for party bags, baby showers, hen-dos, office surprises, and Tuesdays that need lifting.</p>
+    <div class="cup-hero__cta"><a href="contact.html" class="cup-btn">Order yours</a></div>
   </div>
 </section>
 
-<!-- BOX BUILDER (interactive) -->
-<section class="box-builder-section">
+<!-- BOX BUILDER -->
+<section class="cup-builder-section">
   <div class="container">
-    <div class="box-builder" id="boxConfig">
-      <div class="box-builder__form">
-        <p class="wedding-section__eyebrow" style="text-align:left;">Build your box</p>
-        <h2 class="box-builder__heading">Pick your <em>size</em>, <em>finish</em> and <em>diet</em>.</h2>
-        <p class="box-builder__intro">Tap through the options — we&#39;ll send you the exact quote when you enquire.</p>
+    <div class="cup-builder" id="boxConfig">
+      <div class="cup-builder__form">
+        <p class="cup-eyebrow">Quick estimate</p>
+        <h2 class="cup-builder__heading">Build your <em>box.</em></h2>
+        <p class="cup-builder__intro">Pick a size and a finish — we&#39;ll send you the exact quote.</p>
 
-        <div class="box-builder__group">
-          <div class="box-builder__label">Box size</div>
-          <div class="chip-row" id="sizes">
+        <div class="cup-builder__group">
+          <div class="cup-builder__label">Box size</div>
+          <div class="cup-chips" id="sizes">
             <button data-size="6">6 cupcakes</button>
             <button data-size="12" class="on">12 cupcakes</button>
             <button data-size="18">18 cupcakes</button>
@@ -94,9 +95,9 @@
           </div>
         </div>
 
-        <div class="box-builder__group">
-          <div class="box-builder__label">Finish</div>
-          <div class="chip-row" id="finish">
+        <div class="cup-builder__group">
+          <div class="cup-builder__label">Finish</div>
+          <div class="cup-chips" id="finish">
             <button class="on">Classic swirl</button>
             <button>Buttercream rose</button>
             <button>Iced topper</button>
@@ -104,24 +105,24 @@
           </div>
         </div>
 
-        <div class="box-builder__group">
-          <div class="box-builder__label">Diet</div>
-          <div class="chip-row" id="diet">
+        <div class="cup-builder__group">
+          <div class="cup-builder__label">Diet</div>
+          <div class="cup-chips" id="diet">
             <button class="on">Standard</button>
             <button>Gluten-free</button>
             <button>Vegan</button>
           </div>
         </div>
 
-        <div class="box-builder__summary">
+        <div class="cup-builder__summary">
           <div>
-            <div class="box-builder__label">Your selection</div>
-            <div class="box-builder__pick"><span id="summary">12 cupcakes · Classic swirl</span></div>
+            <div class="cup-builder__label">Your selection</div>
+            <div class="cup-builder__pick"><span id="summary">12 cupcakes · Classic swirl</span></div>
           </div>
-          <a href="contact.html" class="btn">Enquire</a>
+          <a href="contact.html" class="cup-btn">Enquire</a>
         </div>
       </div>
-      <div class="box-builder__preview">
+      <div class="cup-builder__preview">
         <img src="images/img_4411.jpeg" alt="Cupcake box preview" id="boxPreview" />
       </div>
     </div>
@@ -161,42 +162,52 @@
 </script>
 
 <!-- GALLERY -->
-<section class="wedding-section">
+<section class="cup-gallery-section">
   <div class="container">
-    <p class="wedding-section__eyebrow" style="text-align:center;">Recently piped</p>
-    <h2 class="wedding-section__heading">A box for every kind of moment</h2>
-    <div class="cupcake-gallery">
-      <figure class="cupcake-figure"><img src="images/cupcake-d34e.jpeg" alt="Oh Baby cupcakes" loading="lazy" /><figcaption><strong>Oh Baby</strong><span>Baby shower · 12 box</span></figcaption></figure>
-      <figure class="cupcake-figure"><img src="images/cupcake-877b.jpeg" alt="Buttercream rose cupcakes" loading="lazy" /><figcaption><strong>Buttercream Rose</strong><span>Birthday · 12 box</span></figcaption></figure>
-      <figure class="cupcake-figure"><img src="images/img_9856.jpeg" alt="Bouquet cupcakes" loading="lazy" /><figcaption><strong>Cupcake Bouquet</strong><span>Personalised</span></figcaption></figure>
-      <figure class="cupcake-figure cupcake-figure--small"><img src="images/img_0125.jpeg" alt="" loading="lazy" /></figure>
-      <figure class="cupcake-figure cupcake-figure--small"><img src="images/img_9911.jpeg" alt="" loading="lazy" /></figure>
-      <figure class="cupcake-figure cupcake-figure--small"><img src="images/cupcake-5335.jpeg" alt="" loading="lazy" /></figure>
-      <figure class="cupcake-figure cupcake-figure--small"><img src="images/img_1732.jpeg" alt="" loading="lazy" /></figure>
+    <div class="cup-section-head">
+      <div>
+        <p class="cup-eyebrow">Recently piped</p>
+        <h2 class="cup-section-head__title">A box for every<br/>kind of moment.</h2>
+      </div>
+      <div class="cup-section-head__num">N° 02</div>
+    </div>
+    <div class="cup-gallery">
+      <figure class="cup-card cup-card--feature"><div class="cup-card__photo"><img src="images/cupcake-d34e.jpeg" alt="Oh Baby cupcakes" loading="lazy" /></div><figcaption><strong>Oh Baby</strong><span>Baby shower · 12 box</span></figcaption></figure>
+      <figure class="cup-card cup-card--feature"><div class="cup-card__photo"><img src="images/cupcake-877b.jpeg" alt="Buttercream rose cupcakes" loading="lazy" /></div><figcaption><strong>Buttercream Rose</strong><span>Birthday · 12 box</span></figcaption></figure>
+      <figure class="cup-card cup-card--feature"><div class="cup-card__photo"><img src="images/img_9856.jpeg" alt="Bouquet cupcakes" loading="lazy" /></div><figcaption><strong>Cupcake Bouquet</strong><span>Personalised</span></figcaption></figure>
+      <figure class="cup-card cup-card--small"><div class="cup-card__photo"><img src="images/img_0125.jpeg" alt="" loading="lazy" /></div></figure>
+      <figure class="cup-card cup-card--small"><div class="cup-card__photo"><img src="images/img_9911.jpeg" alt="" loading="lazy" /></div></figure>
+      <figure class="cup-card cup-card--small"><div class="cup-card__photo"><img src="images/cupcake-5335.jpeg" alt="" loading="lazy" /></div></figure>
+      <figure class="cup-card cup-card--small"><div class="cup-card__photo"><img src="images/img_1732.jpeg" alt="" loading="lazy" /></div></figure>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="alt">
+<!-- HOW TO ORDER -->
+<section class="cup-steps-section">
   <div class="container">
-    <p class="wedding-section__eyebrow" style="text-align:center;">How to order</p>
-    <h2 class="wedding-section__heading">Three days, four steps</h2>
-    <div class="cupcake-steps">
-      <div class="cupcake-step"><div class="cupcake-step__num">01</div><h3>Send a note</h3><p>Tell me the date you need them, the box size, and the vibe — flavours, colours, occasion.</p></div>
-      <div class="cupcake-step"><div class="cupcake-step__num">02</div><h3>I confirm</h3><p>Within a day I&#39;ll come back with a quote, design notes and a collection slot. 48 hours&#39; notice usually.</p></div>
-      <div class="cupcake-step"><div class="cupcake-step__num">03</div><h3>Bake &amp; collect</h3><p>Made fresh on the morning, packed in a gift-ready box, ready to collect from CM2.</p></div>
-      <div class="cupcake-step"><div class="cupcake-step__num">04</div><h3>Delivery (optional)</h3><p>Local CM2 delivery for cupcakes for two people or more — added at quote.</p></div>
+    <div class="cup-section-head">
+      <div>
+        <p class="cup-eyebrow">How to order</p>
+        <h2 class="cup-section-head__title">Three days,<br/>four steps.</h2>
+      </div>
+      <div class="cup-section-head__num">N° 03</div>
+    </div>
+    <div class="cup-steps">
+      <div class="cup-step"><div class="cup-step__num">01</div><h3>Send a note</h3><p>Tell me the date you need them, the box size, and the vibe — flavours, colours, occasion.</p></div>
+      <div class="cup-step"><div class="cup-step__num">02</div><h3>I confirm</h3><p>Within a day I&#39;ll come back with a quote, design notes and a collection slot. 48 hours&#39; notice usually.</p></div>
+      <div class="cup-step"><div class="cup-step__num">03</div><h3>Bake &amp; collect</h3><p>Made fresh on the morning, packed in a gift-ready box, ready to collect from CM2.</p></div>
+      <div class="cup-step"><div class="cup-step__num">04</div><h3>Delivery (optional)</h3><p>Local CM2 delivery for cupcakes for two people or more — added at quote.</p></div>
     </div>
   </div>
 </section>
 
 <!-- DARK CTA -->
-<section class="section-ink section-ink--centered">
+<section class="cup-ink-cta">
   <div class="container container--narrow">
-    <p class="section-eyebrow section-eyebrow--rose">Boxes of 6, 12, 18 or 24</p>
-    <h2 class="section-title">Order a <em class="accent-rose">box.</em></h2>
-    <a href="contact.html" class="btn btn--rose" style="margin-top: 24px;">Send your order</a>
+    <p class="cup-eyebrow cup-eyebrow--center cup-eyebrow--rose">Boxes of 6, 12, 18 or 24</p>
+    <h2 class="cup-ink-cta__heading">Order a <em>box.</em></h2>
+    <a href="contact.html" class="cup-btn cup-btn--rose">Send your order</a>
   </div>
 </section>
 
