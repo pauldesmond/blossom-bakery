@@ -114,7 +114,7 @@ FOOTER = '''<footer class="site-footer">
         </div>
       </div>
       <div class="site-footer__bottom">
-        © 2026 Blossom Bakery · Helen Desmond · Great Baddow, Chelmsford
+        © 2026 Blossom Bakery · Helen Desmond · Chelmsford
       </div>
     </div>
   </footer>'''
