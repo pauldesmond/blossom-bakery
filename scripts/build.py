@@ -26,7 +26,9 @@ PAGE_META = {
     # menu of cards (one per tea offering, with price + photo). The old
     # afternoon-teas.html URL is a meta-refresh redirect.
     'scones':                          ('scones.html',                        'Classic'),
-    'customer-reviews':                ('customer-reviews.html',              'In their own words'),
+    # 'customer-reviews' removed from PAGE_META — testimonials are now hand-crafted as
+    # individual review cards (one per quote) with per-card author + location, not a
+    # single mega-paragraph. Helen edits via direct collaboration with Paul, not Decap.
     'about':                           ('about.html',                         'Meet the baker'),
 }
 
