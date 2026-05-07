@@ -188,3 +188,11 @@ section.alt { background: #fff; }
 @media (max-width: 540px) {
   .section-ink .steps { grid-template-columns: 1fr; gap: 24px; }
 }
+
+/* Wedding Cakes page: multi-section layout matching the WP weddings-4 structure */
+.wedding-section { padding: 56px 0 32px; }
+.wedding-section__heading { text-align: center; font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 500; color: var(--ink); margin-bottom: 24px; }
+.wedding-section__p { font-size: 1.02rem; color: var(--ink); line-height: 1.8; margin-bottom: 14px; }
+.wedding-section__p:last-of-type { margin-bottom: 0; }
+.wedding-photo-grid { margin-top: 32px; }
+.wedding-photo-grid img { aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; }

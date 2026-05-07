@@ -18,7 +18,9 @@ OUT = ROOT
 PAGE_META = {
     'weddings':                        ('weddings.html',                      'Weddings'),
     'handmade-biscuits':               ('handmade-biscuits.html',             'Biscuits'),
-    'wedding-cakes':                   ('wedding-cakes.html',                 'For your day'),
+# 'wedding-cakes' removed from PAGE_META — page is hand-crafted (matches the WP
+# weddings-4 multi-section layout with interleaved photo blocks + the v2 'stress-
+# free' panel). Helen edits it via direct collaboration with Paul, not via Decap.
     'afternoon-teas':                  ('afternoon-teas.html',                'Catering'),
     'cakes':                           ('cakes.html',                         'All cakes'),
     'childrens-cakes':                 ("childrens-cakes.html",               'Birthdays & celebrations'),
@@ -247,8 +249,6 @@ def render_page(filename, title, eyebrow, intro, images):
     </section>''')
     if images:
         blocks.append(gallery_html(images))
-    if filename == 'wedding-cakes.html':
-        blocks.append(WEDDING_PROCESS)
     if filename != 'contact.html':
         blocks.append(CTA)
     return f"""{head}
