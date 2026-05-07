@@ -38,19 +38,40 @@ PAGE_META = {
 
 NAV_HTML = '''<nav class="site-nav">
         <ul class="site-nav__list">
-          <li><a href="cakes.html"{CAKES_ACTIVE}>Cakes</a></li>
-          <li><a href="weddings.html"{WED_ACTIVE}>Weddings</a></li>
-          <li><a href="handmade-biscuits.html"{BIS_ACTIVE}>Biscuits</a></li>
-          <li><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
-          <li><a href="traybakes.html"{TB_ACTIVE}>Tray bakes</a></li>
-          <li><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon tea</a></li>
-          <li><a href="customer-reviews.html"{CR_ACTIVE}>Testimonials</a></li>
+          <li class="site-nav__item has-dropdown">
+            <a href="cakes.html"{CAKES_ACTIVE}>Cakes <span class="caret">▾</span></a>
+            <div class="site-dropdown">
+              <ul>
+                <li><a href="cakes.html"><strong>All Cakes</strong><span>Browse the gallery</span></a></li>
+                <li><a href="ganache-drip-cakes.html"><strong>Drip Cakes</strong><span>Modern · glossy</span></a></li>
+                <li><a href="buttercream-flower-cakes.html"><strong>Buttercream Flower</strong><span>Floral, by hand</span></a></li>
+                <li><a href="numbered-birthday-cakes.html"><strong>Numbered Birthday</strong><span>Big-number</span></a></li>
+                <li><a href="childrens-cakes.html"><strong>Children's Cakes</strong><span>Birthdays</span></a></li>
+                <li><a href="speciality-and-everyday-cakes.html"><strong>Speciality Cakes</strong><span>Every occasion</span></a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="site-nav__item has-dropdown">
+            <a href="weddings.html"{WED_ACTIVE}>Weddings <span class="caret">▾</span></a>
+            <div class="site-dropdown">
+              <ul>
+                <li><a href="wedding-cakes.html"><strong>Wedding Cakes</strong><span>For your day</span></a></li>
+                <li><a href="weddings.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="site-nav__item"><a href="handmade-biscuits.html"{BIS_ACTIVE}>Biscuits</a></li>
+          <li class="site-nav__item"><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
+          <li class="site-nav__item"><a href="traybakes.html"{TB_ACTIVE}>Tray bakes</a></li>
+          <li class="site-nav__item"><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon tea</a></li>
+          <li class="site-nav__item"><a href="customer-reviews.html"{CR_ACTIVE}>Testimonials</a></li>
         </ul>
       </nav>'''
 
 # Map of page filename → active-flag key. Helen's nav is intentionally slim:
-# only the 7 items are highlightable. Pages outside the list (giant cookies,
-# scones, contact, etc.) still render with the nav, just no highlighted item.
+# only the 7 top-level items are highlightable. Pages reached via dropdown
+# sub-links (drip cakes, children's cakes, wedding cakes, etc.) inherit the
+# parent's active state at runtime via CSS — no separate flag needed.
 NAV_KEY = {
     'cakes.html':              'CAKES',
     'weddings.html':           'WED',

@@ -40,13 +40,57 @@ img { max-width: 100%; height: auto; display: block; }
 
 .site-nav { flex: 1; }
 .site-nav__list { display: flex; flex-wrap: wrap; gap: 6px 28px; list-style: none; justify-content: flex-end; padding: 0; margin: 0; }
-.site-nav__list a { color: var(--ink); font-size: 0.95rem; font-weight: 400; padding: 6px 0; transition: color 0.15s; }
+.site-nav__item { position: relative; }
+.site-nav__list a { color: var(--ink); font-size: 0.95rem; font-weight: 400; padding: 6px 0; transition: color 0.15s; text-decoration: none; }
 .site-nav__list a:hover, .site-nav__list a.active { color: var(--rose-dark); }
+.site-nav__list .caret { font-size: 0.7em; opacity: 0.55; margin-left: 3px; transition: transform 0.18s; display: inline-block; }
+.site-nav__item.has-dropdown:hover > a .caret,
+.site-nav__item.has-dropdown:focus-within > a .caret { transform: rotate(180deg); }
+
+/* Dropdown panel — feminine mega-menu lite, italic Cormorant subtitles */
+.site-dropdown {
+  position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) translateY(-6px);
+  background: var(--paper, #fffdfb); border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 24px 60px -28px rgba(74, 30, 26, 0.25);
+  padding: 14px 0; min-width: 260px;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.18s, transform 0.18s, visibility 0.18s;
+  z-index: 200;
+}
+.site-nav__item.has-dropdown:hover > .site-dropdown,
+.site-nav__item.has-dropdown:focus-within > .site-dropdown {
+  opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
+}
+.site-dropdown ul { list-style: none; padding: 0; margin: 0; }
+.site-dropdown li a {
+  display: block; padding: 12px 26px; color: var(--ink); text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.site-dropdown li a:hover { background: var(--blush, rgba(232, 165, 165, 0.12)); color: var(--rose-dark); }
+.site-dropdown strong {
+  display: block; font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  font-size: 1.1rem; font-style: italic; font-weight: 500; letter-spacing: -0.1px; line-height: 1.2;
+}
+.site-dropdown span {
+  display: block; font-size: 0.7rem; color: var(--muted); letter-spacing: 1.4px;
+  text-transform: uppercase; margin-top: 4px;
+}
+/* Bridge the gap between trigger and panel so hover doesn't drop the dropdown */
+.site-nav__item.has-dropdown::after {
+  content: ""; position: absolute; top: 100%; left: 0; right: 0; height: 14px;
+}
+
 .btn--pill { padding: 9px 22px; border-width: 1px; border-radius: 999px; font-size: 0.82rem; letter-spacing: 0.5px; }
 @media (max-width: 880px) {
   .site-header__inner { gap: 14px 18px; }
   .site-nav__list { justify-content: center; gap: 4px 18px; }
   .site-nav__list a { font-size: 0.88rem; }
+  /* On mobile the dropdown becomes static (always-visible inline list) — pure-hover doesn't tap */
+  .site-dropdown { position: static; transform: none; opacity: 1; visibility: visible; box-shadow: none; border: 0; padding: 4px 0 8px; min-width: 0; background: transparent; }
+  .site-dropdown li a { padding: 6px 0; text-align: center; }
+  .site-dropdown strong { font-size: 0.92rem; font-style: normal; }
+  .site-dropdown span { display: none; }
+  .site-nav__list .caret { display: none; }
 }
 
 /* Hero */
