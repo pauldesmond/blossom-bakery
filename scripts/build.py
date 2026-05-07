@@ -23,7 +23,9 @@ PAGE_META = {
 # 'wedding-cakes' removed from PAGE_META — page is hand-crafted (matches the WP
 # weddings-4 multi-section layout with interleaved photo blocks + the v2 'stress-
 # free' panel). Helen edits it via direct collaboration with Paul, not via Decap.
-    'afternoon-teas':                  ('afternoon-teas.html',                'Catering'),
+    # 'afternoon-teas' removed — afternoon-tea.html is now hand-crafted as a
+    # menu of cards (one per tea offering, with price + photo). The old
+    # afternoon-teas.html URL is a meta-refresh redirect.
     'cakes':                           ('cakes.html',                         'All cakes'),
     'childrens-cakes':                 ("childrens-cakes.html",               'Birthdays & celebrations'),
     'cupcakes':                        ('cupcakes.html',                      'Boxes from 6'),
@@ -74,7 +76,7 @@ NAV_HTML = '''<nav class="site-nav">
             </div>
           </li>
           <li class="site-nav__item"><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
-          <li class="site-nav__item"><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon tea</a></li>
+          <li class="site-nav__item"><a href="afternoon-tea.html"{AT_ACTIVE}>Afternoon tea</a></li>
           <li class="site-nav__item"><a href="customer-reviews.html"{CR_ACTIVE}>Testimonials</a></li>
         </ul>
       </nav>'''
@@ -90,7 +92,7 @@ NAV_KEY = {
     'handmade-biscuits.html':  'BAKES',  # Biscuits sub-item lives in Bakes dropdown — highlight the parent
     'traybakes.html':          'BAKES',  # Tray bakes sub-item lives in Bakes dropdown — highlight the parent
     'cupcakes.html':           'CC',
-    'afternoon-teas.html':     'AT',
+    'afternoon-tea.html':      'AT',  # singular URL after rename from afternoon-teas.html
     'customer-reviews.html':   'CR',
 }
 

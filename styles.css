@@ -229,3 +229,25 @@ section.alt { background: #fff; }
 .treat-list { list-style: none; padding: 0; max-width: 580px; margin: 24px auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px 18px; }
 .treat-list li { font-size: 0.95rem; color: var(--ink); padding-left: 16px; position: relative; }
 .treat-list li::before { content: "✿"; position: absolute; left: 0; color: var(--rose-dark); font-size: 0.7em; top: 2px; }
+
+/* Afternoon Tea menu cards */
+.tea-menu-section { padding: 56px 0; background: #fff; border-top: 1px solid var(--border); }
+.tea-menu-section .wedding-section__eyebrow { color: var(--rose-dark); margin-bottom: 8px; text-align: center; }
+.tea-menu-section .wedding-section__heading { margin-bottom: 36px; text-align: center; }
+.tea-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+.tea-card { background: var(--cream); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.18s, box-shadow 0.18s; }
+.tea-card:hover { transform: translateY(-3px); box-shadow: 0 18px 36px -22px rgba(74, 30, 26, 0.22); }
+.tea-card__photo { aspect-ratio: 4 / 3; overflow: hidden; background: #fff; }
+.tea-card__photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.tea-card:hover .tea-card__photo img { transform: scale(1.04); }
+.tea-card__body { padding: 22px 24px 24px; display: flex; flex-direction: column; flex: 1; }
+.tea-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 10px; }
+.tea-card__name { font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: 1.3rem; font-weight: 500; color: var(--ink); line-height: 1.2; flex: 1; }
+.tea-card__price { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--rose-dark); font-weight: 600; white-space: nowrap; }
+.tea-card__desc { font-size: 0.92rem; color: var(--ink); line-height: 1.6; margin-bottom: 12px; flex: 1; }
+.tea-card__serves { font-size: 0.7rem; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.tea-card__thumbs { display: flex; gap: 6px; margin-top: 8px; }
+.tea-card__thumbs img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; }
+
+.intro-p { font-size: 1.02rem; color: var(--ink); line-height: 1.8; margin-bottom: 14px; }
+.intro-p:last-child { margin-bottom: 0; }
