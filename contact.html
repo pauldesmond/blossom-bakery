@@ -3,23 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Get in Touch — Blossom Bakery, Chelmsford</title>
-  <meta name="description" content="Get in Touch from Blossom Bakery in Chelmsford. Homemade by Helen Victors." />
+  <title>Contact — Blossom Bakery, Chelmsford</title>
+  <meta name="description" content="Get in touch with Helen at Blossom Bakery for cake enquiries, quotes and orders. Replies within a day, Mon–Sat. Based in Great Baddow, Chelmsford, Essex CM2." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://myblossombakery.co.uk/contact.html" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://myblossombakery.co.uk/contact.html" />
-  <meta property="og:title" content="Get in Touch — Blossom Bakery" />
-  <meta property="og:description" content="Get in Touch from Blossom Bakery in Chelmsford. Homemade by Helen Victors." />
-  <meta property="og:image" content="https://myblossombakery.co.uk/images/cards-4.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="site-header">
+<header class="site-header">
     <div class="container">
       <div class="site-header__inner">
         <a href="index.html" class="site-header__brand">
@@ -69,28 +64,144 @@
     </div>
   </header>
 
-  <main>
-<section class="page-hero">
-      <div class="container container--narrow">
-        <p class="eyebrow">Send a message</p>
-        <h1>Get in Touch</h1>
-      </div>
-    </section>
-<section>
-      <div class="container container--narrow">
-        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">Contact Us – Blossom Bakery Skip to content Contact Us Please feel free to contact us with any enqiries, quotes or orders you may have – you can use the contact information on this page, or the form below to send us a direct message. ← Back Thank you for your response. ✨ Name (required) Email (required) Message Submit Submitting form Δ 42 Greenland Gardens, Great Baddow, Chelmsford, Essex. CM2 8ZF blossombakedgoods@gmail.com Follow Us Facebook Twitter Instagram We are able to accept Apple Pay, Google Pay, Visa, MasterCard and American Express card/contactless payments as well as bank transfers and cash. Privacy Blossom Bakery</p>
-      </div>
-    </section>
-<section>
-      <div class="container">
-        <div class="photo-grid">
-          <img src="images/cards-4.jpg" alt="" loading="lazy" />
-        </div>
-      </div>
-    </section>
-  </main>
+<main>
 
-  <footer class="site-footer">
+<section class="page-hero">
+  <div class="container container--narrow">
+    <p class="eyebrow">Send a message</p>
+    <h1>Let&#39;s bake<br/><em>something good.</em></h1>
+    <p class="page-hero__lede">Tell me what you have in mind — the date, the rough numbers, and any pictures or boards you&#39;ve been collecting. I&#39;ll be back within a day.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- FORM -->
+      <form id="enquiryForm" class="enquiry-form">
+        <p class="wedding-section__eyebrow" style="text-align:left;">Enquiry form</p>
+        <h2 class="enquiry-form__heading">Tell me about it.</h2>
+
+        <div class="field-row">
+          <div class="field"><label>Your name</label><input type="text" name="name" required placeholder="Helen Smith"/></div>
+          <div class="field"><label>Email</label><input type="email" name="email" required placeholder="you@example.com"/></div>
+        </div>
+
+        <div class="field-row">
+          <div class="field"><label>Phone (optional)</label><input type="tel" name="phone" placeholder="07&hellip;"/></div>
+          <div class="field"><label>Date you need it</label><input type="date" name="date"/></div>
+        </div>
+
+        <div class="field">
+          <label>What can I bake for you?</label>
+          <select name="type">
+            <option>Wedding cake</option>
+            <option>Celebration / birthday cake</option>
+            <option>Cupcakes</option>
+            <option>Children&#39;s cake</option>
+            <option>Afternoon tea</option>
+            <option>Biscuits / cookies</option>
+            <option>Tray bakes</option>
+            <option>Something else</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Rough number of guests</label>
+          <input type="text" name="guests" placeholder="e.g. 60–80"/>
+        </div>
+
+        <div class="field">
+          <label>Tell me everything</label>
+          <textarea name="message" placeholder="Venue, flavours you love, colour scheme, Pinterest links — the more the better." required></textarea>
+        </div>
+
+        <div class="enquiry-form__footer">
+          <small class="enquiry-form__note">Replies within 24 hrs · Mon–Sat</small>
+          <button type="submit" class="btn">Send enquiry</button>
+        </div>
+      </form>
+
+      <!-- SIDEBAR -->
+      <aside class="contact-aside">
+        <div>
+          <p class="wedding-section__eyebrow" style="text-align:left;">Direct</p>
+          <h3 class="contact-aside__phone">07939 618787</h3>
+          <p class="contact-aside__email">blossombakedgoods@gmail.com</p>
+        </div>
+        <div>
+          <p class="wedding-section__eyebrow" style="text-align:left;">Hours</p>
+          <ul class="hours-list">
+            <li><span>Monday – Friday</span><span class="hours-list__time">9 — 5</span></li>
+            <li><span>Saturday</span><span class="hours-list__time">9 — 2</span></li>
+            <li><span>Sunday</span><span class="hours-list__time hours-list__time--closed">Closed</span></li>
+          </ul>
+        </div>
+        <div>
+          <p class="wedding-section__eyebrow" style="text-align:left;">Studio</p>
+          <p class="contact-aside__address">Great Baddow<br/>Chelmsford, Essex<br/>CM2</p>
+          <div class="map-frame">
+            <iframe title="Map" loading="lazy" src="https://maps.google.com/maps?q=Great%20Baddow%20Chelmsford%20CM2&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=&amp;output=embed"></iframe>
+          </div>
+        </div>
+        <div>
+          <p class="wedding-section__eyebrow" style="text-align:left;">Payments</p>
+          <p class="contact-aside__small">Apple Pay · Google Pay · Visa · Mastercard · Amex · bank transfer · cash</p>
+        </div>
+        <div>
+          <p class="wedding-section__eyebrow" style="text-align:left;">Social</p>
+          <div class="social-pills">
+            <a href="https://www.instagram.com/blossombakery_chelmsford/" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://www.facebook.com/blossombakedgoods" target="_blank" rel="noopener">Facebook</a>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="alt">
+  <div class="container container--narrow">
+    <p class="wedding-section__eyebrow" style="text-align:center;">Common questions</p>
+    <h2 class="wedding-section__heading">Before you write</h2>
+    <div id="faqs" class="faq-list"></div>
+  </div>
+</section>
+
+</main>
+
+<div id="toast">Thank you ✿ Helen will reply within a day.</div>
+
+<script>
+  const FAQS = [
+    ["How far in advance should I order a wedding cake?", "I usually take wedding bookings 4–9 months out for peak summer dates, but I'll always try to fit you in if I can — even short notice. For celebration cakes, 2–3 weeks is ideal."],
+    ["Can you do gluten-free or vegan?", "Yes — most of my cakes can be adapted. Just mention it in the enquiry and I'll send the GF/V options for that design."],
+    ["Do you deliver?", "I deliver wedding cakes across Essex and surrounding counties — quoted by venue distance. Cupcakes and cakes for 2+ people can be delivered locally in CM2."],
+    ["Is there a tasting?", "Yes — I do tasting boxes for wedding cakes (sponges + fillings) so you can decide flavours with confidence. Included for confirmed weddings; available separately on enquiry."],
+    ["What about allergens?", "I bake from a domestic kitchen that handles nuts, dairy, eggs, gluten and soya. I follow strict separation but can't certify allergen-free — let me know in the enquiry."]
+  ];
+  const host = document.getElementById('faqs');
+  host.innerHTML = FAQS.map(([q, a]) => `
+    <div class="faq">
+      <div class="faq__q">${q}<span class="faq__plus">+</span></div>
+      <div class="faq__a">${a}</div>
+    </div>
+  `).join('');
+  host.querySelectorAll('.faq').forEach(f => f.addEventListener('click', () => f.classList.toggle('open')));
+
+  document.getElementById('enquiryForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    e.target.reset();
+    setTimeout(() => t.classList.remove('show'), 4000);
+  });
+</script>
+
+<footer class="site-footer">
     <div class="container">
       <div class="site-footer__grid">
         <div>

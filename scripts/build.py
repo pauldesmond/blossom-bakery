@@ -37,7 +37,6 @@ PAGE_META = {
     'traybakes':                       ('traybakes.html',                     'Catering & sharing'),
     'scones':                          ('scones.html',                        'Classic'),
     'customer-reviews':                ('customer-reviews.html',              'In their own words'),
-    'contact':                         ('contact.html',                       'Send a message'),
     'about':                           ('about.html',                         'Meet the baker'),
 }
 
