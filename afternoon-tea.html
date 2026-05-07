@@ -10,8 +10,129 @@
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Lora:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Tea menu — editorial card list */
+    .tea-list {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .tea-item {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 64px;
+      align-items: center;
+      padding: 64px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .tea-item:first-child { padding-top: 0; }
+    .tea-item:last-child { border-bottom: none; }
+    .tea-item:nth-child(even) { direction: rtl; }
+    .tea-item:nth-child(even) > * { direction: ltr; }
+
+    .tea-item__photo {
+      aspect-ratio: 4/5;
+      overflow: hidden;
+      border-radius: 4px;
+      background: var(--cream);
+    }
+    .tea-item__photo img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 1.2s cubic-bezier(.2,.6,.2,1);
+    }
+    .tea-item:hover .tea-item__photo img { transform: scale(1.03); }
+
+    .tea-item__numeral {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--rose-dark);
+      font-weight: 500;
+      margin-bottom: 18px;
+    }
+    .tea-item__name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(28px, 3.4vw, 40px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .tea-item__name em {
+      font-style: italic;
+      color: var(--rose-dark);
+      font-weight: 500;
+    }
+    .tea-item__price {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 20px;
+      color: var(--rose-dark);
+      margin-bottom: 22px;
+    }
+    .tea-item__desc {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--ink-soft);
+      max-width: 52ch;
+      text-wrap: pretty;
+    }
+    .tea-item__serves {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 22px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 820px) {
+      .tea-item {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 48px 0;
+      }
+      .tea-item:nth-child(even) { direction: ltr; }
+      .tea-item__photo { aspect-ratio: 4/3; }
+    }
+
+    .info-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 820px;
+      margin: var(--space-block) auto 0;
+      padding: 36px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .info-strip__item { text-align: center; }
+    .info-strip__label {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    .info-strip__value {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--ink);
+      font-weight: 400;
+    }
+    @media (max-width: 540px) {
+      .info-strip { grid-template-columns: 1fr; gap: 20px; padding: 24px 0; }
+    }
+  </style>
 </head>
 <body>
 <header class="site-header">
@@ -63,157 +184,185 @@
     </div>
   </header>
 <main>
-<section class="page-hero">
-  <div class="container container--narrow">
-    <p class="eyebrow">Pre-order · 48h notice</p>
-    <h1>Afternoon Tea</h1>
-  </div>
-</section>
 
-<section class="wedding-section">
-  <div class="container container--narrow">
-    <p class="intro-p">Our afternoon teas are perfect for all types of celebrations. They are perfect to share with friends and family and make perfect picnics. We can also cater for larger functions and parties and add additional savoury options.</p>
-    <p class="intro-p">We offer a wide range of different types of Afternoon Teas. Traditional, personalised, savoury, Vegetarian, gluten free and Vegan afternoon tea. We also make a lovely Children’s afternoon tea.</p>
-    <p class="intro-p">Our sweet treat boxes, cake boxes and cream teas are also very popular.</p>
-    <p class="intro-p">Please pre-order with 48 hours notice. We offer a local CM2 delivery for afternoon teas for 2 People or more.</p>
-  </div>
-</section>
-
-<section class="tea-menu-section">
-  <div class="container">
-    <p class="wedding-section__eyebrow">The menu</p>
-    <h2 class="wedding-section__heading">Nine ways to take your tea</h2>
-    <div class="tea-grid">
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/afternoon-and-cream-teas-1.png" alt="Traditional Afternoon Teas" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Traditional Afternoon Teas</h3>
-      <span class="tea-card__price">£22.50 per person</span>
-    </header>
-    <p class="tea-card__desc">Enjoy a selection of dainty finger sandwiches with Cumberland sausage rolls, freshly baked plain/fruit scones served with Cornish clotted cream and strawberry jam. To finish off a selection of small cakes, cookies and macarons/ meringue kisses. Our small cake selection changes each week depending on what we are baking at the time of your order.</p>
-    <p class="tea-card__serves">Traditional afternoon tea for two</p>
-    <div class="tea-card__thumbs"><img src="images/img_1236.jpeg" alt="" loading="lazy" /></div>
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/img_5822.jpeg" alt="Personalised Afternoon Teas" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Personalised Afternoon Teas</h3>
-      <span class="tea-card__price">£24.50 per person</span>
-    </header>
-    <p class="tea-card__desc">Enjoy a selection of dainty finger sandwiches with Cumberland sausage rolls, freshly baked plain/fruit scones served with Cornish clotted cream and strawberry jam. To finish off a selection of small cakes, including personalised cupcakes, cookies and macarons/ meringue kisses. Our small cake selection changes each week depending on what we are baking at the time of your order.</p>
-    <p class="tea-card__serves">Personalised afternoon tea for two</p>
-    <div class="tea-card__thumbs"><img src="images/img_3576.jpeg" alt="" loading="lazy" /><img src="images/img_5347.jpeg" alt="" loading="lazy" /><img src="images/img_3420.jpg" alt="" loading="lazy" /><img src="images/img_4480.jpeg" alt="" loading="lazy" /></div>
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/img_4590.jpeg" alt="Savoury Afternoon tea" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Savoury Afternoon tea</h3>
-      <span class="tea-card__price">£22.50 per person</span>
-    </header>
-    <p class="tea-card__desc">Enjoy a selection of Dainty finger sandwiches with Cumberland sausage rolls, matured cheese &amp; smoked bacon quiche and scotch eggs. Freshly baked plain/fruit scones served with Cornish clotted cream and strawberry jam. Finished off with a slice of cake.</p>
-    <p class="tea-card__serves">Savoury afternoon tea for two</p>
-    
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/img_2880.jpeg" alt="Children’s Afternoon Tea" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Children’s Afternoon Tea</h3>
-      <span class="tea-card__price">£12.50 per child</span>
-    </header>
-    <p class="tea-card__desc">Finger sandwiches, on either white or wholemeal bread. Choose from ham, cheese, jam or chocolate spread. Sausage rolls, finished off with a selection of small cakes, cookies, marshmallows and chocolates.</p>
-    <p class="tea-card__serves">Children’s afternoon tea for two.</p>
-    <div class="tea-card__thumbs"><img src="images/img_3839.jpeg" alt="" loading="lazy" /><img src="images/img_6079.jpeg" alt="" loading="lazy" /></div>
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/img_3583.jpg" alt="Vegan Afternoon Tea" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Vegan Afternoon Tea</h3>
-      <span class="tea-card__price">£19.50 per person</span>
-    </header>
-    <p class="tea-card__desc">Enjoy a selection of dainty vegan sandwiches consisting of roasted red pepper &amp; avocado, vegan cheese &amp; cucumber and vegan cheese &amp; caramelised onion chutney. Vegan fruit scone, dairy-free spread &amp; strawberry jam, vanilla cupcake and cookies.</p>
-    <p class="tea-card__serves">Vegan afternoon tea for one</p>
-    
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/img_5492.jpeg" alt="Sweet Treat Box" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Sweet Treat Box</h3>
-      <span class="tea-card__price">£20.00 per person</span>
-    </header>
-    <p class="tea-card__desc">A selection of cakes, tart, cookies, macaroons/ meringue kisses. Your sweet treat box also includes a personalised cupcake.</p>
-    <p class="tea-card__serves">Sweet treat box for one person.</p>
-    
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/img_5836-1.jpeg" alt="Deluxe Sweet treat box" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Deluxe Sweet treat box</h3>
-      <span class="tea-card__price">£25.00 per person</span>
-    </header>
-    <p class="tea-card__desc">A selection of cakes, tart, cookies, macaroons/ meringue kisses. Your sweet treat box also includes a personalised cupcake. Freshly baked scone served with Cornish clotted cream and strawberry jam.</p>
-    <p class="tea-card__serves">Sweet treat box for one person.</p>
-    
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/img_4543.jpeg" alt="Cake box for four people –£40" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Cake box for four people –£40</h3>
-      
-    </header>
-    <p class="tea-card__desc">A selection of cakes, macaroons and meringue kisses. Your cake box also includes personalised cupcakes.</p>
-    
-    
-  </div>
-</article>
-
-<article class="tea-card">
-  <div class="tea-card__photo"><img src="images/cream-tea.png" alt="Classic Cornish Cream Tea for Two- £18.00" loading="lazy" /></div>
-  <div class="tea-card__body">
-    <header class="tea-card__head">
-      <h3 class="tea-card__name">Classic Cornish Cream Tea for Two- £18.00</h3>
-      
-    </header>
-    <p class="tea-card__desc">Two generous sized plain or fruit scones served with Cornish clotted cream, jam and fresh strawberries..</p>
-    
-    
-  </div>
-</article>
+  <!-- HERO -->
+  <section class="page-hero-v2">
+    <div class="container">
+      <p class="page-hero-v2__numeral">N° 04 — On the table</p>
+      <h1>Afternoon <em>tea.</em></h1>
+      <p class="page-hero-v2__lede">Finger sandwiches, scones with Cornish clotted cream, hand-iced macarons and a slice of cake. Pre-order with 48 hours' notice.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="alt">
-  <div class="container container--narrow" style="text-align:center;">
-    <p class="section-eyebrow">Pre-order yours</p>
-    <h2 class="section-title">Let&#39;s set the table</h2>
-    <p style="margin: 16px auto 24px; max-width: 540px; color: var(--muted);">Please pre-order with at least 48 hours&#39; notice. Local CM2 delivery available for two people or more.</p>
-    <p style="margin: 0 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
-    <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-2pm</p>
-    <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
-  </div>
-</section>
+  <div class="rule-v2"></div>
+
+  <!-- INTRO -->
+  <section class="prose-section">
+    <div class="container container--prose">
+      <div class="prose-section__head">
+        <p class="eyebrow-v2 eyebrow-v2--center">For every kind of gathering</p>
+        <h2 class="prose-section__heading">Tea, beautifully <em>set.</em></h2>
+      </div>
+      <div class="prose">
+        <p>Our afternoon teas are made for celebrations, picnics and quiet weekends alike. Traditional, personalised, savoury, vegetarian, gluten-free, vegan and children's options — all baked to order in Chelmsford.</p>
+        <p>For larger gatherings we can scale up and add extra savouries to suit the occasion.</p>
+      </div>
+
+      <div class="info-strip">
+        <div class="info-strip__item">
+          <div class="info-strip__label">Notice</div>
+          <div class="info-strip__value">48 hours</div>
+        </div>
+        <div class="info-strip__item">
+          <div class="info-strip__label">Delivery</div>
+          <div class="info-strip__value">Local CM2</div>
+        </div>
+        <div class="info-strip__item">
+          <div class="info-strip__label">Minimum</div>
+          <div class="info-strip__value">2 people</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEA MENU -->
+  <section class="prose-section" style="padding-bottom: var(--space-section);">
+    <div class="container">
+
+      <div class="tea-list">
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/afternoon-and-cream-teas-1.png" alt="Traditional afternoon tea spread" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 01</p>
+            <h3 class="tea-item__name">Traditional <em>afternoon tea</em></h3>
+            <p class="tea-item__price">£22.50 per person</p>
+            <p class="tea-item__desc">Dainty finger sandwiches with Cumberland sausage rolls, freshly baked plain or fruit scones with Cornish clotted cream and strawberry jam. To finish, a selection of small cakes, cookies and macarons or meringue kisses, changing each week with what we're baking.</p>
+            <p class="tea-item__serves">Pictured · for two</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/img_5822.jpeg" alt="Personalised afternoon tea with named cupcakes" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 02</p>
+            <h3 class="tea-item__name">Personalised <em>afternoon tea</em></h3>
+            <p class="tea-item__price">£24.50 per person</p>
+            <p class="tea-item__desc">Everything from the traditional tea, plus personalised cupcakes hand-iced with a name, message or theme. Made to mark the occasion.</p>
+            <p class="tea-item__serves">Pictured · for two</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/img_4590.jpeg" alt="Savoury afternoon tea with quiche and scotch eggs" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 03</p>
+            <h3 class="tea-item__name">Savoury <em>afternoon tea</em></h3>
+            <p class="tea-item__price">£22.50 per person</p>
+            <p class="tea-item__desc">Dainty finger sandwiches with Cumberland sausage rolls, matured cheese &amp; smoked bacon quiche, scotch eggs and freshly baked scones with Cornish clotted cream and strawberry jam. Finished with a slice of cake.</p>
+            <p class="tea-item__serves">Pictured · for two</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/img_2880.jpeg" alt="Children's afternoon tea with sweet treats" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 04</p>
+            <h3 class="tea-item__name">Children's <em>afternoon tea</em></h3>
+            <p class="tea-item__price">£12.50 per child</p>
+            <p class="tea-item__desc">Finger sandwiches on white or wholemeal — choose from ham, cheese, jam or chocolate spread. Sausage rolls, small cakes, cookies, marshmallows and chocolates.</p>
+            <p class="tea-item__serves">Pictured · for two</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/img_3583.jpg" alt="Vegan afternoon tea" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 05</p>
+            <h3 class="tea-item__name">Vegan <em>afternoon tea</em></h3>
+            <p class="tea-item__price">£19.50 per person</p>
+            <p class="tea-item__desc">Dainty vegan sandwiches — roasted red pepper &amp; avocado, vegan cheese &amp; cucumber, vegan cheese &amp; caramelised onion chutney. Vegan fruit scone with dairy-free spread and strawberry jam, vanilla cupcake and cookies.</p>
+            <p class="tea-item__serves">Per person</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/img_5492.jpeg" alt="Sweet treat box" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 06</p>
+            <h3 class="tea-item__name">Sweet <em>treat box</em></h3>
+            <p class="tea-item__price">£20.00 per person</p>
+            <p class="tea-item__desc">A selection of cakes, tart, cookies and macaroons or meringue kisses, with a personalised cupcake.</p>
+            <p class="tea-item__serves">Per person</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/img_5836-1.jpeg" alt="Deluxe sweet treat box with scone" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 07</p>
+            <h3 class="tea-item__name">Deluxe <em>treat box</em></h3>
+            <p class="tea-item__price">£25.00 per person</p>
+            <p class="tea-item__desc">The sweet treat box with a freshly baked scone, Cornish clotted cream and strawberry jam.</p>
+            <p class="tea-item__serves">Per person</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/img_4543.jpeg" alt="Cake box for four" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 08</p>
+            <h3 class="tea-item__name">Cake <em>box</em></h3>
+            <p class="tea-item__price">£40.00 for four</p>
+            <p class="tea-item__desc">A selection of cakes, macaroons and meringue kisses, with personalised cupcakes for the table.</p>
+            <p class="tea-item__serves">Serves four</p>
+          </div>
+        </article>
+
+        <article class="tea-item">
+          <div class="tea-item__photo">
+            <img src="images/cream-tea.png" alt="Classic Cornish cream tea for two" loading="lazy" />
+          </div>
+          <div>
+            <p class="tea-item__numeral">N° 09</p>
+            <h3 class="tea-item__name">Cornish <em>cream tea</em></h3>
+            <p class="tea-item__price">£18.00 for two</p>
+            <p class="tea-item__desc">Two generous plain or fruit scones with Cornish clotted cream, jam and fresh strawberries. Simple and proper.</p>
+            <p class="tea-item__serves">Serves two</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING CTA -->
+  <section class="closing-cta">
+    <div class="container container--narrow">
+      <p class="eyebrow-v2 eyebrow-v2--center">Set the table</p>
+      <h2 class="closing-cta__heading">Pre-order your <em>tea.</em></h2>
+      <p class="closing-cta__contact">blossombakedgoods@gmail.com</p>
+      <p class="closing-cta__small">07939 618787  ·  Mon–Fri 9–5  ·  Sat 9–2  ·  48 hours notice  ·  Local CM2 delivery</p>
+      <a href="contact.html" class="btn-primary-v2">Send a message</a>
+    </div>
+  </section>
+
 </main>
 <footer class="site-footer">
     <div class="container">

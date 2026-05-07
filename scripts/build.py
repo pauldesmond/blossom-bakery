@@ -19,20 +19,12 @@ PAGE_META = {
     # 'weddings' removed — weddings.html is now a 301 stub redirecting to
     # wedding-bakes.html. Both wedding-cakes.html and wedding-bakes.html are
     # hand-crafted (multi-section, with price tables) — not auto-built.
-    'handmade-biscuits':               ('handmade-biscuits.html',             'Biscuits'),
 # 'wedding-cakes' removed from PAGE_META — page is hand-crafted (matches the WP
 # weddings-4 multi-section layout with interleaved photo blocks + the v2 'stress-
 # free' panel). Helen edits it via direct collaboration with Paul, not via Decap.
     # 'afternoon-teas' removed — afternoon-tea.html is now hand-crafted as a
     # menu of cards (one per tea offering, with price + photo). The old
     # afternoon-teas.html URL is a meta-refresh redirect.
-    'cakes':                           ('cakes.html',                         'All cakes'),
-    'childrens-cakes':                 ("childrens-cakes.html",               'Birthdays & celebrations'),
-    'ganache-drip-cakes':              ('ganache-drip-cakes.html',            'Modern · glossy'),
-    'speciality-and-everyday-cakes':   ('speciality-and-everyday-cakes.html', 'Cakes for any reason'),
-    'numbered-birthday-cakes':         ('numbered-birthday-cakes.html',       'Big-number birthdays'),
-    'giant-cookies':                   ('giant-cookies.html',                 'Decorated · personalised'),
-    'traybakes':                       ('traybakes.html',                     'Catering & sharing'),
     'scones':                          ('scones.html',                        'Classic'),
     'customer-reviews':                ('customer-reviews.html',              'In their own words'),
     'about':                           ('about.html',                         'Meet the baker'),

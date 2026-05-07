@@ -4,19 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Traybakes — Blossom Bakery, Chelmsford</title>
-  <meta name="description" content="Traybakes from Blossom Bakery in Chelmsford. Homemade by Helen Victors." />
+  <meta name="description" content="Traybakes from Blossom Bakery in Chelmsford. Brownies, blondies, millionaire's shortbread, rocky road, tiffin, sprinkle cake. 30×18cm — serves 12, or 24 smaller portions." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://myblossombakery.co.uk/traybakes.html" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://myblossombakery.co.uk/traybakes.html" />
-  <meta property="og:title" content="Traybakes — Blossom Bakery" />
-  <meta property="og:description" content="Traybakes from Blossom Bakery in Chelmsford. Homemade by Helen Victors." />
-  <meta property="og:image" content="https://myblossombakery.co.uk/images/img_1498.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Lora:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .tb-gallery { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .tb-gallery img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; display: block; }
+    .tb-gallery > *:first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: 1/1; }
+    .tb-gallery > *:first-child img { aspect-ratio: 1/1; }
+    @media (max-width: 760px) { .tb-gallery { grid-template-columns: repeat(2, 1fr); } .tb-gallery > *:first-child { grid-column: span 2; grid-row: span 1; } }
+
+    .flavour-list { max-width: 720px; margin: 32px auto 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 32px; }
+    .flavour-list__item {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      color: var(--ink);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 540px) { .flavour-list { grid-template-columns: 1fr; } }
+
+    .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 720px; margin: var(--space-block) auto 0; padding: 36px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .stat-strip__item { text-align: center; }
+    .stat-strip__label { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 10px; }
+    .stat-strip__value { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--ink); }
+    @media (max-width: 540px) { .stat-strip { grid-template-columns: 1fr; gap: 20px; } }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -50,7 +68,7 @@
             </div>
           </li>
           <li class="site-nav__item has-dropdown">
-            <a href="handmade-biscuits.html">Bakes <span class="caret">▾</span></a>
+            <a href="traybakes.html" class="active">Bakes <span class="caret">▾</span></a>
             <div class="site-dropdown">
               <ul>
                 <li><a href="handmade-biscuits.html"><strong>Biscuits</strong><span>All-butter, hand-iced</span></a></li>
@@ -69,38 +87,60 @@
   </header>
 
   <main>
-<section class="page-hero">
-      <div class="container container--narrow">
-        <p class="eyebrow">Catering &amp; sharing</p>
-        <h1>Traybakes</h1>
-      </div>
-    </section>
-<section>
-      <div class="container container--narrow">
-        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">Traybakes are perfect if you don&#x27;t need a whole cake, but you require more than a cupcake.They are ideal for smaller birthday gatherings and suitable for children&#x27;s party bags. we can also personalise these with a special message. We have a wide range of delicious sponge based flavours, buttercreams and designs. We also make a selection of other Traybakes, Millionaire&#x27;s Shortbread/Flapjack, Old-School Sprinkle Cake, Rocky Road, Tiffin, Brownies &amp; Blondes. All our tray bakes measure 30cm x 18cm. They serve 12 people, alternatively, we can also adapt them into 24 smaller size portions. These are perfect for tearoom and coffee shops serving afternoon tea. All of our tray bakes can be personalised for an additional £5. Gluten free (GF) on request and a selection can be adapted for vegan diets (V)</p>
-      </div>
-    </section>
-<section>
+    <section class="page-hero-v2">
       <div class="container">
-        <div class="photo-grid">
-          <img src="images/img_1498.jpg" alt="" loading="lazy" />
-          <img src="images/571d215d-d6da-4e5d-820d-8539ab848309.jpeg" alt="" loading="lazy" />
-          <img src="images/tb1.jpg" alt="" loading="lazy" />
-          <img src="images/tb4.jpg" alt="" loading="lazy" />
-          <img src="images/tb2.jpg" alt="" loading="lazy" />
-          <img src="images/tb5.jpg" alt="" loading="lazy" />
-          <img src="images/tb3.jpg" alt="" loading="lazy" />
-          <img src="images/tb6.jpg" alt="" loading="lazy" />
+        <p class="page-hero-v2__numeral">N° 06 — Catering &amp; sharing</p>
+        <h1>Tray <em>bakes.</em></h1>
+        <p class="page-hero-v2__lede">More than a cupcake, less than a whole cake. Cut into 12 generous slices or 24 smaller portions for the tea-room counter.</p>
+      </div>
+    </section>
+
+    <div class="rule-v2"></div>
+
+    <section class="prose-section">
+      <div class="container container--prose">
+        <div class="prose-section__head">
+          <p class="eyebrow-v2 eyebrow-v2--center">For smaller gatherings</p>
+          <h2 class="prose-section__heading">A whole tray, <em>shared.</em></h2>
+        </div>
+        <div class="prose">
+          <p>Traybakes are perfect for smaller birthdays, party bags and tea-room counters — and we'll personalise them with a message for £5. Choose from a wide range of sponge flavours, buttercreams and toppings, alongside our classics: millionaire's shortbread, flapjack, old-school sprinkle cake, rocky road, tiffin, brownies and blondies.</p>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat-strip__item"><div class="stat-strip__label">Size</div><div class="stat-strip__value">30 × 18 cm</div></div>
+          <div class="stat-strip__item"><div class="stat-strip__label">Serves</div><div class="stat-strip__value">12 or 24</div></div>
+          <div class="stat-strip__item"><div class="stat-strip__label">Diet</div><div class="stat-strip__value">GF · V on request</div></div>
         </div>
       </div>
     </section>
-<section class="alt">
-      <div class="container container--narrow" style="text-align:center;">
-        <p class="section-eyebrow">Order yours</p>
-        <h2 class="section-title">Let's bake something for you</h2>
-        <p style="margin: 24px 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
-        <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-2pm</p>
-        <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
+
+    <section class="prose-section" style="padding-bottom: var(--space-section);">
+      <div class="container">
+        <div class="prose-section__head">
+          <p class="eyebrow-v2 eyebrow-v2--center">From the trays</p>
+          <h2 class="prose-section__heading">A small <em>gallery.</em></h2>
+        </div>
+        <div class="tb-gallery">
+          <img src="images/img_1498.jpg" alt="Traybake" loading="lazy" />
+          <img src="images/571d215d-d6da-4e5d-820d-8539ab848309.jpeg" alt="Traybake" loading="lazy" />
+          <img src="images/tb1.jpg" alt="Traybake" loading="lazy" />
+          <img src="images/tb4.jpg" alt="Traybake" loading="lazy" />
+          <img src="images/tb2.jpg" alt="Traybake" loading="lazy" />
+          <img src="images/tb5.jpg" alt="Traybake" loading="lazy" />
+          <img src="images/tb3.jpg" alt="Traybake" loading="lazy" />
+          <img src="images/tb6.jpg" alt="Traybake" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section class="closing-cta">
+      <div class="container container--narrow">
+        <p class="eyebrow-v2 eyebrow-v2--center">Order yours</p>
+        <h2 class="closing-cta__heading">Let&#39;s bake something <em>for you.</em></h2>
+        <p class="closing-cta__contact">blossombakedgoods@gmail.com</p>
+        <p class="closing-cta__small">07939 618787  ·  Mon–Fri 9–5  ·  Sat 9–2</p>
+        <a href="contact.html" class="btn-primary-v2">Send a message</a>
       </div>
     </section>
   </main>

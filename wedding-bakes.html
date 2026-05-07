@@ -4,18 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wedding Bakes — Blossom Bakery, Chelmsford</title>
-  <meta name="description" content="Wedding Bakes by Helen Victors at Blossom Bakery — delivered across Essex." />
+  <meta name="description" content="Wedding bakes by Helen Victors at Blossom Bakery — sweet treat tables, taster cupcakes and personalised wedding favours, delivered across Essex." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://myblossombakery.co.uk/wedding-bakes.html" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Lora:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .wb-gallery { max-width: 1100px; margin: 32px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .wb-gallery img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; display: block; }
+    @media (max-width: 760px) { .wb-gallery { grid-template-columns: repeat(2, 1fr); } }
+
+    .treat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 32px; max-width: 640px; margin: 32px auto 0; }
+    .treat-grid__item {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; color: var(--ink);
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    @media (max-width: 540px) { .treat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .taster-prices-v2 {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+      max-width: 480px; margin: 36px auto 0;
+    }
+    .taster-prices-v2__card {
+      text-align: center;
+      padding: 28px 16px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .taster-prices-v2__qty {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 28px;
+      color: var(--rose-dark);
+      margin-bottom: 8px;
+    }
+    .taster-prices-v2__price {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--muted);
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
-
-<header class="site-header">
+  <header class="site-header">
     <div class="container">
       <div class="site-header__inner">
         <a href="index.html" class="site-header__brand">
@@ -41,7 +78,7 @@
             <div class="site-dropdown">
               <ul>
                 <li><a href="wedding-cakes.html"><strong>Wedding Cakes</strong><span>For your day</span></a></li>
-                <li><a href="weddings.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
+                <li><a href="wedding-bakes.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
               </ul>
             </div>
           </li>
@@ -55,7 +92,7 @@
             </div>
           </li>
           <li class="site-nav__item"><a href="cupcakes.html">Cupcakes</a></li>
-          <li class="site-nav__item"><a href="afternoon-teas.html">Afternoon tea</a></li>
+          <li class="site-nav__item"><a href="afternoon-tea.html">Afternoon tea</a></li>
           <li class="site-nav__item"><a href="customer-reviews.html">Testimonials</a></li>
         </ul>
       </nav>
@@ -63,109 +100,112 @@
       </div>
     </div>
   </header>
-<main>
-<section class="page-hero">
-  <div class="container container--narrow">
-    <p class="eyebrow">For your guests</p>
-    <h1>Wedding Bakes</h1>
-  </div>
-</section>
-<section class="wedding-section">
-  <div class="container container--narrow">
-    <p class="wedding-section__p">Not every wedding needs a tiered centrepiece. Helen makes the bakes that fill out a sweet table, sit alongside your cake, or replace it altogether — sweet treats, taster cupcakes for tasting visits, and personalised favours for your guests to take home.</p>
-  </div>
-</section>
 
-<section class="wedding-section">
-  <div class="container container--narrow">
-    <p class="wedding-section__eyebrow">Beyond the tier</p>
-    <h2 class="wedding-section__heading">Sweet treat stand</h2>
-    <p class="wedding-section__p">If the traditional tiered wedding cake isn’t for you maybe a selection of sweet treats combined with a smaller cake? We make a large selection of brownies, millionaire shortbread, cookies, cupcakes, blondies and iced personalised biscuits. We also hire out our Sweet treat stand for a small fee.</p>
-    <p class="wedding-section__p">Pricing depends on how many items you require. Tell us how many guests you have and we will pull together a quote based on your favourite items and your numbers</p>
-    <p class="wedding-section__p">We have many years of experience in making wedding cakes, so that you can trust that your ideas will become reality. No idea is too big or too small.</p>
-    <p class="wedding-section__p">At Blossom Bakery it is important to us that the service you receive from us is just as special as your wedding day. We will listen to your ideas, sketch a design for you to review and, most importantly, ensure your ideas and vision is successfully delivered. We ensure all of our clients receive a professional, friendly and reliable service when planning their wedding cake.</p>
-    <ul class="treat-list">
-      <li>Brownies</li><li>Millionaire shortbread</li><li>Cookies</li><li>Cupcakes</li><li>Blondies</li><li>Iced personalised biscuits</li>
-    </ul>
-    <p class="wedding-section__p wedding-section__p--note">The sweet-treat stand itself is also available to hire for a small fee.</p>
-  </div>
-  <div class="container">
-    <div class="photo-grid wedding-photo-grid">
-      <img src="images/562dbebb-024e-4bd4-9f00-9ad26e3cb713.jpeg" alt="" loading="lazy" />
-      <img src="images/img_6823-1.jpeg" alt="" loading="lazy" />
-      <img src="images/img_7033-1.jpeg" alt="" loading="lazy" />
-      <img src="images/img_4757.jpeg" alt="" loading="lazy" />
-      <img src="images/img_3847.jpeg" alt="" loading="lazy" />
-      <img src="images/img_3867.jpeg" alt="" loading="lazy" />
-    </div>
-  </div>
-</section>
-
-<section class="wedding-section">
-  <div class="container container--narrow">
-    <p class="wedding-section__eyebrow">Try before you choose</p>
-    <h2 class="wedding-section__heading">Taster cupcakes</h2>
-    <p class="wedding-section__p">Try a selection of different flavoured cakes with one of our Taster cupcake boxes. These are available in boxes of</p>
-    <div class="taster-prices">
-      <div class="taster-price-card"><strong>Six</strong><span>£20</span></div>
-      <div class="taster-price-card"><strong>Twelve</strong><span>£35</span></div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="photo-grid wedding-photo-grid">
-      <img src="images/img_1925.jpeg" alt="" loading="lazy" />
-      <img src="images/img_0375.jpeg" alt="" loading="lazy" />
-      <img src="images/img_0266.jpeg" alt="" loading="lazy" />
-    </div>
-  </div>
-</section>
-
-<section class="wedding-section">
-  <div class="container container--narrow">
-    <p class="wedding-section__eyebrow">For your guests</p>
-    <h2 class="wedding-section__heading">Favours</h2>
-    <p class="wedding-section__p">In addition to making your wedding cake we can also make your wedding favours for you and your wedding guests to enjoy. These include cupcakes, personalised iced biscuits and macarons. These make the perfect addition to your guests place setting on the table. We are able to co-ordinate these with your wedding cake and colour theme.</p>
-    <p class="wedding-section__p">All of our favours are individually presented in a selection of beautiful packaging for you to choose from. These can also be personalised.</p>
-    <p class="wedding-section__p">ContactPrivacyTerms &amp; Conditions</p>
-  </div>
-  <div class="container">
-    <div class="photo-grid wedding-photo-grid">
-      <img src="images/image-62.png" alt="" loading="lazy" />
-      <img src="images/img_0151.jpeg" alt="" loading="lazy" />
-    </div>
-  </div>
-</section>
-<section class="section-ink">
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <p class="section-eyebrow section-eyebrow--rose">For your wedding day</p>
-        <h2 class="section-title">Your dream cake,<br/>made <em class="accent-rose">stress-free</em>.</h2>
+  <main>
+    <section class="page-hero-v2">
+      <div class="container">
+        <p class="page-hero-v2__numeral">N° 07 — For your guests</p>
+        <h1>Wedding <em>bakes.</em></h1>
+        <p class="page-hero-v2__lede">Not every wedding needs a tiered centrepiece. Sweet treat tables, taster boxes and personalised favours — to fill out, sit alongside, or stand in for the cake itself.</p>
       </div>
-      <div class="section-num">N° 03</div>
-    </div>
-    <div class="steps">
-      <div class="step"><div class="step__num">1</div><h3>Tell me your day</h3><p>Send a quick note — date, venue, rough numbers, the look you love. Pinterest boards welcome.</p></div>
-      <div class="step"><div class="step__num">2</div><h3>We design together</h3><p>I&#39;ll come back with sketches, flavours and a clear quote — no surprises, no upsell.</p></div>
-      <div class="step"><div class="step__num">3</div><h3>Tasting box</h3><p>Pop round (or I can post) for sponges, fillings and a chat about every detail.</p></div>
-      <div class="step"><div class="step__num">4</div><h3>Delivery &amp; set up</h3><p>I deliver and set up at your venue across Essex and the surrounding counties.</p></div>
-    </div>
-    <div class="steps-cta">
-      <a href="contact.html" class="btn btn--rose">Start an enquiry</a>
-    </div>
-  </div>
-</section>
-<section class="alt">
-  <div class="container container--narrow" style="text-align:center;">
-    <p class="section-eyebrow">Order yours</p>
-    <h2 class="section-title">Let&#39;s bake something for you</h2>
-    <p style="margin: 24px 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
-    <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-2pm</p>
-    <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
-  </div>
-</section>
-</main>
-<footer class="site-footer">
+    </section>
+
+    <div class="rule-v2"></div>
+
+    <!-- SWEET TREAT STAND -->
+    <section class="prose-section">
+      <div class="container container--prose">
+        <div class="prose-section__head">
+          <p class="eyebrow-v2 eyebrow-v2--center">Beyond the tier</p>
+          <h2 class="prose-section__heading">Sweet treat <em>stand.</em></h2>
+        </div>
+        <div class="prose">
+          <p>If a traditional tiered cake isn't your style, a selection of sweet treats — perhaps with a smaller cake at the centre — is a beautiful alternative. Tell us how many guests you have and your favourite items, and we'll pull together a quote tailored to your day.</p>
+          <p>The sweet-treat stand itself is also available to hire for a small fee.</p>
+        </div>
+        <div class="treat-grid">
+          <div class="treat-grid__item">Brownies</div>
+          <div class="treat-grid__item">Millionaire shortbread</div>
+          <div class="treat-grid__item">Cookies</div>
+          <div class="treat-grid__item">Cupcakes</div>
+          <div class="treat-grid__item">Blondies</div>
+          <div class="treat-grid__item">Iced biscuits</div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="wb-gallery">
+          <img src="images/562dbebb-024e-4bd4-9f00-9ad26e3cb713.jpeg" alt="Sweet treat stand" loading="lazy" />
+          <img src="images/img_6823-1.jpeg" alt="Sweet treat stand" loading="lazy" />
+          <img src="images/img_7033-1.jpeg" alt="Sweet treat stand" loading="lazy" />
+          <img src="images/img_4757.jpeg" alt="Sweet treat stand" loading="lazy" />
+          <img src="images/img_3847.jpeg" alt="Sweet treat stand" loading="lazy" />
+          <img src="images/img_3867.jpeg" alt="Sweet treat stand" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- TASTER -->
+    <section class="prose-section">
+      <div class="container container--prose">
+        <div class="prose-section__head">
+          <p class="eyebrow-v2 eyebrow-v2--center">Try before you choose</p>
+          <h2 class="prose-section__heading">Taster <em>cupcakes.</em></h2>
+        </div>
+        <div class="prose">
+          <p>Try a selection of different flavoured cakes with one of our taster boxes — a delicious way to find your favourite ahead of the big day.</p>
+        </div>
+        <div class="taster-prices-v2">
+          <div class="taster-prices-v2__card">
+            <div class="taster-prices-v2__qty">Six</div>
+            <div class="taster-prices-v2__price">£20</div>
+          </div>
+          <div class="taster-prices-v2__card">
+            <div class="taster-prices-v2__qty">Twelve</div>
+            <div class="taster-prices-v2__price">£35</div>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="wb-gallery" style="grid-template-columns: repeat(3, 1fr);">
+          <img src="images/img_1925.jpeg" alt="Taster cupcakes" loading="lazy" />
+          <img src="images/img_0375.jpeg" alt="Taster cupcakes" loading="lazy" />
+          <img src="images/img_0266.jpeg" alt="Taster cupcakes" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- FAVOURS -->
+    <section class="prose-section" style="padding-bottom: var(--space-section);">
+      <div class="container container--prose">
+        <div class="prose-section__head">
+          <p class="eyebrow-v2 eyebrow-v2--center">For your guests</p>
+          <h2 class="prose-section__heading"><em>Favours.</em></h2>
+        </div>
+        <div class="prose">
+          <p>Alongside your wedding cake, we also make wedding favours for your guests — cupcakes, personalised iced biscuits and macarons. The perfect addition to a place setting, co-ordinated with your colour theme.</p>
+          <p>All favours are individually presented in a selection of beautiful packaging, and can be personalised.</p>
+        </div>
+      </div>
+      <div class="container">
+        <div class="wb-gallery" style="grid-template-columns: repeat(2, 1fr); max-width: 720px;">
+          <img src="images/image-62.png" alt="Wedding favour" loading="lazy" />
+          <img src="images/img_0151.jpeg" alt="Wedding favour" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section class="closing-cta">
+      <div class="container container--narrow">
+        <p class="eyebrow-v2 eyebrow-v2--center">For your wedding day</p>
+        <h2 class="closing-cta__heading">Let&#39;s plan your <em>sweet table.</em></h2>
+        <p class="closing-cta__contact">blossombakedgoods@gmail.com</p>
+        <p class="closing-cta__small">07939 618787  ·  Mon–Fri 9–5  ·  Sat 9–2</p>
+        <a href="contact.html" class="btn-primary-v2">Start an enquiry</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
     <div class="container">
       <div class="site-footer__grid">
         <div>
