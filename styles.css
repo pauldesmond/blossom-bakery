@@ -457,3 +457,40 @@ section.alt { background: #fff; }
 .cup-ink-cta { background: var(--ink); color: var(--cream); padding: clamp(72px, 9vw, 120px) 0; text-align: center; }
 .cup-ink-cta__heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(44px, 6vw, 84px); font-weight: 400; color: var(--cream); letter-spacing: -0.03em; margin: 12px 0 28px; line-height: 1; }
 .cup-ink-cta__heading em { font-style: italic; color: var(--rose); font-weight: 500; }
+
+/* ======= Contact page — v2 polish overrides ======= */
+
+/* Form panel: cleaner white card, stronger contrast against the cream page */
+.enquiry-form { background: #fffdfb; padding: 44px; }
+@media (max-width: 540px) { .enquiry-form { padding: 28px; } }
+
+/* Select — full appearance suppression + smaller, more elegant chevron */
+.field select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23b8676a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 11px 7px;
+  padding-right: 38px;
+}
+
+/* Phone number — much more prominent, italic Cormorant */
+.contact-aside__phone { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2rem; font-weight: 500; color: var(--ink); margin: 6px 0 6px; line-height: 1; letter-spacing: -0.5px; }
+.contact-aside__email { font-size: 0.95rem; color: var(--muted); }
+
+/* Hours — bigger, tighter spacing matching v2 */
+.hours-list { color: var(--ink); font-size: 1rem; }
+.hours-list li { padding: 4px 0; line-height: 1.9; border-bottom: 0; }
+.hours-list li:not(:last-child) { border-bottom: 0; }
+.hours-list__time { font-family: 'Lora', Georgia, serif; font-style: normal; color: var(--ink); font-weight: 500; letter-spacing: 0.5px; }
+.hours-list__time--closed { color: var(--muted); font-weight: 400; }
+
+/* Tighten sidebar spacing overall */
+.contact-aside { gap: 28px; }
+.contact-aside__address { font-size: 0.95rem; color: var(--ink); line-height: 1.7; }
+
+/* Eyebrow inside sidebar — slightly smaller */
+.contact-aside .wedding-section__eyebrow { margin-bottom: 4px; font-size: 0.65rem; }
