@@ -251,3 +251,58 @@ section.alt { background: #fff; }
 
 .intro-p { font-size: 1.02rem; color: var(--ink); line-height: 1.8; margin-bottom: 14px; }
 .intro-p:last-child { margin-bottom: 0; }
+
+/* Cupcakes page — box builder, editorial gallery, ordering steps, centred dark CTA */
+.page-hero h1 em { font-style: italic; color: var(--rose-dark); }
+.page-hero__lede { max-width: 560px; margin: 16px auto 24px; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+
+.box-builder-section { padding: 56px 0; background: #fff; border-top: 1px solid var(--border); }
+.box-builder { background: var(--cream); border: 1px solid var(--border); border-radius: 18px; padding: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.box-builder__form > * { margin-bottom: 0; }
+.box-builder__heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 500; color: var(--ink); letter-spacing: -0.3px; margin: 6px 0 12px; line-height: 1.1; }
+.box-builder__heading em { font-style: italic; color: var(--rose-dark); }
+.box-builder__intro { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
+.box-builder__group { margin: 22px 0; }
+.box-builder__label { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 500; }
+.box-builder .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.box-builder .chip-row button {
+  padding: 10px 18px; border: 1px solid var(--border); background: transparent; border-radius: 999px;
+  cursor: pointer; font-family: inherit; font-size: 0.88rem; color: var(--ink);
+  transition: all 0.18s;
+}
+.box-builder .chip-row button:hover { border-color: var(--rose-dark); color: var(--rose-dark); }
+.box-builder .chip-row button.on { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.box-builder__summary { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; padding-top: 24px; border-top: 1px solid var(--border); margin-top: 24px; }
+.box-builder__pick { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.3rem; color: var(--ink); margin-top: 6px; line-height: 1.2; }
+.box-builder__preview { aspect-ratio: 1 / 1; border-radius: 14px; overflow: hidden; background: #fff; }
+.box-builder__preview img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+@media (max-width: 880px) { .box-builder { grid-template-columns: 1fr; padding: 28px; gap: 32px; } }
+
+/* Cupcake gallery — bento-ish grid with featured + thumbs */
+.cupcake-gallery { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-top: 24px; }
+.cupcake-figure { grid-column: span 4; margin: 0; position: relative; border-radius: 12px; overflow: hidden; background: var(--cream); }
+.cupcake-figure img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; transition: transform 0.4s; }
+.cupcake-figure:hover img { transform: scale(1.04); }
+.cupcake-figure figcaption { padding: 14px 16px; }
+.cupcake-figure figcaption strong { display: block; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; font-weight: 500; color: var(--ink); }
+.cupcake-figure figcaption span { display: block; font-size: 0.7rem; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.cupcake-figure--small { grid-column: span 3; background: transparent; border-radius: 8px; }
+.cupcake-figure--small img { aspect-ratio: 1 / 1; border-radius: 8px; }
+@media (max-width: 880px) {
+  .cupcake-figure { grid-column: span 6; }
+  .cupcake-figure--small { grid-column: span 6; }
+}
+
+/* Cupcake ordering steps */
+.cupcake-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-top: 24px; }
+.cupcake-step { padding: 8px 0; }
+.cupcake-step__num { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2.6rem; color: var(--rose-dark); line-height: 1; margin-bottom: 12px; }
+.cupcake-step h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.1px; }
+.cupcake-step p { font-size: 0.92rem; color: var(--ink); line-height: 1.6; }
+@media (max-width: 880px) { .cupcake-steps { grid-template-columns: 1fr 1fr; gap: 24px; } }
+@media (max-width: 540px) { .cupcake-steps { grid-template-columns: 1fr; gap: 20px; } }
+
+/* Centred ink CTA */
+.section-ink--centered { text-align: center; }
+.section-ink--centered .section-eyebrow { display: inline-block; margin-bottom: 12px; }
+.section-ink--centered .section-title { color: var(--cream); }

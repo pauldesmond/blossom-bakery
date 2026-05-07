@@ -4,22 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cupcakes — Blossom Bakery, Chelmsford</title>
-  <meta name="description" content="Cupcakes from Blossom Bakery in Chelmsford. Homemade by Helen Victors." />
+  <meta name="description" content="Hand-decorated cupcakes by Blossom Bakery in Chelmsford. Boxes of 6, 12, 18 or 24 — classic swirl, buttercream rose, iced topper or bouquet style. Gluten-free and vegan options available." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://myblossombakery.co.uk/cupcakes.html" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://myblossombakery.co.uk/cupcakes.html" />
-  <meta property="og:title" content="Cupcakes — Blossom Bakery" />
-  <meta property="og:description" content="Cupcakes from Blossom Bakery in Chelmsford. Homemade by Helen Victors." />
-  <meta property="og:image" content="https://myblossombakery.co.uk/images/img_4411.jpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="site-header">
+<header class="site-header">
     <div class="container">
       <div class="site-header__inner">
         <a href="index.html" class="site-header__brand">
@@ -69,46 +64,144 @@
     </div>
   </header>
 
-  <main>
+<main>
+
 <section class="page-hero">
-      <div class="container container--narrow">
-        <p class="eyebrow">Boxes from 6</p>
-        <h1>Cupcakes</h1>
-      </div>
-    </section>
-<section>
-      <div class="container container--narrow">
-        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">Cupcakes are fantastic for all sorts of occasions and are a lovely way to share some happiness around. They are ideal as gifts for friends/family and perfect for children&#x27;s birthday parties. Choose from our wide range of designs and delicious flavours. Our cupcakes can all be made gluten-free on request, and selected cupcakes for vegan diets. All of our cupcakes are packaged in cupcake gift boxes, in quantities of six, twelve, eighteen or twenty-four. Prices start from £25. Prices start from £20 for a box of six cupcakes and go up in price depending on the design and detail We also make a beautiful range of cupcake bouquets. Cupcakes with hand pipped buttercream flowers with a central personalised message. Available in a range of different colour themes. Your bouquet is wrapped in tissue paper with cellophane and tied with satin ribbon. Price: 7 cupcakes £40 12 cupcakes £60 The classic 99 ice cream cone cakes are great fun for children. Wafer cones filled with vanilla or chocolate sponge and topped with a swirl of buttercream and finished off with a Cadbury&#x27;s chocolate flake &amp; sprinkles. £25- Box of six</p>
-      </div>
-    </section>
-<section>
-      <div class="container">
-        <div class="photo-grid">
-          <img src="images/img_4411.jpeg" alt="" loading="lazy" />
-          <img src="images/img_9092.jpeg" alt="" loading="lazy" />
-          <img src="images/img_0125.jpeg" alt="" loading="lazy" />
-          <img src="images/img_9911.jpeg" alt="" loading="lazy" />
-          <img src="images/img_9856.jpeg" alt="" loading="lazy" />
-          <img src="images/877b1e0b-370a-4657-99a2-9661fa198d98.jpeg" alt="" loading="lazy" />
-          <img src="images/5335091b-9b8b-4ac3-9875-067d1876c033.jpeg" alt="" loading="lazy" />
-          <img src="images/8a5f7162-dc8a-4eff-9449-4c9d04a03c8b.jpeg" alt="" loading="lazy" />
-          <img src="images/img_1732.jpeg" alt="" loading="lazy" />
-          <img src="images/d34ebb04-7688-42be-aaba-4f662caac526.jpeg" alt="" loading="lazy" />
+  <div class="container container--narrow">
+    <p class="eyebrow">Boxes of 6, 12, 18 or 24</p>
+    <h1>Cupcakes,<br/><em>by the box.</em></h1>
+    <p class="page-hero__lede">Hand-piped, freshly baked the morning of collection. Perfect for party bags, baby showers, hen-dos, office surprises, and Tuesdays that need lifting.</p>
+    <a href="contact.html" class="btn">Order yours</a>
+  </div>
+</section>
+
+<!-- BOX BUILDER (interactive) -->
+<section class="box-builder-section">
+  <div class="container">
+    <div class="box-builder" id="boxConfig">
+      <div class="box-builder__form">
+        <p class="wedding-section__eyebrow" style="text-align:left;">Build your box</p>
+        <h2 class="box-builder__heading">Pick your <em>size</em>, <em>finish</em> and <em>diet</em>.</h2>
+        <p class="box-builder__intro">Tap through the options — we&#39;ll send you the exact quote when you enquire.</p>
+
+        <div class="box-builder__group">
+          <div class="box-builder__label">Box size</div>
+          <div class="chip-row" id="sizes">
+            <button data-size="6">6 cupcakes</button>
+            <button data-size="12" class="on">12 cupcakes</button>
+            <button data-size="18">18 cupcakes</button>
+            <button data-size="24">24 cupcakes</button>
+          </div>
+        </div>
+
+        <div class="box-builder__group">
+          <div class="box-builder__label">Finish</div>
+          <div class="chip-row" id="finish">
+            <button class="on">Classic swirl</button>
+            <button>Buttercream rose</button>
+            <button>Iced topper</button>
+            <button>Bouquet style</button>
+          </div>
+        </div>
+
+        <div class="box-builder__group">
+          <div class="box-builder__label">Diet</div>
+          <div class="chip-row" id="diet">
+            <button class="on">Standard</button>
+            <button>Gluten-free</button>
+            <button>Vegan</button>
+          </div>
+        </div>
+
+        <div class="box-builder__summary">
+          <div>
+            <div class="box-builder__label">Your selection</div>
+            <div class="box-builder__pick"><span id="summary">12 cupcakes · Classic swirl</span></div>
+          </div>
+          <a href="contact.html" class="btn">Enquire</a>
         </div>
       </div>
-    </section>
-<section class="alt">
-      <div class="container container--narrow" style="text-align:center;">
-        <p class="section-eyebrow">Order yours</p>
-        <h2 class="section-title">Let's bake something for you</h2>
-        <p style="margin: 24px 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
-        <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-2pm</p>
-        <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
+      <div class="box-builder__preview">
+        <img src="images/img_4411.jpeg" alt="Cupcake box preview" id="boxPreview" />
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
+</section>
 
-  <footer class="site-footer">
+<script>
+  (function(){
+    const BOX_IMAGES = {
+      "Classic swirl":   "images/img_4411.jpeg",
+      "Buttercream rose":"images/cupcake-877b.jpeg",
+      "Iced topper":     "images/cupcake-d34e.jpeg",
+      "Bouquet style":   "images/img_9856.jpeg",
+    };
+    let size = 12, finishLabel = "Classic swirl", dietLabel = "";
+    function calc(){
+      const parts = [size + ' cupcakes', finishLabel];
+      if (dietLabel && dietLabel !== "Standard") parts.push(dietLabel);
+      document.getElementById('summary').textContent = parts.join(' · ');
+      const img = BOX_IMAGES[finishLabel] || BOX_IMAGES["Classic swirl"];
+      document.getElementById('boxPreview').src = img;
+    }
+    function wire(groupId, onPick){
+      const g = document.getElementById(groupId);
+      g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+        g.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        onPick(b);
+        calc();
+      }));
+    }
+    wire('sizes',  b => { size = parseInt(b.dataset.size); });
+    wire('finish', b => { finishLabel = b.textContent; });
+    wire('diet',   b => { dietLabel  = b.textContent; });
+    calc();
+  })();
+</script>
+
+<!-- GALLERY -->
+<section class="wedding-section">
+  <div class="container">
+    <p class="wedding-section__eyebrow" style="text-align:center;">Recently piped</p>
+    <h2 class="wedding-section__heading">A box for every kind of moment</h2>
+    <div class="cupcake-gallery">
+      <figure class="cupcake-figure"><img src="images/cupcake-d34e.jpeg" alt="Oh Baby cupcakes" loading="lazy" /><figcaption><strong>Oh Baby</strong><span>Baby shower · 12 box</span></figcaption></figure>
+      <figure class="cupcake-figure"><img src="images/cupcake-877b.jpeg" alt="Buttercream rose cupcakes" loading="lazy" /><figcaption><strong>Buttercream Rose</strong><span>Birthday · 12 box</span></figcaption></figure>
+      <figure class="cupcake-figure"><img src="images/img_9856.jpeg" alt="Bouquet cupcakes" loading="lazy" /><figcaption><strong>Cupcake Bouquet</strong><span>Personalised</span></figcaption></figure>
+      <figure class="cupcake-figure cupcake-figure--small"><img src="images/img_0125.jpeg" alt="" loading="lazy" /></figure>
+      <figure class="cupcake-figure cupcake-figure--small"><img src="images/img_9911.jpeg" alt="" loading="lazy" /></figure>
+      <figure class="cupcake-figure cupcake-figure--small"><img src="images/cupcake-5335.jpeg" alt="" loading="lazy" /></figure>
+      <figure class="cupcake-figure cupcake-figure--small"><img src="images/img_1732.jpeg" alt="" loading="lazy" /></figure>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="alt">
+  <div class="container">
+    <p class="wedding-section__eyebrow" style="text-align:center;">How to order</p>
+    <h2 class="wedding-section__heading">Three days, four steps</h2>
+    <div class="cupcake-steps">
+      <div class="cupcake-step"><div class="cupcake-step__num">01</div><h3>Send a note</h3><p>Tell me the date you need them, the box size, and the vibe — flavours, colours, occasion.</p></div>
+      <div class="cupcake-step"><div class="cupcake-step__num">02</div><h3>I confirm</h3><p>Within a day I&#39;ll come back with a quote, design notes and a collection slot. 48 hours&#39; notice usually.</p></div>
+      <div class="cupcake-step"><div class="cupcake-step__num">03</div><h3>Bake &amp; collect</h3><p>Made fresh on the morning, packed in a gift-ready box, ready to collect from CM2.</p></div>
+      <div class="cupcake-step"><div class="cupcake-step__num">04</div><h3>Delivery (optional)</h3><p>Local CM2 delivery for cupcakes for two people or more — added at quote.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DARK CTA -->
+<section class="section-ink section-ink--centered">
+  <div class="container container--narrow">
+    <p class="section-eyebrow section-eyebrow--rose">Boxes of 6, 12, 18 or 24</p>
+    <h2 class="section-title">Order a <em class="accent-rose">box.</em></h2>
+    <a href="contact.html" class="btn btn--rose" style="margin-top: 24px;">Send your order</a>
+  </div>
+</section>
+
+</main>
+<footer class="site-footer">
     <div class="container">
       <div class="site-footer__grid">
         <div>

@@ -28,7 +28,6 @@ PAGE_META = {
     # afternoon-teas.html URL is a meta-refresh redirect.
     'cakes':                           ('cakes.html',                         'All cakes'),
     'childrens-cakes':                 ("childrens-cakes.html",               'Birthdays & celebrations'),
-    'cupcakes':                        ('cupcakes.html',                      'Boxes from 6'),
     'ganache-drip-cakes':              ('ganache-drip-cakes.html',            'Modern · glossy'),
     'speciality-and-everyday-cakes':   ('speciality-and-everyday-cakes.html', 'Cakes for any reason'),
     'catering-packages':               ('catering-packages.html',             'Events'),
