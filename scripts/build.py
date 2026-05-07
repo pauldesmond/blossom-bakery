@@ -60,9 +60,16 @@ NAV_HTML = '''<nav class="site-nav">
               </ul>
             </div>
           </li>
-          <li class="site-nav__item"><a href="handmade-biscuits.html"{BIS_ACTIVE}>Biscuits</a></li>
+          <li class="site-nav__item has-dropdown">
+            <a href="handmade-biscuits.html"{BAKES_ACTIVE}>Bakes <span class="caret">▾</span></a>
+            <div class="site-dropdown">
+              <ul>
+                <li><a href="handmade-biscuits.html"><strong>Biscuits</strong><span>All-butter, hand-iced</span></a></li>
+                <li><a href="traybakes.html"><strong>Tray bakes</strong><span>Catering &amp; sharing</span></a></li>
+              </ul>
+            </div>
+          </li>
           <li class="site-nav__item"><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
-          <li class="site-nav__item"><a href="traybakes.html"{TB_ACTIVE}>Tray bakes</a></li>
           <li class="site-nav__item"><a href="afternoon-teas.html"{AT_ACTIVE}>Afternoon tea</a></li>
           <li class="site-nav__item"><a href="customer-reviews.html"{CR_ACTIVE}>Testimonials</a></li>
         </ul>
@@ -75,9 +82,9 @@ NAV_HTML = '''<nav class="site-nav">
 NAV_KEY = {
     'cakes.html':              'CAKES',
     'weddings.html':           'WED',
-    'handmade-biscuits.html':  'BIS',
+    'handmade-biscuits.html':  'BAKES',  # Biscuits sub-item lives in Bakes dropdown — highlight the parent
+    'traybakes.html':          'BAKES',  # Tray bakes sub-item lives in Bakes dropdown — highlight the parent
     'cupcakes.html':           'CC',
-    'traybakes.html':          'TB',
     'afternoon-teas.html':     'AT',
     'customer-reviews.html':   'CR',
 }
