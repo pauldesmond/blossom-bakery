@@ -162,3 +162,29 @@ section.alt { background: #fff; }
 .btn:hover { background: var(--ink); color: var(--cream); }
 .btn--outline { background: transparent; border: 2px solid var(--rose-dark); color: var(--rose-dark); }
 .btn--outline:hover { background: var(--rose-dark); color: var(--cream); }
+
+/* ======= Dark-ink section (Wedding Cakes 'stress-free' panel) ======= */
+.section-ink { background: var(--ink); color: var(--cream); padding: clamp(72px, 9vw, 120px) 0; }
+.section-ink .section-eyebrow { color: rgba(250, 246, 240, 0.55); letter-spacing: 3px; text-transform: uppercase; font-size: 0.7rem; }
+.section-ink .section-eyebrow--rose { color: #e8a5a5; }
+.section-ink .section-title { color: var(--cream); font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: clamp(2.2rem, 4.5vw, 3.4rem); font-weight: 400; line-height: 1.05; letter-spacing: -0.5px; margin-top: 12px; }
+.section-ink .accent-rose { color: #e8a5a5; font-style: italic; }
+.section-ink .section-head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 24px; margin-bottom: 56px; padding-bottom: 24px; border-bottom: 1px solid rgba(250, 246, 240, 0.15); }
+.section-ink .section-num { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(56px, 7vw, 96px); color: rgba(250, 246, 240, 0.18); line-height: 1; }
+.section-ink .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 36px; }
+.section-ink .step__num { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 56px; color: #e8a5a5; line-height: 1; margin-bottom: 14px; }
+.section-ink .step h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+.section-ink .step p { color: rgba(250, 246, 240, 0.78); font-size: 0.95rem; line-height: 1.6; }
+.section-ink .steps-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 56px; }
+.section-ink .btn { background: transparent; border: 1px solid rgba(250, 246, 240, 0.4); color: var(--cream); }
+.section-ink .btn:hover { background: var(--cream); color: var(--ink); border-color: var(--cream); }
+.section-ink .btn--rose { background: var(--rose-dark); border-color: var(--rose-dark); color: var(--cream); }
+.section-ink .btn--rose:hover { background: var(--cream); color: var(--ink); border-color: var(--cream); }
+@media (max-width: 880px) {
+  .section-ink .steps { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .section-ink .section-head { grid-template-columns: 1fr; gap: 12px; }
+  .section-ink .section-num { font-size: 48px; }
+}
+@media (max-width: 540px) {
+  .section-ink .steps { grid-template-columns: 1fr; gap: 24px; }
+}

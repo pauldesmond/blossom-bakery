@@ -191,6 +191,48 @@ CTA = '''<section class="alt">
       </div>
     </section>'''
 
+# Wedding-Cakes-only closer: the v2 'Your dream cake, made stress-free' 4-step
+# process panel on a dark ink background. Hard-coded here (not in YAML) so
+# Helen can edit the body content via Decap without accidentally breaking the
+# styled steps panel.
+WEDDING_PROCESS = '''<section class="section-ink">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="section-eyebrow section-eyebrow--rose">For your wedding day</p>
+            <h2 class="section-title">Your dream cake,<br/>made <em class="accent-rose">stress-free</em>.</h2>
+          </div>
+          <div class="section-num">N° 03</div>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step__num">1</div>
+            <h3>Tell me your day</h3>
+            <p>Send a quick note — date, venue, rough numbers, the look you love. Pinterest boards welcome.</p>
+          </div>
+          <div class="step">
+            <div class="step__num">2</div>
+            <h3>We design together</h3>
+            <p>I'll come back with sketches, flavours and a clear quote — no surprises, no upsell.</p>
+          </div>
+          <div class="step">
+            <div class="step__num">3</div>
+            <h3>Tasting box</h3>
+            <p>Pop round (or I can post) for sponges, fillings and a chat about every detail.</p>
+          </div>
+          <div class="step">
+            <div class="step__num">4</div>
+            <h3>Delivery &amp; set up</h3>
+            <p>I deliver and set up at your venue across Essex and the surrounding counties.</p>
+          </div>
+        </div>
+        <div class="steps-cta">
+          <a href="wedding-cakes.html" class="btn btn--rose">Wedding cakes</a>
+          <a href="contact.html" class="btn btn--outline btn--outline-light">Start an enquiry</a>
+        </div>
+      </div>
+    </section>'''
+
 def render_page(filename, title, eyebrow, intro, images):
     description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Victors.'
     og_image = f'images/{images[0]}' if images else 'images/blossom_logo.png'
@@ -205,6 +247,8 @@ def render_page(filename, title, eyebrow, intro, images):
     </section>''')
     if images:
         blocks.append(gallery_html(images))
+    if filename == 'wedding-cakes.html':
+        blocks.append(WEDDING_PROCESS)
     if filename != 'contact.html':
         blocks.append(CTA)
     return f"""{head}
