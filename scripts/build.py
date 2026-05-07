@@ -30,9 +30,7 @@ PAGE_META = {
     'childrens-cakes':                 ("childrens-cakes.html",               'Birthdays & celebrations'),
     'ganache-drip-cakes':              ('ganache-drip-cakes.html',            'Modern · glossy'),
     'speciality-and-everyday-cakes':   ('speciality-and-everyday-cakes.html', 'Cakes for any reason'),
-    'catering-packages':               ('catering-packages.html',             'Events'),
     'numbered-birthday-cakes':         ('numbered-birthday-cakes.html',       'Big-number birthdays'),
-    'buttercream-flower-cakes':        ('buttercream-flower-cakes.html',      'Floral, by hand'),
     'giant-cookies':                   ('giant-cookies.html',                 'Decorated · personalised'),
     'traybakes':                       ('traybakes.html',                     'Catering & sharing'),
     'scones':                          ('scones.html',                        'Classic'),
@@ -48,7 +46,6 @@ NAV_HTML = '''<nav class="site-nav">
               <ul>
                 <li><a href="cakes.html"><strong>All Cakes</strong><span>Browse the gallery</span></a></li>
                 <li><a href="ganache-drip-cakes.html"><strong>Drip Cakes</strong><span>Modern · glossy</span></a></li>
-                <li><a href="buttercream-flower-cakes.html"><strong>Buttercream Flower</strong><span>Floral, by hand</span></a></li>
                 <li><a href="numbered-birthday-cakes.html"><strong>Numbered Birthday</strong><span>Big-number</span></a></li>
                 <li><a href="childrens-cakes.html"><strong>Children's Cakes</strong><span>Birthdays</span></a></li>
                 <li><a href="speciality-and-everyday-cakes.html"><strong>Speciality Cakes</strong><span>Every occasion</span></a></li>
