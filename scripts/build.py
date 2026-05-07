@@ -34,7 +34,7 @@ NAV_HTML = '''<button class="mobile-toggle" aria-label="Open menu" aria-expanded
       <nav class="site-nav">
         <ul class="site-nav__list">
           <li class="site-nav__item has-dropdown">
-            <a href="cakes.html"{CAKES_ACTIVE}>Cakes <span class="caret">▾</span></a>
+            <a href="cakes.html"{CAKES_ACTIVE}>Cakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
             <div class="site-dropdown">
               <ul>
                 <li><a href="cakes.html"><strong>All Cakes</strong><span>Browse the gallery</span></a></li>
@@ -46,7 +46,7 @@ NAV_HTML = '''<button class="mobile-toggle" aria-label="Open menu" aria-expanded
             </div>
           </li>
           <li class="site-nav__item has-dropdown">
-            <a href="weddings.html"{WED_ACTIVE}>Weddings <span class="caret">▾</span></a>
+            <a href="weddings.html"{WED_ACTIVE}>Weddings <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
             <div class="site-dropdown">
               <ul>
                 <li><a href="wedding-cakes.html"><strong>Wedding Cakes</strong><span>For your day</span></a></li>
@@ -55,7 +55,7 @@ NAV_HTML = '''<button class="mobile-toggle" aria-label="Open menu" aria-expanded
             </div>
           </li>
           <li class="site-nav__item has-dropdown">
-            <a href="handmade-biscuits.html"{BAKES_ACTIVE}>Bakes <span class="caret">▾</span></a>
+            <a href="handmade-biscuits.html"{BAKES_ACTIVE}>Bakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
             <div class="site-dropdown">
               <ul>
                 <li><a href="handmade-biscuits.html"><strong>Biscuits</strong><span>All-butter, hand-iced</span></a></li>
