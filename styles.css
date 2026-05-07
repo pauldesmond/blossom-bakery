@@ -884,3 +884,21 @@ section.alt { background: #fff; }
 @media (max-width: 760px) {
   .wb-gallery { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+/* Customer Reviews — editorial grid of testimonial cards */
+.reviews-intro { padding: 48px 0 16px; }
+.reviews-intro__lede { font-size: 1.1rem; color: var(--ink); line-height: 1.7; text-align: center; max-width: 620px; margin: 0 auto; }
+.reviews-intro__note { font-size: 0.92rem; color: var(--muted); line-height: 1.7; text-align: center; max-width: 580px; margin: 18px auto 0; }
+.reviews-intro__note a { color: var(--rose-dark); border-bottom: 1px solid currentColor; }
+.reviews-grid-section { padding: 48px 0 80px; }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1180px; margin: 0 auto; }
+@media (max-width: 880px) { .reviews-grid { grid-template-columns: 1fr 1fr; gap: 18px; } }
+@media (max-width: 540px) { .reviews-grid { grid-template-columns: 1fr; } }
+.review-card { background: #fffdfb; border: 1px solid var(--border); border-radius: 14px; padding: 28px 26px; display: flex; flex-direction: column; gap: 16px; transition: transform 0.18s, box-shadow 0.18s; }
+.review-card:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -22px rgba(74, 30, 26, 0.18); }
+.review-card__stars { color: var(--rose-dark); font-size: 0.9rem; letter-spacing: 4px; }
+.review-card__quote { font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-style: italic; line-height: 1.55; color: var(--ink); margin: 0; flex: 1; }
+.review-card__author { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; border-top: 1px solid var(--border); }
+.review-card__author strong { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; font-size: 1.05rem; color: var(--ink); }
+.review-card__author span { font-size: 0.7rem; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); }
