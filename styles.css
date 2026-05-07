@@ -816,3 +816,6 @@ section.alt { background: #fff; }
   transition: all 0.25s;
 }
 .btn-primary-v2:hover { background: var(--rose-dark); }
+
+/* Small subdued note inside .prose blocks (e.g. delivery caveat) */
+.prose__note { font-size: 0.92rem; color: var(--muted); font-style: italic; margin-top: 16px; }
