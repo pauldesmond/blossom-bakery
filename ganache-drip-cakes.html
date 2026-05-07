@@ -324,7 +324,14 @@
         a.addEventListener('click', function(e) {
           if (window.innerWidth <= 880) {
             e.preventDefault();
-            a.parentElement.classList.toggle('is-open');
+            var li = a.parentElement;
+            var wasOpen = li.classList.contains('is-open');
+            // Close every dropdown first (single-open behaviour)
+            document.querySelectorAll('.site-nav__item.has-dropdown.is-open').forEach(function(o){
+              o.classList.remove('is-open');
+            });
+            // Then re-open this one if it wasn't already open
+            if (!wasOpen) li.classList.add('is-open');
           }
         });
       });
