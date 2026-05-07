@@ -114,7 +114,7 @@ FOOTER = '''<footer class="site-footer">
         </div>
       </div>
       <div class="site-footer__bottom">
-        © 2026 Blossom Bakery · Helen Victors · Great Baddow, Chelmsford
+        © 2026 Blossom Bakery · Helen Desmond · Great Baddow, Chelmsford
       </div>
     </div>
   </footer>'''
@@ -229,7 +229,7 @@ WEDDING_PROCESS = '''<section class="section-ink">
     </section>'''
 
 def render_page(filename, title, eyebrow, intro, images):
-    description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Victors.'
+    description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Desmond.'
     og_image = f'images/{images[0]}' if images else 'images/blossom_logo.png'
     head = HEADER_TPL.format(title=title, description=description, filename=filename,
                              og_image=og_image, nav=render_nav(filename))

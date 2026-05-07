@@ -232,7 +232,7 @@ def intro_paragraphs_after_lede(paragraphs):
 
 
 def render_page(filename, title, eyebrow, intro, images):
-    description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Victors.'
+    description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Desmond.'
     og_image = f'images/{images[0]}' if images else 'images/blossom_logo.png'
     paragraphs = split_paragraphs(clean_intro(intro))
     lede = lede_html(paragraphs)
