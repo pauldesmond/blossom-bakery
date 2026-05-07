@@ -196,3 +196,36 @@ section.alt { background: #fff; }
 .wedding-section__p:last-of-type { margin-bottom: 0; }
 .wedding-photo-grid { margin-top: 32px; }
 .wedding-photo-grid img { aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; }
+
+/* Wedding section refinements */
+.wedding-section { padding: 64px 0 32px; }
+.wedding-section + .wedding-section { padding-top: 32px; border-top: 1px solid var(--border); }
+.wedding-section__eyebrow { text-align: center; font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-dark); margin-bottom: 8px; font-weight: 500; }
+.wedding-section__heading { text-align: center; font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 500; color: var(--ink); margin-bottom: 28px; letter-spacing: -0.3px; }
+.wedding-section__heading + .wedding-section__p { max-width: 620px; margin-left: auto; margin-right: auto; text-align: center; }
+.wedding-section__p { font-size: 1.02rem; color: var(--ink); line-height: 1.8; margin-bottom: 14px; }
+.wedding-section__p--note { font-size: 0.92rem; color: var(--muted); text-align: center; }
+.wedding-photo-grid { margin-top: 32px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.wedding-photo-grid img { aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; }
+
+/* Price table — Lambeth cake sizes */
+.price-table { width: 100%; max-width: 720px; margin: 32px auto; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.price-table caption { caption-side: top; font-size: 0.72rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); padding-bottom: 12px; text-align: left; padding-left: 4px; }
+.price-table thead { background: var(--cream); }
+.price-table th { text-align: left; font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; font-weight: 600; color: var(--ink); padding: 14px 20px; letter-spacing: 0.3px; }
+.price-table td { padding: 14px 20px; border-top: 1px solid var(--border); font-size: 0.95rem; color: var(--ink); }
+.price-table td:last-child { color: var(--rose-dark); font-weight: 600; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-style: italic; }
+.price-table tbody tr:hover { background: rgba(232, 165, 165, 0.05); }
+@media (max-width: 540px) { .price-table th, .price-table td { padding: 10px 12px; font-size: 0.88rem; } }
+
+/* Taster cupcakes price cards */
+.taster-prices { display: flex; gap: 20px; justify-content: center; margin: 28px 0; flex-wrap: wrap; }
+.taster-price-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 22px 36px; text-align: center; min-width: 140px; transition: transform 0.18s, box-shadow 0.18s; }
+.taster-price-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -16px rgba(74, 30, 26, 0.2); }
+.taster-price-card strong { display: block; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.3rem; color: var(--ink); font-weight: 500; }
+.taster-price-card span { display: block; margin-top: 6px; color: var(--rose-dark); font-size: 1.4rem; font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+
+/* Sweet-treat list */
+.treat-list { list-style: none; padding: 0; max-width: 580px; margin: 24px auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px 18px; }
+.treat-list li { font-size: 0.95rem; color: var(--ink); padding-left: 16px; position: relative; }
+.treat-list li::before { content: "✿"; position: absolute; left: 0; color: var(--rose-dark); font-size: 0.7em; top: 2px; }

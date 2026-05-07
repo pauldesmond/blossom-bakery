@@ -16,7 +16,9 @@ OUT = ROOT
 
 # slug → (filename, eyebrow shown above hero title)
 PAGE_META = {
-    'weddings':                        ('weddings.html',                      'Weddings'),
+    # 'weddings' removed — weddings.html is now a 301 stub redirecting to
+    # wedding-bakes.html. Both wedding-cakes.html and wedding-bakes.html are
+    # hand-crafted (multi-section, with price tables) — not auto-built.
     'handmade-biscuits':               ('handmade-biscuits.html',             'Biscuits'),
 # 'wedding-cakes' removed from PAGE_META — page is hand-crafted (matches the WP
 # weddings-4 multi-section layout with interleaved photo blocks + the v2 'stress-
@@ -58,7 +60,7 @@ NAV_HTML = '''<nav class="site-nav">
             <div class="site-dropdown">
               <ul>
                 <li><a href="wedding-cakes.html"><strong>Wedding Cakes</strong><span>For your day</span></a></li>
-                <li><a href="weddings.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
+                <li><a href="wedding-bakes.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
               </ul>
             </div>
           </li>
@@ -83,7 +85,8 @@ NAV_HTML = '''<nav class="site-nav">
 # parent's active state at runtime via CSS — no separate flag needed.
 NAV_KEY = {
     'cakes.html':              'CAKES',
-    'weddings.html':           'WED',
+    'wedding-cakes.html':      'WED',  # Wedding Cakes sub-item — highlight the Weddings parent
+    'wedding-bakes.html':      'WED',  # Wedding Bakes sub-item — highlight the Weddings parent
     'handmade-biscuits.html':  'BAKES',  # Biscuits sub-item lives in Bakes dropdown — highlight the parent
     'traybakes.html':          'BAKES',  # Tray bakes sub-item lives in Bakes dropdown — highlight the parent
     'cupcakes.html':           'CC',
