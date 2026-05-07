@@ -30,7 +30,8 @@ PAGE_META = {
     'about':                           ('about.html',                         'Meet the baker'),
 }
 
-NAV_HTML = '''<nav class="site-nav">
+NAV_HTML = '''<button class="mobile-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primaryNav"><span></span><span></span><span></span></button>
+      <nav class="site-nav">
         <ul class="site-nav__list">
           <li class="site-nav__item has-dropdown">
             <a href="cakes.html"{CAKES_ACTIVE}>Cakes <span class="caret">▾</span></a>

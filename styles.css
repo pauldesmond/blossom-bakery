@@ -94,16 +94,39 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .btn--pill { padding: 9px 22px; border-width: 1px; border-radius: 999px; font-size: 0.82rem; letter-spacing: 0.5px; }
+
+/* Hamburger button — hidden on desktop, shown on mobile */
+.mobile-toggle { display: none; background: transparent; border: 0; padding: 8px; cursor: pointer; align-items: center; justify-content: center; gap: 5px; flex-direction: column; width: 36px; height: 36px; }
+.mobile-toggle span { display: block; width: 22px; height: 2px; background: var(--ink); border-radius: 2px; transition: transform 0.22s, opacity 0.22s; }
+.site-nav.is-open ~ .mobile-toggle span:nth-child(1),
+.site-header__inner:has(.site-nav.is-open) .mobile-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.site-header__inner:has(.site-nav.is-open) .mobile-toggle span:nth-child(2) { opacity: 0; }
+.site-header__inner:has(.site-nav.is-open) .mobile-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
 @media (max-width: 880px) {
-  .site-header__inner { gap: 14px 18px; }
-  .site-nav__list { justify-content: center; gap: 4px 18px; }
-  .site-nav__list a { font-size: 0.88rem; }
-  /* On mobile the dropdown becomes static (always-visible inline list) — pure-hover doesn't tap */
-  .site-dropdown { position: static; transform: none; opacity: 1; visibility: visible; box-shadow: none; border: 0; padding: 4px 0 8px; min-width: 0; background: transparent; }
-  .site-dropdown li a { padding: 6px 0; text-align: center; }
-  .site-dropdown strong { font-size: 0.92rem; font-style: normal; }
-  .site-dropdown span { display: none; }
+  .site-header__inner { gap: 14px 18px; flex-wrap: wrap; }
+  .mobile-toggle { display: flex; order: 2; }
+  .site-header__brand { order: 1; flex: 1; }
+  .btn--pill { display: none; }  /* Enquire pill hides on mobile (it's inside the open menu) */
+
+  /* Mobile nav: collapsed by default, full-width vertical when open */
+  .site-nav { display: none; flex-basis: 100%; order: 99; padding-top: 12px; border-top: 1px solid var(--border); margin-top: 12px; }
+  .site-nav.is-open { display: block; }
+  .site-nav__list { flex-direction: column; gap: 0; align-items: stretch; justify-content: flex-start; }
+  .site-nav__list > li { border-bottom: 1px solid var(--border); }
+  .site-nav__list > li:last-child { border-bottom: 0; }
+  .site-nav__list a { font-size: 1rem; padding: 14px 4px; display: block; }
+
+  /* Dropdowns: collapsed by default on mobile, expanded when parent is .is-open */
+  .site-dropdown { display: none; position: static; transform: none; opacity: 1; visibility: visible; box-shadow: none; border: 0; padding: 4px 0 12px 16px; min-width: 0; background: transparent; }
+  .site-nav__item.has-dropdown.is-open > .site-dropdown { display: block; }
+  .site-dropdown li a { padding: 8px 0; border-bottom: 0; font-size: 0.92rem; }
+  .site-dropdown strong { font-size: 0.95rem; font-style: normal; }
+  .site-dropdown span { display: block; font-size: 0.65rem; }
+
   .site-nav__list .caret { display: none; }
+  .site-nav__item.has-dropdown > a::after { content: "+"; float: right; opacity: 0.45; font-weight: 300; padding-left: 8px; }
+  .site-nav__item.has-dropdown.is-open > a::after { content: "−"; }
 }
 
 /* Hero */
