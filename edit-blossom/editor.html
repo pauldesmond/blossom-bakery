@@ -33,7 +33,6 @@
 
     /* App shell */
     .app { display: grid; grid-template-columns: 280px 1fr 340px; grid-template-rows: 56px 1fr; height: 100vh; }
-    .app--idle { grid-template-columns: 280px 1fr; }
     .topbar { grid-column: 1 / -1; background: var(--paper); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 20px; gap: 16px; }
     .brand { font-family: var(--serif); font-size: 22px; font-weight: 500; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
     .brand img { width: 32px; height: 32px; }
@@ -138,7 +137,7 @@
 
     /* Mobile-friendly */
     @media (max-width: 900px) {
-      .app, .app--idle { grid-template-columns: 1fr; grid-template-rows: 56px auto auto auto; }
+      .app { grid-template-columns: 1fr; grid-template-rows: 56px auto auto auto; }
       .sidebar, .inspector { max-height: 240px; }
       .stage { padding: 8px; }
       .stage__device { min-height: 60vh; }

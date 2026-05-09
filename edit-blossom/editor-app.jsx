@@ -186,7 +186,10 @@ function App() {
     function fit() {
       const w = device.clientWidth;
       const h = device.clientHeight;
-      const scale = Math.min(1, w / FRAME_W);
+      // Scale freely (no cap at 1) so the iframe always fills the stage width.
+      // Iframe stays at 1280px internally so the live nav renders desktop, not
+      // hamburger; CSS transform handles the visual fit.
+      const scale = w / FRAME_W;
       scaler.style.transform = `scale(${scale})`;
       scaler.style.height = `${h / scale}px`;
       scaler.style.width = `${FRAME_W}px`;
@@ -320,9 +323,8 @@ function App() {
     setShowExport(false);
   }
 
-  const inspectorOpen = !!(selection || imageEdit);
   return (
-    <div className={'app' + (inspectorOpen ? '' : ' app--idle')}>
+    <div className="app">
       {/* Top bar */}
       <div className="topbar">
         <div className="brand">
@@ -389,8 +391,8 @@ function App() {
         <div className="stage__hint">Click any text or image on the page to edit</div>
       </div>
 
-      {/* Inspector — only renders when actively editing; idle state hides the column */}
-      {inspectorOpen && <div className="inspector">
+      {/* Inspector */}
+      <div className="inspector">
         {selection ? (
           <div className="inspector__section">
             <h2 className="inspector__title">Editing text</h2>
@@ -449,7 +451,7 @@ function App() {
             )}
           </div>
         )}
-      </div>}
+      </div>
 
       {/* Export modal */}
       {showExport && (
