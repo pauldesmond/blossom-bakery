@@ -6,37 +6,36 @@ const { useState, useEffect, useRef, useCallback, useMemo } = React;
 // ──────────────────────────────────────────────────────────────────
 const PAGES = [
   { id: 'index', file: 'index.html', label: 'Homepage', published: true },
-  { id: 'wedding-cakes', file: 'wedding-cakes.html', label: 'Wedding Cakes', published: true },
-  { id: 'cupcakes', file: 'cupcakes.html', label: 'Cupcakes', published: true },
-  { id: 'contact', file: 'contact.html', label: 'Contact', published: true },
   { id: 'about', file: 'about.html', label: 'About Helen', published: true },
-  { id: 'cakes', file: 'cakes.html', label: 'Speciality Cakes', published: true },
-  { id: 'ganache-drip-cakes', file: 'ganache-drip-cakes.html', label: 'Ganache Drip', published: true },
+  { id: 'wedding-cakes', file: 'wedding-cakes.html', label: 'Wedding Cakes', published: true },
+  { id: 'wedding-bakes', file: 'wedding-bakes.html', label: 'Wedding Bakes', published: true },
+  { id: 'cakes', file: 'cakes.html', label: 'Cakes (gallery)', published: true },
+  { id: 'ganache-drip-cakes', file: 'ganache-drip-cakes.html', label: 'Drip Cakes', published: true },
   { id: 'numbered-birthday-cakes', file: 'numbered-birthday-cakes.html', label: 'Numbered Birthday', published: true },
   { id: 'childrens-cakes', file: 'childrens-cakes.html', label: "Children's Cakes", published: true },
+  { id: 'speciality-and-everyday-cakes', file: 'speciality-and-everyday-cakes.html', label: 'Speciality & Everyday', published: true },
+  { id: 'cupcakes', file: 'cupcakes.html', label: 'Cupcakes', published: true },
   { id: 'handmade-biscuits', file: 'handmade-biscuits.html', label: 'Biscuits', published: true },
+  { id: 'traybakes', file: 'traybakes.html', label: 'Tray Bakes', published: true },
   { id: 'giant-cookies', file: 'giant-cookies.html', label: 'Giant Cookies', published: true },
   { id: 'scones', file: 'scones.html', label: 'Scones', published: true },
-  { id: 'traybakes', file: 'traybakes.html', label: 'Traybakes', published: true },
-  { id: 'wedding-bakes', file: 'wedding-bakes.html', label: 'Wedding Bakes', published: true },
-  { id: 'afternoon-teas', file: 'afternoon-teas.html', label: 'Afternoon Tea', published: true },
-  { id: 'customer-reviews', file: 'customer-reviews.html', label: 'Customer Reviews', published: true },
+  { id: 'afternoon-tea', file: 'afternoon-tea.html', label: 'Afternoon Tea', published: true },
+  { id: 'customer-reviews', file: 'customer-reviews.html', label: 'Testimonials', published: true },
+  { id: 'contact', file: 'contact.html', label: 'Contact', published: true },
 ];
 
 const STORAGE_KEY = 'blossom-editor-draft-v1';
-const BASE_PATH = '../'; // editor lives in /edit-blossom/, site files are one level up
+// Editor lives at /edit-blossom/editor.html; the live site is one level up
+// so iframe srcs need '../' to escape the editor folder.
+const BASE_PATH = '../';
 
-// CSS injected into the iframe to shrink the header for compact editing
+// CSS injected into the iframe so editing UI is unambiguous.
+// The live site's chrome is already well-proportioned — leave it alone.
 const IFRAME_CSS = `
-  .site-header { padding: 14px 0 !important; }
-  .site-header__inner { gap: 24px !important; }
-  .site-header__logo img { height: 60px !important; width: 60px !important; }
-  .site-header__logo span { font-size: 22px !important; }
-  .site-nav { display: flex !important; }
-  .site-nav__link { font-size: 16px !important; padding: 6px 12px 8px !important; }
-  .site-nav__cta { padding: 8px 16px !important; font-size: 11px !important; }
-  .mega { top: 96px !important; }
-  /* Keep frosted-glass effect — only adjust sizing */
+  /* Soften any hover transitions that fight the editor's outline */
+  *:focus-within { outline: none !important; }
+  /* Make sure long content can scroll without clipping inside the editor stage */
+  html, body { overflow-x: hidden; }
 `;
 
 // ──────────────────────────────────────────────────────────────────
@@ -76,7 +75,8 @@ const IFRAME_INJECT = `
 
   function isEditable(el) {
     if (!el || el.closest('[data-edit-skip]')) return false;
-    if (el.closest('header.site-header, footer.site-footer, .mega, .lb, nav, [data-mega], [data-mega-panel]')) return false;
+    // Don't allow editing structural chrome — header, footer, nav, dropdowns, lightboxes
+    if (el.closest('header.site-header, footer.site-footer, .site-dropdown, .mega, .lb, nav, [data-mega], [data-mega-panel]')) return false;
     return el.matches(SELECTORS);
   }
 
@@ -121,7 +121,7 @@ const IFRAME_INJECT = `
 
   document.addEventListener('click', (e) => {
     // Image click → swap
-    if (e.target.tagName === 'IMG' && !e.target.closest('header, footer, .lb')) {
+    if (e.target.tagName === 'IMG' && !e.target.closest('header, footer, .lb, nav, .site-dropdown')) {
       e.preventDefault(); e.stopPropagation();
       const src = e.target.getAttribute('src');
       window.parent.postMessage({ type: 'edit-image', src, alt: e.target.alt }, '*');
@@ -184,6 +184,35 @@ function App() {
   const [showExport, setShowExport] = useState(false);
   const [imageEdit, setImageEdit] = useState(null);
   const iframeRef = useRef(null);
+  const deviceRef = useRef(null);
+  const scalerRef = useRef(null);
+
+  // Keep the iframe (rendered at fixed 1280px desktop width) scaled to fit
+  // the available stage area. This guarantees the live nav stays desktop, no hamburger.
+  useEffect(() => {
+    const device = deviceRef.current;
+    const scaler = scalerRef.current;
+    if (!device || !scaler) return;
+    const FRAME_W = 1280;
+    function fit() {
+      const w = device.clientWidth;
+      const h = device.clientHeight;
+      const scale = Math.min(1, w / FRAME_W);
+      scaler.style.transform = `scale(${scale})`;
+      scaler.style.height = `${h / scale}px`;
+      scaler.style.width = `${FRAME_W}px`;
+      // Also update iframe height so it fills the (now-scaled) device
+      const f = scaler.querySelector('iframe');
+      if (f) {
+        f.style.width = `${FRAME_W}px`;
+        f.style.height = `${h / scale}px`;
+      }
+    }
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(device);
+    return () => ro.disconnect();
+  }, []);
 
   const activePage = PAGES.find(p => p.id === activePageId);
   const pageEdits = draft.edits[activePageId] || {};
@@ -355,14 +384,16 @@ function App() {
 
       {/* Stage */}
       <div className="stage editing">
-        <div className="stage__device">
-          <iframe
-            ref={iframeRef}
-            className="stage__frame"
-            src={BASE_PATH + (activePage?.file || 'index.html')}
-            onLoad={onIframeLoad}
-            key={activePageId}
-          ></iframe>
+        <div className="stage__device" ref={deviceRef}>
+          <div className="stage__scaler" ref={scalerRef}>
+            <iframe
+              ref={iframeRef}
+              className="stage__frame"
+              src={BASE_PATH + (activePage?.file || 'index.html')}
+              onLoad={onIframeLoad}
+              key={activePageId}
+            ></iframe>
+          </div>
         </div>
         <div className="stage__hint">Click any text or image on the page to edit</div>
       </div>

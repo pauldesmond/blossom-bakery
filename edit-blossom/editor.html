@@ -73,10 +73,12 @@
     .new-page-btn { width: 100%; padding: 10px; border: 1px dashed var(--line); border-radius: var(--r-sm); background: transparent; color: var(--ink-soft); font-size: 13px; }
     .new-page-btn:hover { border-color: var(--rose-deep); color: var(--rose-deep); border-style: solid; }
 
-    /* Stage (preview) */
+    /* Stage (preview) — iframe rendered at fixed desktop width (1280) and scaled to fit
+       so nav stays desktop, never falls back to hamburger. */
     .stage { background: linear-gradient(180deg, #ece4d6 0%, #d8cebd 100%); overflow: auto; padding: 20px; position: relative; }
-    .stage__device { background: var(--paper); border-radius: var(--r-md); box-shadow: var(--shadow); margin: 0 auto; max-width: 1200px; min-height: calc(100vh - 96px); position: relative; overflow: hidden; }
-    .stage__frame { width: 100%; height: calc(100vh - 96px); border: 0; display: block; }
+    .stage__device { background: var(--paper); border-radius: var(--r-md); box-shadow: var(--shadow); margin: 0 auto; position: relative; overflow: hidden; height: calc(100vh - 96px); }
+    .stage__scaler { width: 1280px; height: 1100px; transform-origin: top left; }
+    .stage__frame { width: 1280px; height: 1100px; border: 0; display: block; }
     .stage__hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(43,31,28,.85); color: var(--paper); padding: 8px 14px; border-radius: 999px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity .2s; }
     .stage.editing .stage__hint { opacity: 1; }
 
