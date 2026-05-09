@@ -320,8 +320,9 @@ function App() {
     setShowExport(false);
   }
 
+  const inspectorOpen = !!(selection || imageEdit);
   return (
-    <div className="app">
+    <div className={'app' + (inspectorOpen ? '' : ' app--idle')}>
       {/* Top bar */}
       <div className="topbar">
         <div className="brand">
@@ -388,8 +389,8 @@ function App() {
         <div className="stage__hint">Click any text or image on the page to edit</div>
       </div>
 
-      {/* Inspector */}
-      <div className="inspector">
+      {/* Inspector — only renders when actively editing; idle state hides the column */}
+      {inspectorOpen && <div className="inspector">
         {selection ? (
           <div className="inspector__section">
             <h2 className="inspector__title">Editing text</h2>
@@ -448,7 +449,7 @@ function App() {
             )}
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Export modal */}
       {showExport && (
