@@ -16,82 +16,124 @@ OUT = ROOT
 
 # slug → (filename, eyebrow shown above hero title)
 PAGE_META = {
-    # 'weddings' removed — weddings.html is now a 301 stub redirecting to
-    # wedding-bakes.html. Both wedding-cakes.html and wedding-bakes.html are
-    # hand-crafted (multi-section, with price tables) — not auto-built.
-# 'wedding-cakes' removed from PAGE_META — page is hand-crafted (matches the WP
-# weddings-4 multi-section layout with interleaved photo blocks + the v2 'stress-
-# free' panel). Helen edits it via direct collaboration with Paul, not via Decap.
-    # 'afternoon-teas' removed — afternoon-tea.html is now hand-crafted as a
-    # menu of cards (one per tea offering, with price + photo). The old
-    # afternoon-teas.html URL is a meta-refresh redirect.
-    'scones':                          ('scones.html',                        'Classic'),
-    # 'customer-reviews' removed from PAGE_META — testimonials are now hand-crafted as
-    # individual review cards (one per quote) with per-card author + location, not a
-    # single mega-paragraph. Helen edits via direct collaboration with Paul, not Decap.
+    # ---------------------------------------------------------------------
+    # Only TWO pages are still auto-generated from _pages/*.yml: about and
+    # scones. Everything else has been hand-crafted in the v2 redesign and
+    # is edited directly (via the editor → apply-draft pipeline). Adding a
+    # slug here MUST be matched by flipping its `generated: true` flag in
+    # _data/pages.json AND verifying the YAML's content reflects what's
+    # currently on the live HTML, or the next CI build will overwrite it.
+    # ---------------------------------------------------------------------
     'about':                           ('about.html',                         'Meet the baker'),
+    'scones':                          ('scones.html',                        'Classic'),
 }
 
-NAV_HTML = '''<button class="mobile-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primaryNav"><span></span><span></span><span></span></button>
-      <nav class="site-nav">
-        <ul class="site-nav__list">
-          <li class="site-nav__item has-dropdown">
-            <a href="cakes.html"{CAKES_ACTIVE}>Cakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-            <div class="site-dropdown">
-              <ul>
-                <li><a href="cakes.html"><strong>All Cakes</strong><span>Browse the gallery</span></a></li>
-                <li><a href="ganache-drip-cakes.html"><strong>Drip Cakes</strong><span>Modern · glossy</span></a></li>
-                <li><a href="numbered-birthday-cakes.html"><strong>Numbered Birthday</strong><span>Big-number</span></a></li>
-                <li><a href="childrens-cakes.html"><strong>Children's Cakes</strong><span>Birthdays</span></a></li>
-                <li><a href="speciality-and-everyday-cakes.html"><strong>Speciality Cakes</strong><span>Every occasion</span></a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="site-nav__item has-dropdown">
-            <a href="weddings.html"{WED_ACTIVE}>Weddings <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-            <div class="site-dropdown">
-              <ul>
-                <li><a href="wedding-cakes.html"><strong>Wedding Cakes</strong><span>For your day</span></a></li>
-                <li><a href="wedding-bakes.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="site-nav__item has-dropdown">
-            <a href="handmade-biscuits.html"{BAKES_ACTIVE}>Bakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-            <div class="site-dropdown">
-              <ul>
-                <li><a href="handmade-biscuits.html"><strong>Biscuits</strong><span>All-butter, hand-iced</span></a></li>
-                <li><a href="traybakes.html"><strong>Tray bakes</strong><span>Catering &amp; sharing</span></a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="site-nav__item"><a href="cupcakes.html"{CC_ACTIVE}>Cupcakes</a></li>
-          <li class="site-nav__item"><a href="afternoon-tea.html"{AT_ACTIVE}>Afternoon tea</a></li>
-          <li class="site-nav__item"><a href="customer-reviews.html"{CR_ACTIVE}>Testimonials</a></li>
-        </ul>
-      </nav>'''
+# ---------------------------------------------------------------------------
+# Site nav is built from _data/pages.json — the single source of truth shared
+# with the editor and apply-draft.py. To add or rearrange a nav item, edit
+# pages.json (no Python changes needed).
+#
+# Nav model:
+#   - A page with nav.topLevel=true appears on the main bar.
+#   - Pages sharing nav.section form a dropdown; the topLevel page in that
+#     section is the dropdown's parent link AND its first child entry.
+#   - A topLevel page with no section is a plain top-level link.
+#   - Pages with no nav field (or unpublished) are hidden.
+#   - Active highlighting cascades: a child page in a dropdown highlights its
+#     parent's top-level item.
+# ---------------------------------------------------------------------------
 
-# Map of page filename → active-flag key. Helen's nav is intentionally slim:
-# only the 7 top-level items are highlightable. Pages reached via dropdown
-# sub-links (drip cakes, children's cakes, wedding cakes, etc.) inherit the
-# parent's active state at runtime via CSS — no separate flag needed.
-NAV_KEY = {
-    'cakes.html':              'CAKES',
-    'wedding-cakes.html':      'WED',  # Wedding Cakes sub-item — highlight the Weddings parent
-    'wedding-bakes.html':      'WED',  # Wedding Bakes sub-item — highlight the Weddings parent
-    'handmade-biscuits.html':  'BAKES',  # Biscuits sub-item lives in Bakes dropdown — highlight the parent
-    'traybakes.html':          'BAKES',  # Tray bakes sub-item lives in Bakes dropdown — highlight the parent
-    'cupcakes.html':           'CC',
-    'afternoon-tea.html':      'AT',  # singular URL after rename from afternoon-teas.html
-    'customer-reviews.html':   'CR',
-}
+import json as _json
+
+def _load_nav_data():
+    """Read pages.json and return list of published pages with nav data."""
+    pages_json = ROOT / '_data' / 'pages.json'
+    with pages_json.open('r', encoding='utf-8') as f:
+        data = _json.load(f)
+    return [p for p in data.get('pages', []) if p.get('published') and p.get('nav')]
+
+def _build_nav_tree(pages):
+    """Group pages into top-level entries (with optional dropdown children)."""
+    sections = {}  # section_key -> { parent, children, sectionLabel, sectionOrder }
+    standalone = []  # top-level entries with no section
+    for p in pages:
+        nav = p['nav']
+        section = nav.get('section')
+        if section:
+            bucket = sections.setdefault(section, {'parent': None, 'children': [], 'sectionLabel': section, 'sectionOrder': 9999})
+            bucket['children'].append(p)
+            if nav.get('topLevel'):
+                bucket['parent'] = p
+                bucket['sectionLabel'] = nav.get('sectionLabel', section)
+                bucket['sectionOrder'] = nav.get('sectionOrder', 9999)
+        elif nav.get('topLevel'):
+            standalone.append(p)
+    # Sort children within each section by nav.order
+    for bucket in sections.values():
+        bucket['children'].sort(key=lambda p: p['nav'].get('order', 9999))
+    # Build top-level list mixing dropdowns and standalone, sorted by sectionOrder
+    top_level = []
+    for key, bucket in sections.items():
+        if not bucket['parent']:
+            # Section with children but no topLevel anchor — skip (misconfigured)
+            continue
+        top_level.append(('dropdown', bucket))
+    for p in standalone:
+        top_level.append(('link', p))
+    top_level.sort(key=lambda item: (item[1]['nav'].get('sectionOrder', 9999) if item[0] == 'link' else item[1]['sectionOrder']))
+    return top_level
+
+def _section_for_filename(pages, filename):
+    """Find which section (if any) a given page filename belongs to."""
+    for p in pages:
+        if p['file'] == filename:
+            return p['nav'].get('section')
+    return None
+
+_CARET_SVG = '<span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+
+_MOBILE_TOGGLE = '<button class="mobile-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primaryNav"><span></span><span></span><span></span></button>'
 
 def render_nav(active_filename):
-    nav = NAV_HTML
-    for fn, key in NAV_KEY.items():
-        replace = ' class="active"' if fn == active_filename else ''
-        nav = nav.replace('{' + key + '_ACTIVE}', replace)
-    return nav
+    pages = _load_nav_data()
+    top_level = _build_nav_tree(pages)
+    active_section = _section_for_filename(pages, active_filename)
+
+    # Mobile-toggle button precedes <nav> — the live styles.css and the JS
+    # `aria-controls="primaryNav"` wiring both depend on this exact markup.
+    out = [_MOBILE_TOGGLE, '      <nav class="site-nav">', '        <ul class="site-nav__list">']
+    for kind, item in top_level:
+        if kind == 'link':
+            href = item['file']
+            label = item['nav'].get('label', item['label'])
+            cls = ' class="active"' if href == active_filename else ''
+            out.append(f'          <li class="site-nav__item"><a href="{ihtml.escape(href)}"{cls}>{ihtml.escape(label)}</a></li>')
+        else:  # dropdown
+            bucket = item
+            parent = bucket['parent']
+            section_key = parent['nav'].get('section')
+            parent_href = parent['file']
+            section_label = bucket['sectionLabel']
+            is_active = (section_key and section_key == active_section)
+            cls = ' class="active"' if is_active else ''
+            out.append('          <li class="site-nav__item has-dropdown">')
+            # Caret is the SVG version — styles.css `.site-nav__list .caret svg`
+            # styles it specifically; a plain `▾` won't render correctly.
+            out.append(f'            <a href="{ihtml.escape(parent_href)}"{cls}>{ihtml.escape(section_label)} {_CARET_SVG}</a>')
+            out.append('            <div class="site-dropdown">')
+            out.append('              <ul>')
+            for child in bucket['children']:
+                child_href = child['file']
+                child_label = child['nav'].get('label', child['label'])
+                child_note = child['nav'].get('note', '')
+                note_html = f'<span>{ihtml.escape(child_note)}</span>' if child_note else ''
+                out.append(f'                <li><a href="{ihtml.escape(child_href)}"><strong>{ihtml.escape(child_label)}</strong>{note_html}</a></li>')
+            out.append('              </ul>')
+            out.append('            </div>')
+            out.append('          </li>')
+    out.append('        </ul>')
+    out.append('      </nav>')
+    return '\n'.join(out)
 
 FOOTER = '''<footer class="site-footer">
     <div class="container">
