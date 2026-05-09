@@ -1,5 +1,5 @@
 {
-  "_comment": "Canonical page registry. Read by both edit-blossom/editor-app.jsx (fetched at runtime) and scripts/apply-draft.py (read at run). When you add or rename a page, edit it HERE and only here. The 'generated' flag must match scripts/build.py's PAGE_META — pages where generated=true are rebuilt from _pages/<id>.yml on every CI run, so apply-draft.py also mirrors edits into the YAML.",
+  "_comment": "Canonical page registry. Read by both edit-blossom/editor-app.jsx (fetched at runtime) and scripts/apply-draft.py (read at run). When you add or rename a page, edit it HERE and only here. The 'generated' flag must match scripts/build.py's PAGE_META exactly. If you add a page to PAGE_META, also flip its generated flag to true here — and confirm the YAML's content reflects what's currently on the live HTML, or the next build will overwrite it.",
   "pages": [
     {
       "id": "index",
