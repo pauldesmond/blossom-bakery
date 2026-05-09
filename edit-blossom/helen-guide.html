@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to update your website — Blossom Bakery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #faf6f1;
+      --bg-soft: #f3ece2;
+      --paper: #fffdfb;
+      --ink: #2b1f1c;
+      --ink-soft: #6b5a55;
+      --rose: #e7b6b6;
+      --rose-soft: #f5dbd9;
+      --rose-deep: #b56a78;
+      --line: #e6dccf;
+      --serif: 'Fraunces', Georgia, serif;
+      --sans: 'Inter', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap { max-width: 720px; margin: 0 auto; padding: 80px 28px 120px; }
+
+    /* Hero */
+    .hero { text-align: center; margin-bottom: 72px; }
+    .hero__eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--rose-deep);
+      margin: 0 0 18px;
+      font-weight: 500;
+    }
+    .hero__title {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(40px, 6vw, 64px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin: 0 0 18px;
+      text-wrap: balance;
+    }
+    .hero__title em { font-style: italic; color: var(--rose-deep); }
+    .hero__intro {
+      font-family: var(--serif);
+      font-size: 21px;
+      line-height: 1.5;
+      color: var(--ink-soft);
+      margin: 0 auto;
+      max-width: 540px;
+      text-wrap: pretty;
+      font-style: italic;
+      font-weight: 300;
+    }
+    .hero__rule {
+      width: 60px;
+      height: 1px;
+      background: var(--rose-deep);
+      margin: 36px auto 0;
+      border: 0;
+    }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      counter-reset: step;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .step__num {
+      font-family: var(--serif);
+      font-size: 56px;
+      font-weight: 300;
+      line-height: 1;
+      color: var(--rose-deep);
+      letter-spacing: -0.02em;
+      font-feature-settings: "lnum";
+    }
+    .step__body h2 {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin: 8px 0 12px;
+    }
+    .step__body p {
+      margin: 0 0 12px;
+      color: var(--ink);
+    }
+    .step__body p.muted { color: var(--ink-soft); font-size: 15px; }
+    .step__body a {
+      color: var(--rose-deep);
+      text-decoration: underline;
+      text-decoration-color: var(--rose);
+      text-underline-offset: 3px;
+    }
+    .step__body code {
+      background: var(--bg-soft);
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.92em;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      color: var(--ink);
+    }
+    .step__body strong { color: var(--ink); font-weight: 600; }
+
+    /* Tip card inside a step */
+    .tip {
+      margin-top: 16px;
+      padding: 18px 22px;
+      background: var(--rose-soft);
+      border-radius: 10px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .tip__label {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--rose-deep);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      margin-right: 6px;
+    }
+
+    /* Sub-list inside a step */
+    .step__list {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .step__list li {
+      padding-left: 22px;
+      position: relative;
+      color: var(--ink);
+    }
+    .step__list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--rose);
+    }
+
+    /* CTA bookmark card */
+    .cta {
+      margin: 40px 0 64px;
+      padding: 32px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      text-align: center;
+    }
+    .cta__label {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 10px;
+    }
+    .cta__url {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--ink);
+      word-break: break-all;
+      margin: 0 0 16px;
+    }
+    .cta__url a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rose-deep); padding-bottom: 2px; }
+    .cta__hint { font-size: 13px; color: var(--ink-soft); margin: 0; font-style: italic; font-family: var(--serif); }
+
+    /* Bottom note */
+    .closer {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+    }
+    .closer p {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-style: italic;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin: 0;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .closer .signoff {
+      margin-top: 18px;
+      font-family: var(--serif);
+      font-size: 16px;
+      color: var(--rose-deep);
+      font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+      .wrap { padding: 56px 22px 80px; }
+      .step { grid-template-columns: 48px 1fr; gap: 16px; }
+      .step__num { font-size: 40px; }
+      .step__body h2 { font-size: 22px; }
+      .cta { padding: 24px 20px; }
+      .cta__url { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="hero">
+      <p class="hero__eyebrow">Blossom Bakery</p>
+      <h1 class="hero__title">How to update <em>your website</em></h1>
+      <p class="hero__intro">A simple guide for keeping the website fresh — no code, no stress, just a few clicks whenever you'd like to change something.</p>
+      <hr class="hero__rule" />
+    </header>
+
+    <section class="cta">
+      <p class="cta__label">Bookmark this in your browser</p>
+      <p class="cta__url"><a href="https://myblossombakery.co.uk/edit-blossom/editor.html">myblossombakery.co.uk/edit-blossom/editor.html</a></p>
+      <p class="cta__hint">This is your editor. Open it whenever you'd like to change something.</p>
+    </section>
+
+    <ol class="steps" style="list-style:none; padding:0; margin:0;">
+
+      <li class="step">
+        <div class="step__num">1</div>
+        <div class="step__body">
+          <h2>Open the editor</h2>
+          <p>Click the link above. You'll see your website on the left, and a panel of tools on the right. The list of pages — Homepage, Wedding Cakes, Scones, and so on — sits down the left-hand side.</p>
+        </div>
+      </li>
+
+      <li class="step">
+        <div class="step__num">2</div>
+        <div class="step__body">
+          <h2>Pick a page to edit</h2>
+          <p>Click any page in the list. The preview updates so you can see exactly what visitors see.</p>
+          <div class="tip"><span class="tip__label">Tip —</span> Want to take a page off the website temporarily? Hover over it in the list and click the little toggle to hide it. You can switch it back on any time.</div>
+        </div>
+      </li>
+
+      <li class="step">
+        <div class="step__num">3</div>
+        <div class="step__body">
+          <h2>Make your changes</h2>
+          <p>Click on anything in the preview to edit it:</p>
+          <ul class="step__list">
+            <li><strong>Click a piece of text</strong> — change the wording in the panel on the right.</li>
+            <li><strong>Click a photo</strong> — upload a new one from your computer.</li>
+          </ul>
+          <p class="muted" style="margin-top: 14px;">Don't worry about getting it perfect first time — nothing is live until you say so.</p>
+        </div>
+      </li>
+
+      <li class="step">
+        <div class="step__num">4</div>
+        <div class="step__body">
+          <h2>Save your draft</h2>
+          <p>Click <strong>Save Draft</strong> at the top of the editor. Your work is safely tucked away in the browser — you can close the tab and come back tomorrow exactly where you left off.</p>
+          <div class="tip"><span class="tip__label">Good to know —</span> Drafts are saved on this computer in this browser. If you switch devices, you'll need to export your draft (next step) to bring it with you.</div>
+        </div>
+      </li>
+
+      <li class="step">
+        <div class="step__num">5</div>
+        <div class="step__body">
+          <h2>Export your draft</h2>
+          <p>When you're happy with everything, click <strong>Export Draft</strong>. A small file lands in your Downloads folder — something like <code>blossom-draft-2026-05-09.json</code>.</p>
+          <p class="muted">Don't worry about what's inside it — it's just a tidy parcel of all your changes.</p>
+        </div>
+      </li>
+
+      <li class="step">
+        <div class="step__num">6</div>
+        <div class="step__body">
+          <h2>Send it to Paul</h2>
+          <p>Email or message that file to Paul. He'll review it, click a button to publish, and your changes will appear on the live website within a couple of minutes.</p>
+          <div class="tip"><span class="tip__label">Why this step? —</span> It gives a friendly second pair of eyes before anything goes live — useful for catching the odd typo or wonky photo. It's also your safety net: nothing reaches the website without your sign-off being confirmed.</div>
+        </div>
+      </li>
+
+    </ol>
+
+    <footer class="closer">
+      <p>That's it. No passwords to remember, nothing to install — just edit, save, send.</p>
+      <p class="signoff">Happy baking, Helen ✿</p>
+    </footer>
+
+  </div>
+</body>
+</html>

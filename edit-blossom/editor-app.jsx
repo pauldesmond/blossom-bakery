@@ -336,6 +336,7 @@ function App() {
         <div className={'topbar__status ' + (totalEditsCount ? 'dirty' : '')}>
           {totalEditsCount ? `${totalEditsCount} change${totalEditsCount === 1 ? '' : 's'} in draft` : 'No changes'}
         </div>
+        <a className="btn btn--ghost" href="helen-guide.html" target="_blank" rel="noopener" title="How to update your website" style={{ textDecoration: 'none' }}>Help</a>
         <button className="btn btn--ghost" onClick={clearAllDrafts}>Discard drafts</button>
         <button className="btn btn--primary" onClick={() => setShowExport(true)} disabled={!totalEditsCount}>
           Save draft for review
