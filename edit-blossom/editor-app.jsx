@@ -2,27 +2,16 @@
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 // ──────────────────────────────────────────────────────────────────
-// Page registry — every page Helen can edit
+// Page registry — fetched from canonical source at /_data/pages.json
+// (the SAME file scripts/apply-draft.py reads, so the two can never drift).
+// Synchronously injected via <script> in editor.html before this file runs.
 // ──────────────────────────────────────────────────────────────────
-const PAGES = [
-  { id: 'index', file: 'index.html', label: 'Homepage', published: true },
-  { id: 'about', file: 'about.html', label: 'About Helen', published: true },
-  { id: 'wedding-cakes', file: 'wedding-cakes.html', label: 'Wedding Cakes', published: true },
-  { id: 'wedding-bakes', file: 'wedding-bakes.html', label: 'Wedding Bakes', published: true },
-  { id: 'cakes', file: 'cakes.html', label: 'Cakes (gallery)', published: true },
-  { id: 'ganache-drip-cakes', file: 'ganache-drip-cakes.html', label: 'Drip Cakes', published: true },
-  { id: 'numbered-birthday-cakes', file: 'numbered-birthday-cakes.html', label: 'Numbered Birthday', published: true },
-  { id: 'childrens-cakes', file: 'childrens-cakes.html', label: "Children's Cakes", published: true },
-  { id: 'speciality-and-everyday-cakes', file: 'speciality-and-everyday-cakes.html', label: 'Speciality & Everyday', published: true },
-  { id: 'cupcakes', file: 'cupcakes.html', label: 'Cupcakes', published: true },
-  { id: 'handmade-biscuits', file: 'handmade-biscuits.html', label: 'Biscuits', published: true },
-  { id: 'traybakes', file: 'traybakes.html', label: 'Tray Bakes', published: true },
-  { id: 'giant-cookies', file: 'giant-cookies.html', label: 'Giant Cookies', published: true },
-  { id: 'scones', file: 'scones.html', label: 'Scones', published: true },
-  { id: 'afternoon-tea', file: 'afternoon-tea.html', label: 'Afternoon Tea', published: true },
-  { id: 'customer-reviews', file: 'customer-reviews.html', label: 'Testimonials', published: true },
-  { id: 'contact', file: 'contact.html', label: 'Contact', published: true },
-];
+const PAGES = (window.__BLOSSOM_PAGES__ || []).map(p => ({
+  id: p.id, file: p.file, label: p.label, published: p.published !== false,
+}));
+if (!PAGES.length) {
+  console.error('Blossom editor: page registry missing — _data/pages.json failed to load.');
+}
 
 const STORAGE_KEY = 'blossom-editor-draft-v1';
 // Editor lives at /edit-blossom/editor.html; the live site is one level up

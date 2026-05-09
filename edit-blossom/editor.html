@@ -152,6 +152,27 @@
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
+  <!-- Load canonical page registry (shared with scripts/apply-draft.py).
+       Synchronous on purpose so editor-app.jsx can read window.__BLOSSOM_PAGES__
+       at parse time. -->
+  <script>
+    (function() {
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '../_data/pages.json', false);
+        xhr.send();
+        if (xhr.status >= 200 && xhr.status < 300) {
+          window.__BLOSSOM_PAGES__ = JSON.parse(xhr.responseText).pages;
+        } else {
+          throw new Error('HTTP ' + xhr.status);
+        }
+      } catch (e) {
+        console.error('Blossom editor: failed to load _data/pages.json —', e);
+        window.__BLOSSOM_PAGES__ = [];
+      }
+    })();
+  </script>
+
   <script type="text/babel" src="editor-app.jsx"></script>
 </body>
 </html>
