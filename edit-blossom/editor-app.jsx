@@ -31,8 +31,8 @@ const IFRAME_CSS = `
 // Draft store — localStorage persistence
 // ──────────────────────────────────────────────────────────────────
 function loadDraft() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { edits: {}, images: {}, pageStatus: {}, site: {} }; }
-  catch { return { edits: {}, images: {}, pageStatus: {}, site: {} }; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [] }; }
+  catch { return { edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [] }; }
 }
 function saveDraft(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 
@@ -171,6 +171,7 @@ function App() {
   const [selection, setSelection] = useState(null); // { type, selector, value, image }
   const [toasts, setToasts] = useState([]);
   const [showExport, setShowExport] = useState(false);
+  const [showNewPage, setShowNewPage] = useState(false);
   const [imageEdit, setImageEdit] = useState(null);
   const iframeRef = useRef(null);
   const deviceRef = useRef(null);
@@ -206,7 +207,15 @@ function App() {
     return () => ro.disconnect();
   }, []);
 
-  const activePage = PAGES.find(p => p.id === activePageId);
+  // Combine canonical PAGES with draft-only "new" pages so they appear in the sidebar.
+  const draftNewPages = (draft.newPages || []);
+  const ALL_PAGES = [...PAGES, ...draftNewPages];
+  const activePage = ALL_PAGES.find(p => p.id === activePageId);
+  // For draft new pages, load the TEMPLATE page in the iframe (the new file
+  // doesn't exist on disk yet — it materialises when Paul applies the draft).
+  const activeIframeFile = activePage?.draftNew
+    ? (PAGES.find(p => p.id === activePage.template)?.file || 'index.html')
+    : (activePage?.file || 'index.html');
   const pageEdits = draft.edits[activePageId] || {};
   const pageImages = draft.images || {};
   const totalEditsCount = Object.values(draft.edits).reduce((s, e) => s + Object.keys(e).length, 0)
@@ -298,12 +307,43 @@ function App() {
     toast('Drafts cleared', 'success');
   }
 
+  function createNewPage({ label, slug, templateId }) {
+    const tpl = PAGES.find(p => p.id === templateId);
+    if (!tpl) { toast('Pick a template', 'error'); return; }
+    const id = slug.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+    if (!id) { toast('Need a URL slug', 'error'); return; }
+    if (ALL_PAGES.some(p => p.id === id)) { toast('A page with that URL already exists', 'error'); return; }
+    const newPage = {
+      id, file: id + '.html', label: label.trim() || id, template: templateId,
+      published: false, draftNew: true,
+    };
+    setDraft(d => ({ ...d, newPages: [...(d.newPages || []), newPage] }));
+    setActivePageId(id);
+    setShowNewPage(false);
+    toast('New page added to draft — edit away', 'success');
+  }
+
+  function removeDraftNewPage(id) {
+    if (!confirm('Remove this draft page? Any edits to it will be discarded.')) return;
+    setDraft(d => {
+      const { [id]: _, ...restEdits } = d.edits || {};
+      return {
+        ...d,
+        newPages: (d.newPages || []).filter(p => p.id !== id),
+        edits: restEdits,
+      };
+    });
+    if (activePageId === id) setActivePageId('index');
+    toast('Draft page removed', 'success');
+  }
+
   function exportDraft() {
     const payload = {
       _meta: { exportedAt: new Date().toISOString(), version: 1 },
       edits: draft.edits,
       pageStatus: draft.pageStatus,
       site: draft.site,
+      newPages: draft.newPages || [],
       // Images: include ref + base64 — Paul/Claude Code will save these to disk
       images: Object.fromEntries(
         Object.entries(draft.images || {}).map(([oldSrc, dataUrl]) => {
@@ -351,7 +391,7 @@ function App() {
         <div className="sidebar__section">
           <div className="sidebar__title">Pages</div>
           <ul className="page-list">
-            {PAGES.map(p => {
+            {ALL_PAGES.map(p => {
               const published = draft.pageStatus[p.id] !== undefined ? draft.pageStatus[p.id] : p.published;
               return (
                 <li
@@ -360,18 +400,30 @@ function App() {
                   onClick={() => setActivePageId(p.id)}
                 >
                   <span className="page-item__icon"></span>
-                  <span className="page-item__name">{p.label}</span>
-                  <button
-                    className="page-item__toggle"
-                    title={published ? 'Hide page' : 'Show page'}
-                    onClick={(e) => { e.stopPropagation(); togglePagePublished(p.id); }}
-                  >
-                    {published ? 'Hide' : 'Show'}
-                  </button>
+                  <span className="page-item__name">
+                    {p.label}
+                    {p.draftNew && <span style={{ marginLeft: 6, fontSize: 10, padding: '1px 6px', background: 'var(--rose-soft)', color: 'var(--rose-deep)', borderRadius: 999, letterSpacing: '.05em', textTransform: 'uppercase' }}>NEW</span>}
+                  </span>
+                  {p.draftNew ? (
+                    <button
+                      className="page-item__toggle"
+                      title="Remove this draft page"
+                      onClick={(e) => { e.stopPropagation(); removeDraftNewPage(p.id); }}
+                    >Remove</button>
+                  ) : (
+                    <button
+                      className="page-item__toggle"
+                      title={published ? 'Hide page' : 'Show page'}
+                      onClick={(e) => { e.stopPropagation(); togglePagePublished(p.id); }}
+                    >{published ? 'Hide' : 'Show'}</button>
+                  )}
                 </li>
               );
             })}
           </ul>
+          <button className="new-page-btn" style={{ marginTop: 12 }} onClick={() => setShowNewPage(true)}>
+            + New page (duplicate &amp; fill)
+          </button>
         </div>
       </div>
 
@@ -382,7 +434,7 @@ function App() {
             <iframe
               ref={iframeRef}
               className="stage__frame"
-              src={BASE_PATH + (activePage?.file || 'index.html')}
+              src={BASE_PATH + activeIframeFile}
               onLoad={onIframeLoad}
               key={activePageId}
             ></iframe>
@@ -453,6 +505,9 @@ function App() {
         )}
       </div>
 
+      {/* New page modal */}
+      {showNewPage && <NewPageModal pages={PAGES} onCancel={() => setShowNewPage(false)} onCreate={createNewPage} />}
+
       {/* Export modal */}
       {showExport && (
         <div className="drawer-bg" onClick={() => setShowExport(false)}>
@@ -482,3 +537,42 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+function NewPageModal({ pages, onCancel, onCreate }) {
+  const [label, setLabel] = useState('');
+  const [slug, setSlug] = useState('');
+  const [templateId, setTemplateId] = useState(pages[0]?.id || '');
+  const slugFromLabel = label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const effectiveSlug = slug || slugFromLabel;
+  return (
+    <div className="drawer-bg" onClick={onCancel}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+        <h2>Add a new page</h2>
+        <p style={{ color: 'var(--ink-soft)', fontSize: 13, lineHeight: 1.6, margin: '0 0 18px' }}>
+          Pick an existing page to use as a starting point. The new page will copy its layout — you can then change the text and photos in it like any other page.
+        </p>
+        <div className="field">
+          <label className="field__label">Page name</label>
+          <input type="text" value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Christmas Cookies" />
+          <div className="field__hint">Shows in the menu and at the top of the page.</div>
+        </div>
+        <div className="field">
+          <label className="field__label">Web address</label>
+          <input type="text" value={effectiveSlug} onChange={(e) => setSlug(e.target.value)} placeholder="christmas-cookies" />
+          <div className="field__hint">myblossombakery.co.uk/<strong>{effectiveSlug || 'your-page'}</strong>.html · lowercase, hyphens only.</div>
+        </div>
+        <div className="field">
+          <label className="field__label">Copy layout from</label>
+          <select value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
+            {pages.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+          </select>
+          <div className="field__hint">Tip: pick a page whose shape matches what you have in mind.</div>
+        </div>
+        <div className="drawer__actions">
+          <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
+          <button className="btn btn--primary" disabled={!label.trim() || !effectiveSlug} onClick={() => onCreate({ label, slug: effectiveSlug, templateId })}>Create draft page</button>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -229,6 +229,40 @@ def apply_draft(draft_path: Path) -> None:
     edits: dict[str, dict[str, str]] = draft.get("edits", {}) or {}
     images: dict[str, dict[str, str]] = draft.get("images", {}) or {}
     page_status: dict[str, bool] = draft.get("pageStatus", {}) or {}
+    new_pages: list[dict] = draft.get("newPages", []) or []
+
+    # ── 0. Materialise new pages (copy template HTML, register in pages.json)
+    if new_pages:
+        registry = json.loads(PAGES_JSON.read_text(encoding="utf-8")) if PAGES_JSON.exists() else {"pages": []}
+        existing_ids = {p["id"] for p in registry.get("pages", [])}
+        registry_dirty = False
+        for np in new_pages:
+            nid = np["id"]
+            template_id = np.get("template")
+            template_file = PAGE_FILES.get(template_id)
+            new_file = np.get("file") or f"{nid}.html"
+            if not template_file:
+                print(f"! New page '{nid}': unknown template '{template_id}' — skipping", file=sys.stderr)
+                continue
+            tpl_path = SITE / template_file
+            new_path = SITE / new_file
+            if not tpl_path.exists():
+                print(f"! New page '{nid}': template /{template_file} missing — skipping", file=sys.stderr)
+                continue
+            if not new_path.exists():
+                new_path.write_bytes(tpl_path.read_bytes())
+                print(f"  + created /{new_file} from /{template_file}")
+            if nid not in existing_ids:
+                registry.setdefault("pages", []).append({
+                    "id": nid, "file": new_file, "label": np.get("label", nid),
+                    "published": bool(np.get("published", False)), "generated": False,
+                })
+                registry_dirty = True
+                # Make this page editable in subsequent runs
+                PAGE_FILES[nid] = new_file
+        if registry_dirty:
+            PAGES_JSON.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            print(f"  ✓ _data/pages.json updated ({len(new_pages)} new page(s))")
 
     summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "page_status": 0}
 

@@ -1,124 +1,22 @@
 {
   "_comment": "Canonical page registry. Read by both edit-blossom/editor-app.jsx (fetched at runtime) and scripts/apply-draft.py (read at run). When you add or rename a page, edit it HERE and only here. The 'generated' flag must match scripts/build.py's PAGE_META exactly. If you add a page to PAGE_META, also flip its generated flag to true here — and confirm the YAML's content reflects what's currently on the live HTML, or the next build will overwrite it.",
   "pages": [
-    {
-      "id": "index",
-      "file": "index.html",
-      "label": "Homepage",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "about",
-      "file": "about.html",
-      "label": "About Helen",
-      "published": true,
-      "generated": true
-    },
-    {
-      "id": "wedding-cakes",
-      "file": "wedding-cakes.html",
-      "label": "Wedding Cakes",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "wedding-bakes",
-      "file": "wedding-bakes.html",
-      "label": "Wedding Bakes",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "cakes",
-      "file": "cakes.html",
-      "label": "Cakes (gallery)",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "ganache-drip-cakes",
-      "file": "ganache-drip-cakes.html",
-      "label": "Drip Cakes",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "numbered-birthday-cakes",
-      "file": "numbered-birthday-cakes.html",
-      "label": "Numbered Birthday",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "childrens-cakes",
-      "file": "childrens-cakes.html",
-      "label": "Children's Cakes",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "speciality-and-everyday-cakes",
-      "file": "speciality-and-everyday-cakes.html",
-      "label": "Speciality & Everyday",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "cupcakes",
-      "file": "cupcakes.html",
-      "label": "Cupcakes",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "handmade-biscuits",
-      "file": "handmade-biscuits.html",
-      "label": "Biscuits",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "traybakes",
-      "file": "traybakes.html",
-      "label": "Tray Bakes",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "giant-cookies",
-      "file": "giant-cookies.html",
-      "label": "Giant Cookies",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "scones",
-      "file": "scones.html",
-      "label": "Scones",
-      "published": true,
-      "generated": true
-    },
-    {
-      "id": "afternoon-tea",
-      "file": "afternoon-tea.html",
-      "label": "Afternoon Tea",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "customer-reviews",
-      "file": "customer-reviews.html",
-      "label": "Testimonials",
-      "published": true,
-      "generated": false
-    },
-    {
-      "id": "contact",
-      "file": "contact.html",
-      "label": "Contact",
-      "published": true,
-      "generated": false
-    }
+    { "id": "index",                          "file": "index.html",                          "label": "Homepage",              "published": true,  "generated": false },
+    { "id": "about",                          "file": "about.html",                          "label": "About Helen",           "published": true,  "generated": true  },
+    { "id": "wedding-cakes",                  "file": "wedding-cakes.html",                  "label": "Wedding Cakes",         "published": true,  "generated": false },
+    { "id": "wedding-bakes",                  "file": "wedding-bakes.html",                  "label": "Wedding Bakes",         "published": true,  "generated": false },
+    { "id": "cakes",                          "file": "cakes.html",                          "label": "Cakes (gallery)",       "published": true,  "generated": false },
+    { "id": "ganache-drip-cakes",             "file": "ganache-drip-cakes.html",             "label": "Drip Cakes",            "published": true,  "generated": false },
+    { "id": "numbered-birthday-cakes",        "file": "numbered-birthday-cakes.html",        "label": "Numbered Birthday",     "published": true,  "generated": false },
+    { "id": "childrens-cakes",                "file": "childrens-cakes.html",                "label": "Children's Cakes",      "published": true,  "generated": false },
+    { "id": "speciality-and-everyday-cakes",  "file": "speciality-and-everyday-cakes.html",  "label": "Speciality & Everyday", "published": true,  "generated": false },
+    { "id": "cupcakes",                       "file": "cupcakes.html",                       "label": "Cupcakes",              "published": true,  "generated": false },
+    { "id": "handmade-biscuits",              "file": "handmade-biscuits.html",              "label": "Biscuits",              "published": true,  "generated": false },
+    { "id": "traybakes",                      "file": "traybakes.html",                      "label": "Tray Bakes",            "published": true,  "generated": false },
+    { "id": "giant-cookies",                  "file": "giant-cookies.html",                  "label": "Giant Cookies",         "published": true,  "generated": false },
+    { "id": "scones",                         "file": "scones.html",                         "label": "Scones",                "published": true,  "generated": true  },
+    { "id": "afternoon-tea",                  "file": "afternoon-tea.html",                  "label": "Afternoon Tea",         "published": true,  "generated": false },
+    { "id": "customer-reviews",               "file": "customer-reviews.html",               "label": "Testimonials",          "published": true,  "generated": false },
+    { "id": "contact",                        "file": "contact.html",                        "label": "Contact",               "published": true,  "generated": false }
   ]
 }
