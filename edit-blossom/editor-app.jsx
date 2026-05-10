@@ -731,25 +731,29 @@ function App() {
 
   async function publishNow({ password, message }) {
     setPublishStatus({ phase: 'sending' });
-    const slimDraft = {
-      _meta: { publishedAt: new Date().toISOString(), version: 1 },
-      edits: draft.edits,
-      pageStatus: draft.pageStatus,
-      newPages: draft.newPages || [],
-      styles: draft.styles || {},
-      imageDeletes: draft.imageDeletes || [],
-      // Image swaps now go through publish too — the edge function stages the
-      // full draft as a file in the repo and passes a path to the workflow,
-      // sidestepping the 65KB workflow_dispatch input cap. 8MB ceiling at the
-      // edge function; bigger drafts still need the manual Save Draft path.
-      images: draft.images || {},
-    };
+    let stage = 'building draft';
     try {
+      const slimDraft = {
+        _meta: { publishedAt: new Date().toISOString(), version: 1 },
+        edits: draft.edits,
+        pageStatus: draft.pageStatus,
+        newPages: draft.newPages || [],
+        styles: draft.styles || {},
+        imageDeletes: draft.imageDeletes || [],
+        // Image swaps now go through publish too — the edge function stages
+        // the full draft as a file in the repo and passes a path to the
+        // workflow, sidestepping the 65KB workflow_dispatch input cap.
+        images: draft.images || {},
+      };
+      stage = 'serialising';
+      const body = JSON.stringify({ password, message, draft: slimDraft });
+      stage = 'sending request';
       const resp = await fetch(PUBLISH_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, message, draft: slimDraft }),
+        body,
       });
+      stage = 'reading response';
       const data = await resp.json();
       if (!resp.ok || !data.ok) {
         if (resp.status === 401) localStorage.removeItem(PASSWORD_KEY);
@@ -771,7 +775,11 @@ function App() {
       // just cleared it — keep around for now until polling confirms).
       pollRunStatus(data.runId, data.runUrl);
     } catch (err) {
-      setPublishStatus({ phase: 'failed', error: String(err) });
+      // Surface where in the flow we blew up so on iPad (no devtools) the
+      // user can read enough context to send Paul a useful message.
+      const detail = err && (err.message || err.toString && err.toString()) || String(err);
+      setPublishStatus({ phase: 'failed', error: `[${stage}] ${detail}` });
+      try { console.error('[publishNow]', stage, err); } catch (_) {}
     }
   }
 
@@ -1224,8 +1232,8 @@ function PublishModal({ editsCount, editPages, imagesCount, newPagesCount, statu
               About to publish: <strong>{editsCount} text edit{editsCount === 1 ? '' : 's'}</strong>{editPages.length ? <> across <strong>{editPages.length} page{editPages.length === 1 ? '' : 's'}</strong></> : null}
               {newPagesCount > 0 && <><br/>Plus <strong>{newPagesCount} new page{newPagesCount === 1 ? '' : 's'}</strong> to add to the site.</>}
               {imagesCount > 0 && (
-                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)', color: 'var(--rose-deep)' }}>
-                  <strong>Note:</strong> {imagesCount} photo swap{imagesCount === 1 ? '' : 's'} won't go through this — they need Paul. Use <em>Save draft</em> for those.
+                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)' }}>
+                  Plus <strong>{imagesCount} photo swap{imagesCount === 1 ? '' : 's'}</strong>.
                 </div>
               )}
             </div>
