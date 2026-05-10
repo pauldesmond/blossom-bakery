@@ -165,10 +165,14 @@
       .stage { padding: 8px; }
       .stage__device { min-height: 60vh; }
       .stage__frame { height: 60vh; }
-      /* Idle "Click to edit" panel eats ~1/3 of an iPad screen when stacked
-         below the stage. Hide it; the inspector container's auto row
-         collapses to 0 height so the stage gets the space back. The
-         inspector still pops in when Helen actively selects something. */
+    }
+    /* Idle "Click to edit" panel eats ~1/3 of the screen on any non-
+       desktop layout. Hide it through to landscape iPad (~1180px) and
+       wider — Helen's mostly on iPad, the panel was always more of a
+       desktop-cursor hint anyway. The inspector container's auto row
+       collapses to 0 height so the stage gets the space back; the
+       inspector still pops in normally when Helen selects something. */
+    @media (max-width: 1200px) {
       .inspector__empty { display: none; }
     }
   </style>
