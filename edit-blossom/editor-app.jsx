@@ -72,6 +72,13 @@ const IFRAME_INJECT = `
     if (!el || el.closest('[data-edit-skip]')) return false;
     // Don't allow editing structural chrome — header, footer, nav, dropdowns, lightboxes
     if (el.closest('header.site-header, footer.site-footer, .site-dropdown, .mega, .lb, nav, [data-mega], [data-mega-panel]')) return false;
+    // Refuse compound elements (with child elements). apply-draft replaces
+    // their entire inner content with plain text — wiping any inner <br>,
+    // <em>, <span class="..."> formatting. e.g. an h1 like
+    //   "Beautiful bakes,<br><em>baked at home</em>"
+    // would collapse to one line, single colour. Helen edits the inner
+    // <em> directly instead; the wrapping h1 stays as-is.
+    if (el.children.length > 0) return false;
     return el.matches(SELECTORS);
   }
 
