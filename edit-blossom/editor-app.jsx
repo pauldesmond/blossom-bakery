@@ -400,6 +400,29 @@ function App() {
     });
   }
 
+  // Find the commit a publish workflow run actually pushed. The run's
+  // `head_sha` is the PRE-run state of main, NOT the new commit — using it
+  // for revert would target some earlier random commit. Walk the commits
+  // API and find the one whose parent is head_sha; that's the commit our
+  // workflow added.
+  async function findPushedSha(runId) {
+    if (!runId) return null;
+    try {
+      const runResp = await fetch(`https://api.github.com/repos/pauldesmond/blossom-bakery/actions/runs/${runId}`);
+      if (!runResp.ok) return null;
+      const runData = await runResp.json();
+      const headSha = runData.head_sha;
+      if (!headSha) return null;
+      const cResp = await fetch(`https://api.github.com/repos/pauldesmond/blossom-bakery/commits?per_page=30`);
+      if (!cResp.ok) return null;
+      const commits = await cResp.json();
+      const target = commits.find(c => c.parents?.[0]?.sha === headSha);
+      return target?.sha || null;
+    } catch {
+      return null;
+    }
+  }
+
   async function pollRunStatus(runId, runUrl) {
     if (!runId) return;
     const start = Date.now();
@@ -414,11 +437,11 @@ function App() {
           const data = await r.json();
           if (data.status === 'completed') {
             if (data.conclusion === 'success') {
-              setPublishStatus({ phase: 'done', runUrl, sha: data.head_sha });
-              // Backfill the SHA into the matching recent-publish entry so
-              // the Undo button works after the run finishes.
+              const pushedSha = await findPushedSha(runId);
+              setPublishStatus({ phase: 'done', runUrl, sha: pushedSha });
+              // Backfill the SHA into the matching recent-publish entry.
               setRecentPublishes(prev => {
-                const next = prev.map(p => p.runId === runId ? { ...p, sha: data.head_sha } : p);
+                const next = prev.map(p => p.runId === runId ? { ...p, sha: pushedSha } : p);
                 localStorage.setItem(PUBLISHES_KEY, JSON.stringify(next));
                 return next;
               });
@@ -496,21 +519,17 @@ function App() {
   }, [publishStatus?.phase]);
 
   async function revertPublish(entry) {
-    if (!entry?.sha && !entry?.runId) return;
-    let sha = entry.sha;
-    // Older entries (or ones from before the SHA-backfill) only have the
-    // runId — fetch the run from GitHub to recover the head_sha.
-    if (!sha && entry.runId) {
-      try {
-        const r = await fetch(`https://api.github.com/repos/pauldesmond/blossom-bakery/actions/runs/${entry.runId}`);
-        if (r.ok) {
-          const data = await r.json();
-          if (data.head_sha) sha = data.head_sha;
-        }
-      } catch {}
+    if (!entry?.runId) {
+      alert("Couldn't find that publish in GitHub. Open the link to revert manually.");
+      if (entry?.runUrl) window.open(entry.runUrl, '_blank');
+      return;
     }
+    // Always look up the actual pushed commit for safety — older entries
+    // were saved with run.head_sha which is the WRONG sha (pre-run state).
+    let sha = await findPushedSha(entry.runId);
+    if (!sha) sha = entry.sha;  // fallback to whatever was cached, even if probably wrong
     if (!sha) {
-      alert("Couldn't look up that publish — open the GitHub link to revert manually.");
+      alert("Couldn't find the commit for that publish. Open the GitHub link to revert manually.");
       window.open(entry.runUrl, '_blank');
       return;
     }
