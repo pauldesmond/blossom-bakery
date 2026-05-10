@@ -65,6 +65,71 @@ def _load_pages_registry():
 PAGE_FILES, GENERATED = _load_pages_registry()
 
 
+# ─── Per-element text colour palette (mirrors editor-app.jsx TEXT_COLOURS) ───
+# Helen can only pick from this set in the editor; we still validate here
+# so a hand-edited draft can't inject arbitrary CSS.
+ALLOWED_TEXT_COLOURS = {
+    '#d89396',  # blush
+    '#b8676a',  # deep rose
+    '#9bb098',  # sage
+    '#4a423a',  # soft ink
+    '#7a7068',  # muted
+}
+
+# Mirrors editor-app.jsx TEXT_SIZES — keep in sync.
+ALLOWED_FONT_SIZES = {
+    '14px',  # small
+    '17px',  # body
+    '28px',  # subhead
+    '48px',  # heading
+    '80px',  # display
+}
+
+
+def apply_element_styles(soup, decls_by_selector: dict) -> tuple[int, list]:
+    """Apply inline styles to elements. Supports `color` and `font-size`.
+    Returns (n_applied, list_of_skipped_msgs).
+    """
+    applied = 0
+    skipped = []
+    for sel, decls in (decls_by_selector or {}).items():
+        el = find_by_selector(soup, sel)
+        if el is None:
+            skipped.append(f"selector did not match: {sel}")
+            continue
+        style_attr = el.get('style', '') or ''
+        cur = {}
+        for part in style_attr.split(';'):
+            if ':' in part:
+                k, v = part.split(':', 1)
+                cur[k.strip().lower()] = v.strip()
+        d = decls or {}
+        colour = d.get('color')
+        if colour is None or colour == '':
+            cur.pop('color', None)
+        else:
+            colour = colour.strip().lower()
+            if colour not in ALLOWED_TEXT_COLOURS:
+                skipped.append(f"colour '{colour}' not in palette: {sel}")
+                continue
+            cur['color'] = colour
+        size = d.get('fontSize')
+        if size is None or size == '':
+            cur.pop('font-size', None)
+        else:
+            size = size.strip().lower()
+            if size not in ALLOWED_FONT_SIZES:
+                skipped.append(f"font-size '{size}' not in palette: {sel}")
+                continue
+            cur['font-size'] = size
+        if cur:
+            el['style'] = '; '.join(f"{k}: {v}" for k, v in cur.items())
+        elif 'style' in el.attrs:
+            del el['style']
+        applied += 1
+    return applied, skipped
+
+
 # ─── Selector parser ───────────────────────────────────────────────────
 # The editor emits selectors like:
 #   "main > section:nth-of-type(2) > div > h2"
@@ -250,6 +315,7 @@ def apply_draft(draft_path: Path) -> None:
     images: dict[str, dict[str, str]] = draft.get("images", {}) or {}
     page_status: dict[str, bool] = draft.get("pageStatus", {}) or {}
     new_pages: list[dict] = draft.get("newPages", []) or []
+    styles: dict[str, dict] = draft.get("styles", {}) or {}
 
     # ── 0. Materialise new pages (copy template HTML, register in pages.json)
     if new_pages:
@@ -284,7 +350,7 @@ def apply_draft(draft_path: Path) -> None:
             PAGES_JSON.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"  ✓ _data/pages.json updated ({len(new_pages)} new page(s))")
 
-    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "page_status": 0}
+    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "page_status": 0, "styles_ok": 0, "styles_skipped": []}
 
     # Latent landmine check: warn about _pages/*.yml files that are NOT in
     # GENERATED. They aren't consumed today, but if anyone re-adds them to
@@ -340,6 +406,33 @@ def apply_draft(draft_path: Path) -> None:
                         summary.setdefault("yaml_misses", []).append((page_id, sel, original, new_val))
 
         html_path.write_text(str(soup), encoding="utf-8")
+
+    # ── 1b. Per-element styles (text colour + size) ─────────────────
+    # Second pass — re-open each page's HTML so we apply against the latest
+    # text-edited state. Validates against ALLOWED_TEXT_COLOURS / _FONT_SIZES.
+    for page_id, page_styles in styles.items():
+        if not page_styles:
+            continue
+        file = PAGE_FILES.get(page_id)
+        if not file:
+            print(f"! Unknown page id '{page_id}' for styles — skipping {len(page_styles)} entries")
+            for sel in page_styles:
+                summary["styles_skipped"].append((page_id, sel, "unknown page id"))
+            continue
+        html_path = SITE / file
+        if not html_path.exists():
+            print(f"! Missing /{file} for styles — skipping {len(page_styles)} entries")
+            for sel in page_styles:
+                summary["styles_skipped"].append((page_id, sel, "html missing"))
+            continue
+        soup_styles = BeautifulSoup(html_path.read_text(encoding="utf-8"), "html.parser")
+        n_ok, skipped = apply_element_styles(soup_styles, page_styles)
+        summary["styles_ok"] += n_ok
+        for msg in skipped:
+            summary["styles_skipped"].append((page_id, msg, ""))
+        if n_ok:
+            html_path.write_text(str(soup_styles), encoding="utf-8")
+            print(f"  ✓ styles applied to /{file} ({n_ok} element{'s' if n_ok != 1 else ''})")
 
     # ── 2. Image swaps ─────────────────────────────────────────────
     for old_src, info in images.items():

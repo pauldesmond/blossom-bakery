@@ -24,6 +24,33 @@ const BASE_PATH = '../';
 // apply-helen-draft GitHub Actions workflow. Replace the URL after deploy.
 const PUBLISH_ENDPOINT = 'https://rvokskoevmcekkgiglpa.supabase.co/functions/v1/publish-draft';
 
+// ──────────────────────────────────────────────────────────────────
+// Per-element text colour palette — brand-locked. Pops up in the
+// inspector when text is selected; persisted as
+// draft.styles[pageId][selector] = { color: '#hex' }. Kept short on
+// purpose so Helen can't drift into a 50-shade rainbow page.
+// Mirror this list in scripts/apply-draft.py ALLOWED_TEXT_COLOURS.
+// ──────────────────────────────────────────────────────────────────
+const TEXT_COLOURS = [
+  { id: 'default',   label: 'Default',   value: null },        // remove override
+  { id: 'rose',      label: 'Blush',     value: '#d89396' },
+  { id: 'rose-dark', label: 'Deep rose', value: '#b8676a' },
+  { id: 'sage',      label: 'Sage',      value: '#9bb098' },
+  { id: 'ink-soft',  label: 'Soft ink',  value: '#4a423a' },
+  { id: 'muted',     label: 'Muted',     value: '#7a7068' },
+];
+
+// Per-element font-size palette. Values should match the sizes used in
+// styles.css. Mirror in apply-draft.py ALLOWED_FONT_SIZES.
+const TEXT_SIZES = [
+  { id: 'default', label: 'Default', value: null,    preview: 16 },
+  { id: 'sm',      label: 'Small',   value: '14px',  preview: 12 },
+  { id: 'md',      label: 'Body',    value: '17px',  preview: 15 },
+  { id: 'lg',      label: 'Subhead', value: '28px',  preview: 18 },
+  { id: 'xl',      label: 'Heading', value: '48px',  preview: 22 },
+  { id: 'xxl',     label: 'Display', value: '80px',  preview: 26 },
+];
+
 // CSS injected into the iframe so editing UI is unambiguous.
 // The live site's chrome is already well-proportioned — leave it alone.
 const IFRAME_CSS = `
@@ -37,8 +64,9 @@ const IFRAME_CSS = `
 // Draft store — localStorage persistence
 // ──────────────────────────────────────────────────────────────────
 function loadDraft() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [] }; }
-  catch { return { edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [] }; }
+  const blank = { edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [], styles: {} };
+  try { return { ...blank, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) }; }
+  catch { return blank; }
 }
 function saveDraft(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 
@@ -132,6 +160,21 @@ const IFRAME_INJECT = `
     });
   }
 
+  function applyStyles(styles) {
+    // styles: { selector: { color?: '#hex'|null, fontSize?: 'Npx'|null } }
+    // Missing/null props clear that override.
+    Object.entries(styles || {}).forEach(([sel, decls]) => {
+      try {
+        const el = document.querySelector(sel);
+        if (!el) return;
+        if (decls && decls.color)     el.style.color = decls.color;
+        else                          el.style.removeProperty('color');
+        if (decls && decls.fontSize)  el.style.fontSize = decls.fontSize;
+        else                          el.style.removeProperty('font-size');
+      } catch(e) {}
+    });
+  }
+
   let highlighted = null;
 
   document.addEventListener('mouseover', (e) => {
@@ -206,6 +249,7 @@ const IFRAME_INJECT = `
   window.__applyDraft = function(draft) {
     applyEdits(draft.edits);
     applyImages(draft.images);
+    applyStyles(draft.styles);
   };
 
   window.parent.postMessage({ type: 'iframe-ready' }, '*');
@@ -276,7 +320,35 @@ function App() {
   const pageEdits = draft.edits[activePageId] || {};
   const pageImages = draft.images || {};
   const totalEditsCount = Object.values(draft.edits).reduce((s, e) => s + Object.keys(e).length, 0)
-    + Object.keys(draft.images || {}).length;
+    + Object.keys(draft.images || {}).length
+    + Object.values(draft.styles || {}).reduce((s, e) => s + Object.keys(e).length, 0);
+  const pageStyles = (draft.styles || {})[activePageId] || {};
+
+  // Generic style setter — Helen picks colour/size/etc. → write to
+  // draft.styles[pageId][selector] and live-update the iframe element.
+  function setSelectionStyle(prop, value) {
+    if (!selection) return;
+    const sel = selection.selector;
+    const cssProp = prop === 'fontSize' ? 'font-size' : prop;
+    setDraft(d => {
+      const pageMap = { ...((d.styles || {})[activePageId] || {}) };
+      const current = { ...(pageMap[sel] || {}) };
+      if (value == null) delete current[prop]; else current[prop] = value;
+      if (Object.keys(current).length === 0) delete pageMap[sel];
+      else pageMap[sel] = current;
+      const nextStyles = { ...(d.styles || {}) };
+      if (Object.keys(pageMap).length === 0) delete nextStyles[activePageId];
+      else nextStyles[activePageId] = pageMap;
+      return { ...d, styles: nextStyles };
+    });
+    try {
+      const el = iframeRef.current.contentDocument.querySelector(sel);
+      if (el) {
+        if (value == null) el.style.removeProperty(cssProp);
+        else el.style.setProperty(cssProp, value);
+      }
+    } catch {}
+  }
 
   // Persist draft on change
   useEffect(() => { saveDraft(draft); }, [draft]);
@@ -401,6 +473,7 @@ function App() {
       pageStatus: draft.pageStatus,
       site: draft.site,
       newPages: draft.newPages || [],
+      styles: draft.styles || {},
       // Images: include ref + base64 — Paul/Claude Code will save these to disk
       images: Object.fromEntries(
         Object.entries(draft.images || {}).map(([oldSrc, dataUrl]) => {
@@ -501,6 +574,7 @@ function App() {
       edits: draft.edits,
       pageStatus: draft.pageStatus,
       newPages: draft.newPages || [],
+      styles: draft.styles || {},
       images: {}, // images stripped server-side too; explicit here for clarity
     };
     try {
@@ -717,6 +791,55 @@ function App() {
               />
               <div className="field__hint">Saves to draft as you type</div>
             </div>
+
+            <div className="field" style={{ marginTop: 6 }}>
+              <label className="field__label">Colour</label>
+              <div className="colour-row">
+                {TEXT_COLOURS.map(c => {
+                  const cur = (pageStyles[selection.selector] || {}).color || null;
+                  const isActive = cur === c.value;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={'colour-swatch' + (isActive ? ' active' : '')}
+                      onClick={() => setSelectionStyle('color', c.value)}
+                      title={c.label}
+                    >
+                      <span
+                        className="colour-swatch__dot"
+                        style={c.value
+                          ? { background: c.value }
+                          : { background: 'transparent', backgroundImage: 'linear-gradient(45deg, transparent 45%, var(--ink-soft) 45%, var(--ink-soft) 55%, transparent 55%)' }}
+                      ></span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="field">
+              <label className="field__label">Size</label>
+              <div className="size-row">
+                {TEXT_SIZES.map(s => {
+                  const cur = (pageStyles[selection.selector] || {}).fontSize || null;
+                  const isActive = cur === s.value;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={'size-btn' + (isActive ? ' active' : '')}
+                      onClick={() => setSelectionStyle('fontSize', s.value)}
+                      title={s.label + (s.value ? ` (${s.value})` : '')}
+                    >
+                      <span className="size-btn__sample" style={{ fontSize: s.preview + 'px' }}>Aa</span>
+                      <span className="size-btn__label">{s.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <button className="btn" onClick={() => setSelection(null)}>Done</button>
           </div>
         ) : imageEdit ? (
