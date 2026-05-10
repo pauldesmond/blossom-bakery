@@ -142,6 +142,11 @@
       .stage { padding: 8px; }
       .stage__device { min-height: 60vh; }
       .stage__frame { height: 60vh; }
+      /* Idle "Click to edit" panel eats ~1/3 of an iPad screen when stacked
+         below the stage. Hide it; the inspector container's auto row
+         collapses to 0 height so the stage gets the space back. The
+         inspector still pops in when Helen actively selects something. */
+      .inspector__empty { display: none; }
     }
   </style>
 </head>
