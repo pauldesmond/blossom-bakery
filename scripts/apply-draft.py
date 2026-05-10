@@ -85,6 +85,9 @@ ALLOWED_FONT_SIZES = {
     '80px',  # display
 }
 
+# Mirrors editor-app.jsx TEXT_ALIGNS — keep in sync.
+ALLOWED_TEXT_ALIGNS = {'left', 'center', 'right'}
+
 
 def apply_element_styles(soup, decls_by_selector: dict) -> tuple[int, list]:
     """Apply inline styles to elements. Supports `color` and `font-size`.
@@ -122,6 +125,15 @@ def apply_element_styles(soup, decls_by_selector: dict) -> tuple[int, list]:
                 skipped.append(f"font-size '{size}' not in palette: {sel}")
                 continue
             cur['font-size'] = size
+        align = d.get('textAlign')
+        if align is None or align == '':
+            cur.pop('text-align', None)
+        else:
+            align = align.strip().lower()
+            if align not in ALLOWED_TEXT_ALIGNS:
+                skipped.append(f"text-align '{align}' not allowed: {sel}")
+                continue
+            cur['text-align'] = align
         if cur:
             el['style'] = '; '.join(f"{k}: {v}" for k, v in cur.items())
         elif 'style' in el.attrs:

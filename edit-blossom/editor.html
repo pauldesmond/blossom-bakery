@@ -88,6 +88,14 @@
     .size-btn__sample { font-family: var(--serif); line-height: 1; font-weight: 500; color: inherit; }
     .size-btn__label { font-size: 10px; letter-spacing: .04em; color: inherit; }
 
+    /* Per-element alignment picker (in inspector) */
+    .align-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .align-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 4px 8px; background: transparent; border: 1px solid var(--line); border-radius: var(--r-sm); color: var(--ink-soft); cursor: pointer; transition: border-color .15s, color .15s; min-height: 52px; }
+    .align-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .align-btn.active { border-color: var(--rose-deep); color: var(--rose-deep); background: var(--bg-soft); }
+    .align-btn__icon { font-size: 16px; line-height: 1; color: inherit; }
+    .align-btn__label { font-size: 10px; letter-spacing: .04em; color: inherit; }
+
     /* Stage (preview) — iframe rendered at fixed desktop width (1280) and scaled to fit
        so nav stays desktop, never falls back to hamburger. */
     .stage { background: linear-gradient(180deg, #ece4d6 0%, #d8cebd 100%); overflow: auto; padding: 20px; position: relative; }

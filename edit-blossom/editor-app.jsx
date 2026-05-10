@@ -51,6 +51,14 @@ const TEXT_SIZES = [
   { id: 'xxl',     label: 'Display', value: '80px',  preview: 26 },
 ];
 
+// Per-element text alignment. Mirror in apply-draft.py ALLOWED_TEXT_ALIGNS.
+const TEXT_ALIGNS = [
+  { id: 'default', label: 'Default', value: null,     icon: '↺' },
+  { id: 'left',    label: 'Left',    value: 'left',   icon: '⬅' },
+  { id: 'center',  label: 'Center',  value: 'center', icon: '↔' },
+  { id: 'right',   label: 'Right',   value: 'right',  icon: '➡' },
+];
+
 // CSS injected into the iframe so editing UI is unambiguous.
 // The live site's chrome is already well-proportioned — leave it alone.
 const IFRAME_CSS = `
@@ -168,16 +176,17 @@ const IFRAME_INJECT = `
   }
 
   function applyStyles(styles) {
-    // styles: { selector: { color?: '#hex'|null, fontSize?: 'Npx'|null } }
+    // styles: { selector: { color?, fontSize?, textAlign? } }
     // Missing/null props clear that override.
+    var KNOWN = { color: 'color', fontSize: 'font-size', textAlign: 'text-align' };
     Object.entries(styles || {}).forEach(([sel, decls]) => {
       try {
         const el = document.querySelector(sel);
         if (!el) return;
-        if (decls && decls.color)     el.style.color = decls.color;
-        else                          el.style.removeProperty('color');
-        if (decls && decls.fontSize)  el.style.fontSize = decls.fontSize;
-        else                          el.style.removeProperty('font-size');
+        Object.keys(KNOWN).forEach(function(key) {
+          if (decls && decls[key]) el.style.setProperty(KNOWN[key], decls[key]);
+          else                     el.style.removeProperty(KNOWN[key]);
+        });
       } catch(e) {}
     });
   }
@@ -336,7 +345,8 @@ function App() {
   function setSelectionStyle(prop, value) {
     if (!selection || selection.type !== 'text') return;
     const sel = selection.selector;
-    const cssProp = prop === 'fontSize' ? 'font-size' : prop;
+    // camelCase → kebab-case for CSS (fontSize → font-size, textAlign → text-align)
+    const cssProp = prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
     setDraft(d => {
       const pageMap = { ...((d.styles || {})[activePageId] || {}) };
       const current = { ...(pageMap[sel] || {}) };
@@ -385,6 +395,7 @@ function App() {
           value: m.original,
           color: existing.color || null,
           fontSize: existing.fontSize || null,
+          textAlign: existing.textAlign || null,
         });
       }
       if (m.type === 'edit-commit') {
@@ -877,6 +888,28 @@ function App() {
                     >
                       <span className="size-btn__sample" style={{ fontSize: s.preview + 'px' }}>Aa</span>
                       <span className="size-btn__label">{s.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="field">
+              <label className="field__label">Alignment</label>
+              <div className="align-row">
+                {TEXT_ALIGNS.map(a => {
+                  const isActive = (selection.textAlign || null) === a.value;
+                  return (
+                    <button
+                      key={a.id}
+                      type="button"
+                      className={'align-btn' + (isActive ? ' active' : '')}
+                      onClick={() => setSelectionStyle('textAlign', a.value)}
+                      title={a.label}
+                      aria-label={a.label}
+                    >
+                      <span className="align-btn__icon">{a.icon}</span>
+                      <span className="align-btn__label">{a.label}</span>
                     </button>
                   );
                 })}
