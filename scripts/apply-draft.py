@@ -582,6 +582,15 @@ def apply_draft(draft_path: Path) -> None:
 
     # ── 2. Image swaps ─────────────────────────────────────────────
     for old_src, info in images.items():
+        # Skip "chained" re-swap entries where the old_src is itself a data
+        # URL. These happen when Helen swaps photo A → B → C — the second
+        # entry has dataUrl-of-B as its key. There's no HTML reference to
+        # rewrite (no <img src="data:image/..."> on disk), and Path(SITE/<huge
+        # data url>) overflows the OS filename limit. Apply the FIRST swap
+        # only and warn.
+        if old_src.startswith("data:"):
+            print(f"  ! image entry with data:URL key — chained re-swap, skipping (the prior swap on this image still lands)")
+            continue
         result = save_image(old_src, info)
         if not result:
             continue
