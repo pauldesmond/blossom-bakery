@@ -68,7 +68,14 @@ function loadDraft() {
   try { return { ...blank, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) }; }
   catch { return blank; }
 }
-function saveDraft(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+function saveDraft(d) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+  catch (e) {
+    // Quota exceeded (e.g. accumulated photo data URLs). Don't let it
+    // propagate into the render loop and blank the editor.
+    console.warn('[Blossom] draft save failed:', e?.message || e);
+  }
+}
 
 // ──────────────────────────────────────────────────────────────────
 // Inject editor logic into the iframe
@@ -425,14 +432,43 @@ function App() {
   // Image swap
   function applyImageSwap(file) {
     if (!file || !imageEdit) return;
+    // Resize to ≤1600px on the longest edge before storing. Modern iPhone
+    // photos are 4032×3024 (~7MB as base64), which:
+    //   - blanks the iframe on iPad Safari (image-decode memory pressure)
+    //   - blows past localStorage's ~5-10MB quota, silently dropping the save
+    //   - bloats the eventual published JPEG well beyond what a 1280px-wide
+    //     iframe can show anyway
+    // Resize fixes all three.
     const reader = new FileReader();
-    reader.onload = () => {
-      setDraft(d => ({ ...d, images: { ...d.images, [imageEdit.src]: reader.result } }));
-      toast('Image swapped (draft)', 'success');
-      setImageEdit(null);
-      // Force iframe reload to apply
-      const win = iframeRef.current?.contentWindow;
-      if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: { ...pageImages, [imageEdit.src]: reader.result } });
+    reader.onerror = () => toast('Could not read that photo. Try again?', 'error');
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => {
+        toast("Couldn't open that photo. Try a JPEG or PNG?", 'error');
+        setImageEdit(null);
+      };
+      img.onload = () => {
+        const MAX = 1600;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const scale = Math.min(1, MAX / Math.max(w, h));
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        // 0.85 quality JPEG — sweet spot for photos at this resolution.
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setDraft(d => ({ ...d, images: { ...d.images, [imageEdit.src]: dataUrl } }));
+        toast('Photo swapped (draft)', 'success');
+        setImageEdit(null);
+        const win = iframeRef.current?.contentWindow;
+        if (win && win.__applyDraft) {
+          win.__applyDraft({ edits: pageEdits, images: { ...pageImages, [imageEdit.src]: dataUrl }, styles: pageStyles });
+        }
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
