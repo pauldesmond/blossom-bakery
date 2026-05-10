@@ -80,5 +80,23 @@ jobs:
           git config user.email "blossom-publish-bot@users.noreply.github.com"
       - name: Revert and push
         run: |
-          git revert --no-edit "${{ inputs.revert_sha }}"
+          SHA="${{ inputs.revert_sha }}"
+          # Already reverted? Look for "Revert ... <sha>" or "This reverts commit <sha>"
+          # in any commit message since SHA. If found, treat as already-done success.
+          if git log "$SHA"..HEAD --pretty=%B 2>/dev/null | grep -qE "^This reverts commit $SHA"; then
+            echo "::notice::Commit $SHA was already reverted — nothing to do."
+            exit 0
+          fi
+          # Try revert. If it fails because the diff is empty (changes already
+          # undone manually), exit success with a notice instead of erroring.
+          if ! git revert --no-edit "$SHA" 2>/tmp/revert.err; then
+            cat /tmp/revert.err
+            if grep -qiE "nothing to commit|empty|previous cherry-pick" /tmp/revert.err; then
+              echo "::notice::Nothing to revert for $SHA — its changes are already absent."
+              git revert --abort 2>/dev/null || true
+              exit 0
+            fi
+            echo "::error::git revert failed. Probable conflict — needs manual resolution."
+            exit 1
+          fi
           git push
