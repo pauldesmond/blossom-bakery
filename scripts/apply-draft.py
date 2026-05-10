@@ -277,16 +277,23 @@ def save_image(old_src: str, info: dict[str, str]) -> tuple[str, Path] | None:
 
 
 def rewrite_image_refs(old_src: str, new_src: str) -> int:
-    """Walk every HTML file at the repo root and rewrite <img src> refs.
+    """Walk every HTML file at the repo root and rewrite all references
+    pointing at old_src — both <img src="…"> and the absolute-URL form
+    <meta content="https://…/old_src"> used for og:image. Missing the
+    meta-tag variant previously left og:image pointing at deleted files
+    after a swap, so social-share previews 404'd until manual fix-up.
     Returns number of files changed.
     """
     n = 0
+    abs_url = f"https://myblossombakery.co.uk/{old_src}"
+    new_abs = f"https://myblossombakery.co.uk/{new_src}"
     for html in SITE.glob("*.html"):
         if "edit-blossom" in html.parts:
             continue  # don't touch the editor itself
         text = html.read_text(encoding="utf-8")
-        new = text.replace(f'src="{old_src}"', f'src="{new_src}"')
-        # Also handle "./..." and "/v2/..." prefixed refs, but keep this simple.
+        new = (text
+               .replace(f'src="{old_src}"', f'src="{new_src}"')
+               .replace(f'content="{abs_url}"', f'content="{new_abs}"'))
         if new != text:
             html.write_text(new, encoding="utf-8")
             n += 1
