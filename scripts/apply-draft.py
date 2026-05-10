@@ -469,6 +469,7 @@ def apply_draft(draft_path: Path) -> None:
     print(f"           {summary['yaml_updated']} YAML field(s) updated")
     print(f"           {summary['images']} image swap(s)")
     print(f"           {summary['page_status']} page-status change(s)")
+    print(f"           {summary['styles_ok']} per-element style change(s)")
     if summary["text_skipped"]:
         print(f"  Skipped: {len(summary['text_skipped'])} edit(s) — see below")
         for page_id, sel, val, reason in summary["text_skipped"]:

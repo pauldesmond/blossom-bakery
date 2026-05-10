@@ -327,7 +327,7 @@ function App() {
   // Generic style setter — Helen picks colour/size/etc. → write to
   // draft.styles[pageId][selector] and live-update the iframe element.
   function setSelectionStyle(prop, value) {
-    if (!selection) return;
+    if (!selection || selection.type !== 'text') return;
     const sel = selection.selector;
     const cssProp = prop === 'fontSize' ? 'font-size' : prop;
     setDraft(d => {
@@ -341,6 +341,7 @@ function App() {
       else nextStyles[activePageId] = pageMap;
       return { ...d, styles: nextStyles };
     });
+    setSelection(s => s ? { ...s, [prop]: value } : s);
     try {
       const el = iframeRef.current.contentDocument.querySelector(sel);
       if (el) {
@@ -348,6 +349,7 @@ function App() {
         else el.style.setProperty(cssProp, value);
       }
     } catch {}
+    toast(value == null ? 'Reset to default' : 'Saved to draft', 'success');
   }
 
   // Persist draft on change
@@ -366,10 +368,17 @@ function App() {
       if (m.type === 'iframe-ready') {
         // Push current draft into iframe
         const win = iframeRef.current?.contentWindow;
-        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages });
+        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages, styles: pageStyles });
       }
       if (m.type === 'edit-start') {
-        setSelection({ type: 'text', selector: m.selector, value: m.original });
+        const existing = (draft.styles?.[activePageId] || {})[m.selector] || {};
+        setSelection({
+          type: 'text',
+          selector: m.selector,
+          value: m.original,
+          color: existing.color || null,
+          fontSize: existing.fontSize || null,
+        });
       }
       if (m.type === 'edit-commit') {
         setDraft(d => ({
@@ -430,7 +439,7 @@ function App() {
 
   function clearAllDrafts() {
     if (!confirm('Discard all draft edits? This cannot be undone.')) return;
-    setDraft({ edits: {}, images: {}, pageStatus: {}, site: {} });
+    setDraft({ edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [], styles: {} });
     const win = iframeRef.current?.contentWindow;
     if (win) win.location.reload();
     toast('Drafts cleared', 'success');
@@ -796,8 +805,7 @@ function App() {
               <label className="field__label">Colour</label>
               <div className="colour-row">
                 {TEXT_COLOURS.map(c => {
-                  const cur = (pageStyles[selection.selector] || {}).color || null;
-                  const isActive = cur === c.value;
+                  const isActive = (selection.color || null) === c.value;
                   return (
                     <button
                       key={c.id}
@@ -822,8 +830,7 @@ function App() {
               <label className="field__label">Size</label>
               <div className="size-row">
                 {TEXT_SIZES.map(s => {
-                  const cur = (pageStyles[selection.selector] || {}).fontSize || null;
-                  const isActive = cur === s.value;
+                  const isActive = (selection.fontSize || null) === s.value;
                   return (
                     <button
                       key={s.id}
