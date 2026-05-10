@@ -129,8 +129,11 @@ const IFRAME_INJECT = `
     // <em> directly instead; the wrapping h1 stays as-is.
     // Exception: <br> children are fine — they're how multi-line edits land
     // in the DOM, and the live-update path can losslessly rewrite them.
+    // Exception 2: EMPTY inner elements are fine too — e.g. <em></em>
+    // residue left after Helen deleted the styled second line. There's
+    // nothing to lose, and the next save will quietly drop the empty tag.
     const kids = Array.from(el.children);
-    if (kids.some(c => c.tagName !== 'BR')) return false;
+    if (kids.some(c => c.tagName !== 'BR' && c.textContent.trim() !== '')) return false;
     return el.matches(SELECTORS);
   }
 
