@@ -109,7 +109,7 @@ const IFRAME_INJECT = `
     return parts.join(' > ');
   }
 
-  const SELECTORS = 'h1, h2, h3, h4, p, li, span:not(:has(*)), a:not(:has(img)), small, em, strong, button, blockquote';
+  const SELECTORS = 'h1, h2, h3, h4, p, li, span:not(:has(*)), a:not(:has(img)), small, em, strong, button, blockquote, div:not(:has(*))';
 
   function isEditable(el) {
     if (!el || el.closest('[data-edit-skip]')) return false;
@@ -217,6 +217,14 @@ const IFRAME_INJECT = `
       const src = e.target.getAttribute('src');
       window.parent.postMessage({ type: 'edit-image', src, alt: e.target.alt }, '*');
       return;
+    }
+    // Block link navigation inside the editor iframe — Helen is editing,
+    // not browsing. Without this, clicking text inside a card link (or any
+    // header/footer link) navigates away before the edit handler fires.
+    // The sidebar is the navigator; the iframe stays on the active page.
+    const linkAncestor = e.target.closest('a[href]');
+    if (linkAncestor) {
+      e.preventDefault();
     }
     if (!isEditable(e.target)) return;
     e.preventDefault(); e.stopPropagation();
