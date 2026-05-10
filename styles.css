@@ -887,8 +887,21 @@ section.alt { background: #fff; }
 /* Empty placeholder slots — visible only inside the editor (override
    injected by editor-app.jsx). Once Helen swaps a placeholder for a
    real photo, the src no longer matches and the rule lapses on its
-   own, so the swapped image renders normally on the public site. */
-.wb-gallery img[src*="_add-photo.svg"] { display: none; }
+   own, so the swapped image renders normally on the public site.
+   Broad selector covers both gallery cells AND in-prose photo slots. */
+img[src*="_add-photo.svg"] { display: none; }
+/* In-prose photo helper. After Helen fills a placeholder, the src
+   changes, so the same <img> just renders as a centred prose photo. */
+.prose-photo {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  margin: 32px auto;
+  border-radius: 4px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
 
 
 /* Customer Reviews — editorial grid of testimonial cards */
