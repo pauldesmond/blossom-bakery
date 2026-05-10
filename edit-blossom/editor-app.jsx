@@ -306,6 +306,7 @@ function App() {
   const [showPublish, setShowPublish] = useState(false);
   const [publishStatus, setPublishStatus] = useState(null); // null | { phase, runUrl?, runId?, error? }
   const [showRecent, setShowRecent] = useState(false);
+  const [editingNavFor, setEditingNavFor] = useState(null);
   const [recentPublishes, setRecentPublishes] = useState(() => {
     try { return JSON.parse(localStorage.getItem(PUBLISHES_KEY) || '[]'); }
     catch { return []; }
@@ -593,6 +594,20 @@ function App() {
     toast('New page added to draft — edit away', 'success');
   }
 
+  // Edit the menu placement (section + subtitle) on an existing draft new
+  // page. Used to retrofit pages created before NewPageModal grew the
+  // section field — Helen doesn't have to discard the draft and recreate.
+  function setDraftNavPlacement(id, section, note) {
+    setDraft(d => ({
+      ...d,
+      newPages: (d.newPages || []).map(p =>
+        p.id === id ? { ...p, section: section || '', note: (note || '').trim() } : p
+      ),
+    }));
+    toast('Menu placement saved', 'success');
+    setEditingNavFor(null);
+  }
+
   function removeDraftNewPage(id) {
     if (!confirm('Remove this draft page? Any edits to it will be discarded.')) return;
     setDraft(d => {
@@ -858,11 +873,18 @@ function App() {
                     {p.draftNew && <span style={{ marginLeft: 6, fontSize: 10, padding: '1px 6px', background: 'var(--rose-soft)', color: 'var(--rose-deep)', borderRadius: 999, letterSpacing: '.05em', textTransform: 'uppercase' }}>NEW</span>}
                   </span>
                   {p.draftNew ? (
-                    <button
-                      className="page-item__toggle"
-                      title="Remove this draft page"
-                      onClick={(e) => { e.stopPropagation(); removeDraftNewPage(p.id); }}
-                    >Remove</button>
+                    <span style={{ display: 'inline-flex', gap: 6 }}>
+                      <button
+                        className="page-item__toggle"
+                        title="Where this page appears in the menu"
+                        onClick={(e) => { e.stopPropagation(); setEditingNavFor(p.id); }}
+                      >Menu</button>
+                      <button
+                        className="page-item__toggle"
+                        title="Remove this draft page"
+                        onClick={(e) => { e.stopPropagation(); removeDraftNewPage(p.id); }}
+                      >Remove</button>
+                    </span>
                   ) : (
                     <button
                       className="page-item__toggle"
@@ -1046,6 +1068,15 @@ function App() {
 
       {/* New page modal */}
       {showNewPage && <NewPageModal pages={PAGES} onCancel={() => setShowNewPage(false)} onCreate={createNewPage} />}
+
+      {/* Menu placement modal for existing draft new pages */}
+      {editingNavFor && (
+        <EditNavPlacementModal
+          page={(draft.newPages || []).find(p => p.id === editingNavFor)}
+          onCancel={() => setEditingNavFor(null)}
+          onSave={setDraftNavPlacement}
+        />
+      )}
 
       {/* Export modal */}
       {showExport && (
@@ -1292,6 +1323,46 @@ function RecentPublishesModal({ publishes, onClose, onRevert }) {
         </ul>
         <div className="drawer__actions">
           <button className="btn btn--ghost" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Tiny modal that edits ONLY menu placement (section + subtitle) on an
+// existing draft new page. Used to retrofit pages that were created
+// before NewPageModal grew the section dropdown — Helen sets where the
+// page goes in the menu without losing any text or photo edits she's
+// already made on it.
+function EditNavPlacementModal({ page, onCancel, onSave }) {
+  const [section, setSection] = useState(page?.section || 'cakes');
+  const [note, setNote] = useState(page?.note || '');
+  if (!page) return null;
+  return (
+    <div className="drawer-bg" onClick={onCancel}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+        <h2>Menu placement</h2>
+        <p style={{ color: 'var(--ink-soft)', fontSize: 13, lineHeight: 1.6, margin: '0 0 18px' }}>
+          Where should <strong>{page.label}</strong> appear in the site menu? You can change this any time before publishing.
+        </p>
+        <div className="field">
+          <label className="field__label">Add to menu under</label>
+          <select value={section} onChange={(e) => setSection(e.target.value)}>
+            <option value="cakes">Cakes</option>
+            <option value="weddings">Weddings</option>
+            <option value="bakes">Bakes</option>
+            <option value="">— Don't add to menu —</option>
+          </select>
+          <div className="field__hint">Also adds a card to the homepage when you publish.</div>
+        </div>
+        <div className="field">
+          <label className="field__label">Subtitle in menu (optional)</label>
+          <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Two-tier · celebration" />
+          <div className="field__hint">The small grey line under the page name in the dropdown. Leave blank for a clean entry.</div>
+        </div>
+        <div className="drawer__actions">
+          <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
+          <button className="btn btn--primary" onClick={() => onSave(page.id, section, note)}>Save</button>
         </div>
       </div>
     </div>
