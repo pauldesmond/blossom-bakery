@@ -738,7 +738,11 @@ function App() {
       newPages: draft.newPages || [],
       styles: draft.styles || {},
       imageDeletes: draft.imageDeletes || [],
-      images: {}, // image *swaps* still stripped — data URLs blow the edge-fn payload limit
+      // Image swaps now go through publish too — the edge function stages the
+      // full draft as a file in the repo and passes a path to the workflow,
+      // sidestepping the 65KB workflow_dispatch input cap. 8MB ceiling at the
+      // edge function; bigger drafts still need the manual Save Draft path.
+      images: draft.images || {},
     };
     try {
       const resp = await fetch(PUBLISH_ENDPOINT, {
@@ -782,7 +786,7 @@ function App() {
         newPages: [],
         styles: {},
         imageDeletes: [],
-        // images (swaps) preserved — they didn't go in this publish (edge-fn payload limit)
+        images: {}, // image swaps now go through publish via _drafts/ staging
       }));
       // Reload iframe after a short delay (Pages needs to rebuild)
       setTimeout(() => {

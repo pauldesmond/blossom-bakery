@@ -1,0 +1,5 @@
+# Staging directory for editor-published drafts. The publish-draft edge
+# function commits a draft JSON here, dispatches the apply-helen-draft
+# workflow with its path, and the workflow deletes the file as part of
+# the publish commit. Should always be empty between runs — any file
+# lingering here longer than a few minutes means a workflow failed.
