@@ -187,20 +187,34 @@ serve(async (req) => {
     return json({ ok: false, error: "Failed to start publish.", details: text.slice(0, 500) }, 502);
   }
 
-  // GitHub doesn't return the run ID from dispatches — list recent runs to
-  // find the one we just kicked off. Best-effort; the editor polls anyway.
-  await new Promise((r) => setTimeout(r, 1500));
-  const runsResp = await fetch(
-    `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=1`,
-    { headers: { Authorization: `Bearer ${GH_TOKEN}`, Accept: "application/vnd.github+json" } },
-  );
+  // GitHub doesn't return the run ID from dispatches — list recent runs
+  // to find the one we just kicked off. Without the runId the editor's
+  // pollRunStatus exits early and the draft-clear-on-done effect never
+  // fires. Retry up to ~6s with backoff so we don't lose the runId on
+  // the occasional slow dispatch registration.
   let runUrl = `https://github.com/${REPO}/actions/workflows/${WORKFLOW}`;
   let runId: number | null = null;
-  if (runsResp.ok) {
+  const dispatchedAt = Date.now();
+  for (const wait of [1500, 1500, 1500, 1500]) {
+    await new Promise((r) => setTimeout(r, wait));
+    const runsResp = await fetch(
+      `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=5`,
+      { headers: { Authorization: `Bearer ${GH_TOKEN}`, Accept: "application/vnd.github+json" } },
+    );
+    if (!runsResp.ok) continue;
     const data = await runsResp.json();
-    if (data.workflow_runs?.[0]) {
-      runUrl = data.workflow_runs[0].html_url;
-      runId = data.workflow_runs[0].id;
+    // Find the most recent run that started AFTER we dispatched. Listing
+    // top-1 was racy — could return a previous publish if GitHub hasn't
+    // registered the new run yet, and on the next dispatch we'd return
+    // an outdated run.
+    const candidate = (data.workflow_runs || []).find((r: { created_at?: string; run_started_at?: string; html_url?: string; id?: number }) => {
+      const t = Date.parse(r.run_started_at || r.created_at || "");
+      return t && t >= dispatchedAt - 5000;
+    });
+    if (candidate) {
+      runUrl = candidate.html_url || runUrl;
+      runId = candidate.id || null;
+      break;
     }
   }
 
