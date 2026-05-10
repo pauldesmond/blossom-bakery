@@ -415,6 +415,13 @@ function App() {
           if (data.status === 'completed') {
             if (data.conclusion === 'success') {
               setPublishStatus({ phase: 'done', runUrl, sha: data.head_sha });
+              // Backfill the SHA into the matching recent-publish entry so
+              // the Undo button works after the run finishes.
+              setRecentPublishes(prev => {
+                const next = prev.map(p => p.runId === runId ? { ...p, sha: data.head_sha } : p);
+                localStorage.setItem(PUBLISHES_KEY, JSON.stringify(next));
+                return next;
+              });
               return;
             }
             setPublishStatus({ phase: 'failed', runUrl, error: data.conclusion });
@@ -490,9 +497,20 @@ function App() {
 
   async function revertPublish(entry) {
     if (!entry?.sha && !entry?.runId) return;
-    const sha = entry.sha;
+    let sha = entry.sha;
+    // Older entries (or ones from before the SHA-backfill) only have the
+    // runId — fetch the run from GitHub to recover the head_sha.
+    if (!sha && entry.runId) {
+      try {
+        const r = await fetch(`https://api.github.com/repos/pauldesmond/blossom-bakery/actions/runs/${entry.runId}`);
+        if (r.ok) {
+          const data = await r.json();
+          if (data.head_sha) sha = data.head_sha;
+        }
+      } catch {}
+    }
     if (!sha) {
-      // Older entries didn't capture SHA; ask the user to revert via GitHub
+      alert("Couldn't look up that publish — open the GitHub link to revert manually.");
       window.open(entry.runUrl, '_blank');
       return;
     }
@@ -888,8 +906,8 @@ function RecentPublishesModal({ publishes, onClose, onRevert }) {
                   {p.newPages > 0 && <> · {p.newPages} new page{p.newPages === 1 ? '' : 's'}</>}
                 </div>
               </div>
-              <button className="btn btn--ghost" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => onRevert(p)} title={p.sha ? 'Revert this publish' : 'Open on GitHub'}>
-                {p.sha ? 'Undo' : 'View'}
+              <button className="btn btn--ghost" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => onRevert(p)} title="Revert this publish">
+                Undo
               </button>
             </li>
           ))}
