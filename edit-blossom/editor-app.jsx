@@ -441,47 +441,80 @@ function App() {
   }
 
   // Image swap
-  function applyImageSwap(file) {
+  async function applyImageSwap(file) {
     if (!file || !imageEdit) return;
-    // Resize to ≤1600px on the longest edge before storing. Modern iPhone
-    // photos are 4032×3024 (~7MB as base64), which:
-    //   - blanks the iframe on iPad Safari (image-decode memory pressure)
-    //   - blows past localStorage's ~5-10MB quota, silently dropping the save
-    //   - bloats the eventual published JPEG well beyond what a 1280px-wide
-    //     iframe can show anyway
-    // Resize fixes all three.
-    const reader = new FileReader();
-    reader.onerror = () => toast('Could not read that photo. Try again?', 'error');
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onerror = () => {
-        toast("Couldn't open that photo. Try a JPEG or PNG?", 'error');
-        setImageEdit(null);
-      };
-      img.onload = () => {
-        const MAX = 1600;
-        let w = img.naturalWidth, h = img.naturalHeight;
-        const scale = Math.min(1, MAX / Math.max(w, h));
-        w = Math.round(w * scale);
-        h = Math.round(h * scale);
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        // 0.85 quality JPEG — sweet spot for photos at this resolution.
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        setDraft(d => ({ ...d, images: { ...d.images, [imageEdit.src]: dataUrl } }));
-        toast('Photo swapped (draft)', 'success');
-        setImageEdit(null);
-        const win = iframeRef.current?.contentWindow;
-        if (win && win.__applyDraft) {
-          win.__applyDraft({ edits: pageEdits, images: { ...pageImages, [imageEdit.src]: dataUrl }, styles: pageStyles });
+    // Hard guard: > 25MB will OOM-crash an iPad Safari tab even with
+    // optimised decode. Refuse politely instead.
+    if (file.size > 25 * 1024 * 1024) {
+      toast("That photo's huge — try one under 25MB", 'error');
+      setImageEdit(null);
+      return;
+    }
+    const MAX = 1600;
+    const targetSrc = imageEdit.src;
+    setImageEdit(null); // close the inspector immediately so Helen sees progress
+    toast('Resizing photo…', 'info');
+    try {
+      // Use a blob URL rather than FileReader → base64. A FileReader
+      // pushes a copy into JS memory AS bytes AND as a base64 string
+      // simultaneously, which on iPad Safari is enough to OOM the tab
+      // and white-screen the WebView. Blob URLs let the browser
+      // decode lazily without copying.
+      const blobUrl = URL.createObjectURL(file);
+      let dataUrl;
+      try {
+        // createImageBitmap with resizeWidth/Height does the resize
+        // *during decode* — it never holds a full-resolution bitmap in
+        // memory. Best path on Safari 14+.
+        let bitmap;
+        try {
+          // Probe the image dims first so we resize the longest edge
+          const probeImg = await new Promise((res, rej) => {
+            const i = new Image();
+            i.onload = () => res(i);
+            i.onerror = () => rej(new Error('image decode failed'));
+            i.src = blobUrl;
+          });
+          const w0 = probeImg.naturalWidth, h0 = probeImg.naturalHeight;
+          if (!w0 || !h0) throw new Error('zero-dimension image');
+          const scale = Math.min(1, MAX / Math.max(w0, h0));
+          const w = Math.max(1, Math.round(w0 * scale));
+          const h = Math.max(1, Math.round(h0 * scale));
+          if (typeof createImageBitmap === 'function') {
+            try {
+              bitmap = await createImageBitmap(file, {
+                resizeWidth: w, resizeHeight: h, resizeQuality: 'high',
+              });
+            } catch (_e) { /* fall through to manual canvas draw */ }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (bitmap) {
+            ctx.drawImage(bitmap, 0, 0);
+            if (bitmap.close) bitmap.close();
+          } else {
+            ctx.drawImage(probeImg, 0, 0, w, h);
+          }
+          dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        } finally {
+          URL.revokeObjectURL(blobUrl);
         }
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      } catch (innerErr) {
+        URL.revokeObjectURL(blobUrl);
+        throw innerErr;
+      }
+      setDraft(d => ({ ...d, images: { ...d.images, [targetSrc]: dataUrl } }));
+      toast('Photo swapped (draft)', 'success');
+      const win = iframeRef.current?.contentWindow;
+      if (win && win.__applyDraft) {
+        win.__applyDraft({ edits: pageEdits, images: { ...pageImages, [targetSrc]: dataUrl }, styles: pageStyles });
+      }
+    } catch (err) {
+      console.error('[Blossom] image swap failed:', err);
+      toast("Couldn't process that photo — try a smaller or different one", 'error');
+    }
   }
 
   function clearAllDrafts() {
