@@ -734,7 +734,8 @@ function App() {
       pageStatus: draft.pageStatus,
       newPages: draft.newPages || [],
       styles: draft.styles || {},
-      images: {}, // images stripped server-side too; explicit here for clarity
+      imageDeletes: draft.imageDeletes || [],
+      images: {}, // image *swaps* still stripped — data URLs blow the edge-fn payload limit
     };
     try {
       const resp = await fetch(PUBLISH_ENDPOINT, {
@@ -776,7 +777,9 @@ function App() {
         edits: {},
         pageStatus: {},
         newPages: [],
-        // images preserved — they didn't go in this publish
+        styles: {},
+        imageDeletes: [],
+        // images (swaps) preserved — they didn't go in this publish (edge-fn payload limit)
       }));
       // Reload iframe after a short delay (Pages needs to rebuild)
       setTimeout(() => {
