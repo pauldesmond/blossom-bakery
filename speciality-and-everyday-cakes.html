@@ -3,33 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Speciality &amp; Everyday Cakes — Blossom Bakery, Chelmsford</title>
-  <meta name="description" content="The full Blossom Bakery cake menu — over 30 flavours across Sponges & Everyday, Chocolate & Signature and Tall & Layered sections. Made in Chelmsford, Essex." />
+  <title>Everyday Cakes — Blossom Bakery, Chelmsford</title>
+  <meta name="description" content="Everyday occasion cakes from Blossom Bakery in Chelmsford — twelve flavours from £40. Mocha, lemon, Cherry Bakewell, Carrot, Coffee &amp; Walnut, Victoria Sponge, Red Velvet, Black Forest, Pina Colada, Pistachio &amp; Rose and more. Gluten-free, dairy-free and vegan options." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://myblossombakery.co.uk/speciality-and-everyday-cakes.html" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://myblossombakery.co.uk/speciality-and-everyday-cakes.html" />
-  <meta property="og:title" content="Speciality &amp; Everyday Cakes — Blossom Bakery" />
-  <meta property="og:description" content="Our full flavour menu, baked in Chelmsford by Helen Desmond." />
-  <meta property="og:image" content="https://myblossombakery.co.uk/images/img_4263.jpeg" />
+  <meta property="og:title" content="Everyday Cakes — Blossom Bakery" />
+  <meta property="og:description" content="Twelve flavours of everyday occasion cake from Blossom Bakery, from £40." />
+  <meta property="og:image" content="https://myblossombakery.co.uk/images/img_8056.jpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .flavour-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 32px 40px; margin-top: 40px; }
-    .flavour { padding-top: 18px; border-top: 1px solid var(--border); }
-    .flavour__head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 8px; }
-    .flavour__name { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 500; line-height: 1.2; color: var(--ink); }
-    .flavour__tag { font-size: 0.7rem; letter-spacing: 1.8px; text-transform: uppercase; color: var(--rose-dark); white-space: nowrap; }
-    .flavour__desc { font-size: 0.95rem; color: var(--muted); line-height: 1.65; margin-bottom: 10px; text-wrap: pretty; }
-    .flavour__price { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; color: var(--ink); }
-    .flavour__price em { color: var(--muted); font-style: normal; font-size: 0.85rem; margin-left: 4px; }
-    .flavour-section + .flavour-section { margin-top: 64px; }
-    .flavour-section__head { text-align: center; margin-bottom: 8px; }
-    .flavour-section__head h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 500; }
-    .flavour-section__head p { color: var(--muted); font-style: italic; }
+    /* Cake cards — flavour grid for the everyday-cakes menu */
+    .cake-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1100px; margin: 0 auto; }
+    .cake-card { display: flex; flex-direction: column; gap: 8px; }
+    .cake-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; display: block; }
+    .cake-card__name { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 500; color: var(--ink); margin: 8px 0 0; letter-spacing: -0.01em; line-height: 1.2; }
+    .cake-card__desc { font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 0; }
+    .cake-card__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; font-size: 12px; margin: 4px 0 0; line-height: 1.4; }
+    .cake-card__diet { font-family: 'Inter', sans-serif; letter-spacing: 0.04em; color: var(--muted); }
+    .cake-card__price { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--rose-dark); }
+    @media (max-width: 880px) { .cake-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+    @media (max-width: 540px) { .cake-grid { grid-template-columns: 1fr; gap: 28px; } }
   </style>
   <script type="application/ld+json">
 {
@@ -37,10 +36,7 @@
   "@type": "Bakery",
   "@id": "https://myblossombakery.co.uk/#bakery",
   "name": "Blossom Bakery",
-  "alternateName": "Blossom Bakery Chelmsford",
-  "description": "Bespoke wedding cakes, celebration cakes, cupcakes, hand-iced biscuits, tray bakes and afternoon teas \u2014 handmade by Helen Desmond in Great Baddow, Chelmsford. Gluten-free, dairy-free and vegan options available.",
   "url": "https://myblossombakery.co.uk/",
-  "image": "https://myblossombakery.co.uk/images/helen-portrait.webp",
   "logo": "https://myblossombakery.co.uk/images/blossom_logo.png",
   "telephone": "+44 7939 618787",
   "email": "blossombakedgoods@gmail.com",
@@ -51,139 +47,19 @@
     "postalCode": "CM2",
     "addressCountry": "GB"
   },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 51.7138,
-    "longitude": 0.4994
-  },
-  "areaServed": [
-    {
-      "@type": "City",
-      "name": "Chelmsford"
-    },
-    {
-      "@type": "AdministrativeArea",
-      "name": "Essex"
-    }
-  ],
-  "priceRange": "\u00a3\u00a3",
-  "paymentAccepted": "Apple Pay, Google Pay, Visa, Mastercard, American Express, Bank Transfer, Cash",
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "opens": "09:00",
-      "closes": "17:00"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Saturday",
-      "opens": "09:00",
-      "closes": "14:00"
-    }
-  ],
-  "founder": {
-    "@type": "Person",
-    "@id": "https://myblossombakery.co.uk/about.html#helen",
-    "name": "Helen Desmond",
-    "jobTitle": "Founder & Baker",
-    "image": "https://myblossombakery.co.uk/images/helen-portrait.webp"
-  },
-  "sameAs": [
-    "https://www.instagram.com/blossombakery_chelmsford/",
-    "https://www.facebook.com/blossombakedgoods"
-  ],
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "5.0",
-    "reviewCount": "60",
-    "bestRating": "5",
-    "worstRating": "1"
-  },
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Blossom Bakery Services",
-    "itemListElement": [
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Wedding Cakes",
-          "url": "https://myblossombakery.co.uk/wedding-cakes.html"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Speciality & Everyday Cakes",
-          "url": "https://myblossombakery.co.uk/cakes.html"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Cupcakes",
-          "url": "https://myblossombakery.co.uk/cupcakes.html"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Afternoon Tea",
-          "url": "https://myblossombakery.co.uk/afternoon-tea.html"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Handmade Biscuits",
-          "url": "https://myblossombakery.co.uk/handmade-biscuits.html"
-        }
-      },
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Tray Bakes",
-          "url": "https://myblossombakery.co.uk/traybakes.html"
-        }
-      }
-    ]
-  }
+  "founder": { "@type": "Person", "name": "Helen Desmond" }
 }
 </script>
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": "https://myblossombakery.co.uk/#website",
-  "url": "https://myblossombakery.co.uk/",
-  "name": "Blossom Bakery",
-  "publisher": {
-    "@id": "https://myblossombakery.co.uk/#bakery"
-  }
-}
-</script>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Menu",
-  "@id": "https://myblossombakery.co.uk/speciality-and-everyday-cakes.html#menu",
-  "name": "Speciality & Everyday Cake Menu",
-  "description": "The full Blossom Bakery cake menu \u2014 sponge cakes, chocolate cakes, signature flavours and tall layered cakes.",
-  "provider": {
-    "@id": "https://myblossombakery.co.uk/#bakery"
-  }
+  "@type": "Service",
+  "@id": "https://myblossombakery.co.uk/speciality-and-everyday-cakes.html#service",
+  "serviceType": "Everyday occasion cakes",
+  "name": "Everyday Cakes",
+  "description": "Twelve everyday-occasion cake flavours from Blossom Bakery in Chelmsford. From £40. Gluten-free, dairy-free and vegan options.",
+  "provider": { "@id": "https://myblossombakery.co.uk/#bakery" },
+  "areaServed": [{ "@type": "AdministrativeArea", "name": "Essex" }]
 }
 </script>
 </head>
@@ -199,42 +75,42 @@
           <span></span><span></span><span></span>
         </button>
         <nav class="site-nav">
-          <ul class="site-nav__list">
-            <li class="site-nav__item has-dropdown">
-              <a href="cakes.html" class="active">Cakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-              <div class="site-dropdown">
-                <ul>
-                  <li><a href="cakes.html"><strong>All Cakes</strong><span>Browse the gallery</span></a></li>
-                  <li><a href="ganache-drip-cakes.html"><strong>Drip Cakes</strong><span>Modern · glossy</span></a></li>
-                  <li><a href="numbered-birthday-cakes.html"><strong>Numbered Birthday</strong><span>Big-number</span></a></li>
-                  <li><a href="childrens-cakes.html"><strong>Children's Cakes</strong><span>Birthdays</span></a></li>
-                  <li><a href="speciality-and-everyday-cakes.html"><strong>Speciality Cakes</strong><span>Every occasion</span></a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="site-nav__item has-dropdown">
-              <a href="weddings.html">Weddings <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-              <div class="site-dropdown">
-                <ul>
-                  <li><a href="wedding-cakes.html"><strong>Wedding Cakes</strong><span>For your day</span></a></li>
-                  <li><a href="wedding-bakes.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="site-nav__item has-dropdown">
-              <a href="handmade-biscuits.html">Bakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-              <div class="site-dropdown">
-                <ul>
-                  <li><a href="handmade-biscuits.html"><strong>Biscuits</strong><span>All-butter, hand-iced</span></a></li>
-                  <li><a href="traybakes.html"><strong>Tray bakes</strong><span>Catering &amp; sharing</span></a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="site-nav__item"><a href="cupcakes.html">Cupcakes</a></li>
-            <li class="site-nav__item"><a href="afternoon-tea.html">Afternoon tea</a></li>
-            <li class="site-nav__item"><a href="customer-reviews.html">Testimonials</a></li>
-          </ul>
-        </nav>
+        <ul class="site-nav__list">
+          <li class="site-nav__item has-dropdown">
+            <a href="cakes.html">Cakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            <div class="site-dropdown">
+              <ul>
+                <li><a href="cakes.html"><strong>Speciality Cakes</strong><span>Browse the gallery</span></a></li>
+                <li><a href="ganache-drip-cakes.html"><strong>Drip Cakes</strong><span>Modern · glossy</span></a></li>
+                <li><a href="numbered-birthday-cakes.html"><strong>Numbered Birthday</strong><span>Big-number</span></a></li>
+                <li><a href="childrens-cakes.html"><strong>Children's Cakes</strong><span>Birthdays</span></a></li>
+                <li><a href="speciality-and-everyday-cakes.html" class="active"><strong>Everyday Cakes</strong><span>Twelve flavours</span></a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="site-nav__item has-dropdown">
+            <a href="weddings.html">Weddings <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            <div class="site-dropdown">
+              <ul>
+                <li><a href="wedding-cakes.html"><strong>Wedding Cakes</strong><span>For your day</span></a></li>
+                <li><a href="wedding-bakes.html"><strong>Wedding Bakes</strong><span>Favours &amp; dessert tables</span></a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="site-nav__item has-dropdown">
+            <a href="handmade-biscuits.html">Bakes <span class="caret"><svg viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="M1 1.5c1.5 0 1.5 3 3 3s1.5-3 3-3 1.5 3 3 3 1.5-3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            <div class="site-dropdown">
+              <ul>
+                <li><a href="handmade-biscuits.html"><strong>Biscuits</strong><span>All-butter, hand-iced</span></a></li>
+                <li><a href="traybakes.html"><strong>Tray bakes</strong><span>Catering &amp; sharing</span></a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="site-nav__item"><a href="cupcakes.html">Cupcakes</a></li>
+          <li class="site-nav__item"><a href="afternoon-tea.html">Afternoon tea</a></li>
+          <li class="site-nav__item"><a href="customer-reviews.html">Testimonials</a></li>
+        </ul>
+      </nav>
         <a href="contact.html" class="btn btn--outline btn--pill">Enquire</a>
       </div>
     </div>
@@ -243,334 +119,114 @@
   <main>
     <section class="page-hero">
       <div class="container container--narrow">
-        <p class="eyebrow">The flavour menu</p>
-        <h1>Speciality &amp; Everyday Cakes</h1>
+        <p class="eyebrow">Twelve flavours · from £40</p>
+        <h1>Everyday Cakes</h1>
       </div>
     </section>
 
     <section class="wedding-section">
       <div class="container container--narrow">
-        <p class="intro-p">Over forty signature flavours, from the timeless Victoria sponge to pistachio rose, salted caramel, Biscoff and rainbow. Each cake is baked to order with free-range eggs and ingredients we shop locally where we can.</p>
-        <p class="intro-p">Available in three sizes — <em>ten inch</em> (14–16 servings), <em>eight inch</em> (12–14) and <em>six inch</em> (10–12). Most can be adapted gluten-free <strong>(GF)</strong>, vegan <strong>(V)</strong> or both. Add a personalised acrylic topper to make it yours.</p>
+        <p class="intro-p">A range of slightly more affordable occasion cakes — twelve flavours, two sizes, prices starting from £40. All can be made gluten-free, with most available dairy-free and vegan too.</p>
       </div>
     </section>
 
     <section>
+      <div class="container container--narrow" style="text-align:center;">
+        <img src="images/img_8056.jpeg" alt="Everyday cake by Blossom Bakery, Chelmsford" loading="lazy" style="width:100%; max-width: 540px; border-radius: 8px;" />
+      </div>
+    </section>
+
+    <section class="wedding-section">
       <div class="container">
-
-        <div class="flavour-section">
-          <div class="flavour-section__head">
-            <p class="wedding-section__eyebrow">Classics</p>
-            <h2>Sponges &amp; everyday cakes</h2>
-            <p>8-inch £45 · 6-inch £40 unless noted</p>
-          </div>
-          <div class="flavour-grid">
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Victoria Sponge</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Vanilla sponge sandwiched between strawberry jam and vanilla buttercream, decorated with fresh strawberries. Available with fresh cream in place of buttercream.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Lemon</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Lemon sponge with lemon buttercream and lemon curd, finished with fresh lemon slices. Add blueberries on request.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Lemon Meringue</h3></header>
-              <p class="flavour__desc">Lemon sponges layered with lemon curd and lemon buttercream, topped with homemade lemon meringue kisses.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Lime</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Lime sponge with lemon curd and lemon buttercream, finished on top with lime buttercream and fresh lime slices.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Carrot</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Spiced carrot sponge with walnuts and sultanas, mascarpone frosting, walnuts and fondant carrots on top.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Coffee &amp; Walnut</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Coffee and walnut sponge layered with coffee buttercream, finished with chopped walnuts.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Maple Pecan</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Maple sponge with chopped pecans, layered with maple buttercream and more pecans on top.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Red Velvet</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Red velvet sponge with white chocolate buttercream.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Cherry &amp; Almond</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Almond sponge with cherry jam and almond buttercream, dressed with glacé cherries.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Black Forest</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Chocolate sponge layered with black cherry jam and vanilla buttercream, finished with glacé cherries and milk chocolate shavings. Available with fresh cream.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Apple Crumble</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Apple sponge with vanilla custard buttercream and blackcurrant jam, topped with all-butter crumble.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Rhubarb &amp; Ginger</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Rhubarb sponge with rhubarb &amp; ginger Tiptree jam and swirls of rhubarb buttercream.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Passion Fruit</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Passion fruit sponge with white chocolate buttercream and Tiptree passionfruit curd, finished with passion fruit buttercream and white chocolate shavings.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Pistachio Rose</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Pistachio sponge with delicate rose-flavoured buttercream, sprinkled with pistachio nuts.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Pistachio &amp; Lime</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Pistachio sponge with lime buttercream, finished with chopped pistachios and lime zest.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Coconut &amp; Pineapple</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Coconut sponge with pineapple jam, Jamaican rum buttercream and coconut.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Coconut &amp; Lime</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Coconut sponge with lime and coconut buttercream, decorated with coconut and lime zest.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Citrus Sunshine</h3></header>
-              <p class="flavour__desc">Orange sponge with lemon curd and lemon-and-orange buttercream, finished with fresh orange and lemon slices.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Banoffee</h3></header>
-              <p class="flavour__desc">Banana sponge with homemade caramel sauce and caramel buttercream, dressed with Cadbury's milk chocolate caramel.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Salted Caramel</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Salted caramel sponge with salted caramel buttercream, decorated with salted caramel chocolates.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-          </div>
+        <div class="cake-grid">
+          <article class="cake-card">
+            <img src="images/mocha.jpg" alt="Mocha cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Mocha</h3>
+            <p class="cake-card__desc">Chocolate and coffee flavoured sponge. Sandwiched between a layer of coffee buttercream with a milk chocolate ganache top, chocolate buttercream and chocolate flakes.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/lemon.jpg" alt="Lemon cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Lemon</h3>
+            <p class="cake-card__desc">Lemon flavoured sponge decorated with lemon buttercream, lemon curd and fresh lemon slices. Add blueberries for an additional cost.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/bakewell.jpg" alt="Cherry Bakewell cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Cherry Bakewell</h3>
+            <p class="cake-card__desc">Almond flavoured sponge sandwiched between cherry jam and almond buttercream. Decorated with almond buttercream and glacé cherries.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/carrot.jpg" alt="Carrot cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Carrot Cake</h3>
+            <p class="cake-card__desc">A lovely spiced carrot cake with walnuts and sultanas. Mascarpone frosting, topped with walnuts and fondant carrots.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/rasp_lemon-1.jpg" alt="Raspberry &amp; Lemon Meringue cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Raspberry &amp; Lemon Meringue</h3>
+            <p class="cake-card__desc">Raspberry flavoured sponge with lemon buttercream and lemon curd. Decorated with raspberry buttercream and homemade raspberry meringue kisses.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF</span><span class="cake-card__price">8″ £50 · 6″ £45</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/coffee.jpg" alt="Coffee &amp; Walnut cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Coffee &amp; Walnut</h3>
+            <p class="cake-card__desc">Coffee and walnut sponge sandwiched between coffee buttercream and topped with chopped walnuts.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/victoria.jpg" alt="Victoria Sponge cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Victoria Sponge</h3>
+            <p class="cake-card__desc">Vanilla sponge sandwiched between strawberry jam and vanilla buttercream. Decorated with fresh strawberries. Can also be made with fresh cream instead of buttercream.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/rebeccared-1.jpg" alt="Red Velvet cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Red Velvet</h3>
+            <p class="cake-card__desc">Red Velvet sponge with white chocolate buttercream.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/black.jpg" alt="Black Forest cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Black Forest</h3>
+            <p class="cake-card__desc">Chocolate sponge sandwiched between black cherry jam and vanilla buttercream. Decorated with glacé cherries and milk chocolate shavings. Can also be made with fresh cream.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/pina.jpg" alt="Pina Colada cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Pina Colada</h3>
+            <p class="cake-card__desc">Coconut sponge with pineapple jam, Jamaican rum buttercream and coconut.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/oreo.jpg" alt="Oreo Cookie &amp; Cream cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Oreo Cookie &amp; Cream</h3>
+            <p class="cake-card__desc">Oreo cookie sponge with Oreo cookie buttercream decorated with Oreo biscuits.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
+          <article class="cake-card">
+            <img src="images/pistachio.jpg" alt="Pistachio &amp; Rose cake by Blossom Bakery, Chelmsford" loading="lazy" />
+            <h3 class="cake-card__name">Pistachio &amp; Rose</h3>
+            <p class="cake-card__desc">Pistachio sponge sandwiched between delicate rose flavoured buttercream, sprinkled with pistachio nuts on top.</p>
+            <p class="cake-card__meta"><span class="cake-card__diet">GF · DF · V</span><span class="cake-card__price">8″ £45 · 6″ £40</span></p>
+          </article>
         </div>
-
-        <div class="flavour-section">
-          <div class="flavour-section__head">
-            <p class="wedding-section__eyebrow">Indulgent</p>
-            <h2>Chocolate &amp; signature</h2>
-            <p>8-inch £45 · 6-inch £40 unless noted</p>
-          </div>
-          <div class="flavour-grid">
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Chocolate &amp; Coffee Ganache</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Chocolate and coffee sponge with coffee buttercream and milk chocolate ganache top, finished with chocolate buttercream and chocolate flakes.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Marble Chocolate</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Chocolate sponge with milk chocolate ganache, decorated with milk and white chocolate buttercream swirls and chocolate chunks.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Chocolate Caramel</h3></header>
-              <p class="flavour__desc">Chocolate sponge with caramel buttercream, homemade caramel sauce and caramel chocolates.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Chocolate Fudge</h3></header>
-              <p class="flavour__desc">Chocolate sponge with fudge and chocolate buttercream, dressed with clotted cream fudge pieces.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Mint Aero</h3></header>
-              <p class="flavour__desc">Chocolate sponge with peppermint buttercream, decorated with Aero chocolate balls and chocolate chunks.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Chocolate Orange</h3></header>
-              <p class="flavour__desc">Chocolate orange sponge with orange buttercream, finished with Terry's chocolate orange segments.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Millionaire's</h3></header>
-              <p class="flavour__desc">Chocolate sponge with chocolate and caramel buttercream, milk chocolate ganache top and millionaire's shortbreads.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Reese's Peanut Butter</h3></header>
-              <p class="flavour__desc">Chocolate sponge with peanut butter buttercream, decorated with Reese's chocolates.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Kinder Bueno</h3></header>
-              <p class="flavour__desc">Rich chocolate sponge with white and milk chocolate buttercream, dressed with Kinder Bueno bars.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Mocha Marble</h3></header>
-              <p class="flavour__desc">Coffee and chocolate sponges layered with chocolate buttercream and milk chocolate ganache, finished with white chocolate shavings.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Oreo</h3></header>
-              <p class="flavour__desc">Oreo cookie sponge with Oreo cookie buttercream, decorated with Oreo biscuits.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Biscoff</h3></header>
-              <p class="flavour__desc">Cinnamon sponge with Lotus Biscoff buttercream, decorated with Biscoff biscuits.</p>
-              <p class="flavour__price">£45 <em>· 6&Prime; £40</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Salted Caramel Ganache</h3></header>
-              <p class="flavour__desc">Salted caramel sponge with salted caramel ganache, decorated with salted caramel chocolates and fudge pieces.</p>
-              <p class="flavour__price">£50 <em>· 6&Prime; £45</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Raspberry Meringue</h3><span class="flavour__tag">GF</span></header>
-              <p class="flavour__desc">Raspberry sponge with lemon buttercream and lemon curd, decorated with raspberry buttercream and homemade raspberry meringue kisses.</p>
-              <p class="flavour__price">£50 <em>· 6&Prime; £45</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Strawberries &amp; Cream</h3></header>
-              <p class="flavour__desc">Strawberry sponge with strawberry jam and clotted cream buttercream, decorated with Lindt white chocolates.</p>
-              <p class="flavour__price">£50 <em>· 6&Prime; £45</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Lemon Macaroon</h3></header>
-              <p class="flavour__desc">Lemon cake with lemon curd and lemon buttercream, decorated with ten homemade lemon macaroons.</p>
-              <p class="flavour__price">£60 <em>· 6&Prime; £55</em></p>
-            </article>
-
-          </div>
-        </div>
-
-        <div class="flavour-section">
-          <div class="flavour-section__head">
-            <p class="wedding-section__eyebrow">Showstoppers</p>
-            <h2>Tall &amp; layered</h2>
-            <p>Three to six layers · serves 25+</p>
-          </div>
-          <div class="flavour-grid">
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Tall Victoria</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Three layers of vanilla sponge with strawberry jam, vanilla buttercream and a selection of fresh fruit.</p>
-              <p class="flavour__price">£85 <em>· 6&Prime; £75</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Strawberries &amp; White Chocolate</h3><span class="flavour__tag">GF</span></header>
-              <p class="flavour__desc">Vanilla sponge with strawberry jam and vanilla buttercream, decorated with white chocolate shards and fresh strawberries.</p>
-              <p class="flavour__price">£85 <em>· 6&Prime; £75</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">White Chocolate &amp; Raspberry</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Fresh raspberries and vanilla sponge, white chocolate buttercream and white chocolate ganache, topped with fresh raspberries.</p>
-              <p class="flavour__price">£75 <em>· 6&Prime; £65</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Rainbow</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Six layers of vanilla rainbow-coloured sponge, coated in vanilla buttercream and sprinkles.</p>
-              <p class="flavour__price">£85 <em>· 6&Prime; £75</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Rainbow Chocolate Ganache</h3></header>
-              <p class="flavour__desc">Six layers of vanilla rainbow sponge, decorated with chocolate ganache and chocolate treats. Includes a personalised topper.</p>
-              <p class="flavour__price">£90 <em>· 6&Prime; £80</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Birthday Buttercream</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Vanilla sponge with strawberry jam and vanilla buttercream, decorated with buttercream swirls and sugar paste flowers. Comes with a personalised name and age board.</p>
-              <p class="flavour__price">£85 <em>· 6&Prime; £75</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Fresh Flower Cake</h3><span class="flavour__tag">GF · V</span></header>
-              <p class="flavour__desc">Vanilla sponge with strawberry jam and vanilla buttercream, decorated with fresh flowers in your colour scheme and a personalised topper.</p>
-              <p class="flavour__price">£85 <em>· 6&Prime; £75</em></p>
-            </article>
-
-            <article class="flavour">
-              <header class="flavour__head"><h3 class="flavour__name">Bespoke</h3></header>
-              <p class="flavour__desc">Full creative control. We'll work with you on the flavours and design from first sketch to finished cake — please get in touch to arrange a consultation.</p>
-              <p class="flavour__price">By consultation</p>
-            </article>
-
-          </div>
-        </div>
-
       </div>
     </section>
 
     <section class="alt">
       <div class="container container--narrow" style="text-align:center;">
-        <p class="section-eyebrow">Order yours</p>
-        <h2 class="section-title">Let's bake something for you</h2>
-        <p style="margin: 16px auto 24px; max-width: 540px; color: var(--muted);">All cakes available in 8-inch and 6-inch sizes. Personalised acrylic toppers available — let us know your message and colour palette.</p>
-        <p style="margin: 0 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
-        <p style="color: var(--muted);">Mobile: 07939 618787 · Mon–Fri 9am–5pm · Sat 9am–2pm</p>
-        <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
+        <p class="eyebrow">Order yours</p>
+        <h2 class="closing-cta__heading" style="font-family: var(--serif); font-size: 32px; font-weight: 500;">Tell Helen <em>which one.</em></h2>
+        <p class="intro-p">Let her know your flavour, size and date — she'll come back with a quote.</p>
+        <p style="margin-top: 24px;"><a href="contact.html" class="btn btn--rose">Order an everyday cake</a></p>
       </div>
     </section>
+
   </main>
 
-  <footer class="site-footer">
+<footer class="site-footer">
     <div class="container">
       <div class="site-footer__grid">
         <div>
@@ -589,7 +245,7 @@
         <div>
           <h4>Contact</h4>
           <p>blossombakedgoods@gmail.com<br />07939 618787</p>
-          <p style="margin-top: 12px;">Monday–Friday 9am–5pm<br />Saturday 9am–2pm</p>
+          <p style="margin-top: 12px;">Monday-Friday 9am-5pm<br />Saturday 9am-2pm</p>
         </div>
       </div>
       <div class="site-footer__bottom">
@@ -615,11 +271,9 @@
             e.preventDefault();
             var li = a.parentElement;
             var wasOpen = li.classList.contains('is-open');
-            // Close every dropdown first (single-open behaviour)
             document.querySelectorAll('.site-nav__item.has-dropdown.is-open').forEach(function(o){
               o.classList.remove('is-open');
             });
-            // Then re-open this one if it wasn't already open
             if (!wasOpen) li.classList.add('is-open');
           }
         });

@@ -12,8 +12,8 @@
       "nav": { "section": "cakes",                                                            "label": "Numbered Birthday", "note": "Big-number",                "order": 30 } },
     { "id": "childrens-cakes",                "file": "childrens-cakes.html",                "label": "Children's Cakes",      "published": true,  "generated": false,
       "nav": { "section": "cakes",                                                            "label": "Children's Cakes",  "note": "Birthdays",                 "order": 40 } },
-    { "id": "speciality-and-everyday-cakes",  "file": "speciality-and-everyday-cakes.html",  "label": "Speciality & Everyday", "published": true,  "generated": false,
-      "nav": { "section": "cakes",                                                            "label": "Speciality Cakes",  "note": "Every occasion",            "order": 50 } },
+    { "id": "speciality-and-everyday-cakes",  "file": "speciality-and-everyday-cakes.html",  "label": "Everyday Cakes",        "published": true,  "generated": false,
+      "nav": { "section": "cakes",                                                            "label": "Everyday Cakes",    "note": "Twelve flavours",           "order": 50 } },
 
     { "id": "wedding-cakes",                  "file": "wedding-cakes.html",                  "label": "Wedding Cakes",         "published": true,  "generated": false,
       "nav": { "topLevel": true,  "section": "weddings", "sectionLabel": "Weddings",     "label": "Wedding Cakes",     "note": "For your day",              "order": 10, "sectionOrder": 2 } },
