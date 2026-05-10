@@ -1,0 +1,8 @@
+# Per-function deploy config. Without this, `supabase functions deploy`
+# defaults to verify_jwt = true and Supabase's gateway rejects unauthed
+# POSTs from the editor with 401 before our handler runs. The publish-
+# draft function does its own password check (PUBLISH_PASSWORD) and
+# must accept anonymous requests so the editor can call it directly.
+
+[functions.publish-draft]
+verify_jwt = false
