@@ -50,6 +50,17 @@ IMAGES_DIR = SITE / "images"
 # ─── Canonical page registry ─────────────────────────────────────
 PAGES_JSON = ROOT / "_data" / "pages.json"
 
+# Pull build.py's nav renderer so we use the EXACT same nav model when
+# rewriting hand-crafted pages' nav blocks. Keeps a single source of truth
+# for the markup; build.py and apply-draft.py never disagree on what
+# the nav should look like.
+def _import_build():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("blossom_build", Path(__file__).resolve().parent / "build.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
 def _load_pages_registry():
     """Single source of truth shared with edit-blossom/editor-app.jsx.
     Returns (PAGE_FILES dict, GENERATED set). Falls back to empty on error.
@@ -320,6 +331,107 @@ def update_page_status(page_id: str, published: bool) -> bool:
     return False
 
 
+# ─── Nav + cat-grid sync ────────────────────────────────────────────────
+# Site nav and the homepage cat-grid are hand-coded into every HTML file.
+# These two helpers regenerate them from _data/pages.json so a new page
+# created via the editor automatically wires into the menus and homepage.
+
+# Match the EXACT block render_nav() emits in build.py: mobile-toggle
+# button followed (after whitespace) by <nav class="site-nav">…</nav>.
+# We replace that whole region; everything outside it (brand link,
+# Enquire button, etc.) stays untouched.
+_NAV_BLOCK_RE = re.compile(
+    r'<button class="mobile-toggle"[^>]*>.*?</button>\s*<nav class="site-nav">.*?</nav>',
+    re.DOTALL,
+)
+
+
+def sync_navs() -> int:
+    """Rewrite the nav block in every hand-crafted HTML file from pages.json.
+    Returns the number of files that actually changed."""
+    build_mod = _import_build()
+    changed = 0
+    for html_path in sorted(SITE.glob("*.html")):
+        if "edit-blossom" in html_path.parts:
+            continue
+        text = html_path.read_text(encoding="utf-8")
+        if 'class="site-nav"' not in text:
+            continue
+        new_nav = build_mod.render_nav(html_path.name)
+        new_text, n = _NAV_BLOCK_RE.subn(new_nav, text, count=1)
+        if n and new_text != text:
+            html_path.write_text(new_text, encoding="utf-8")
+            changed += 1
+    return changed
+
+
+def _first_real_img_src(html_path: Path) -> tuple[str, str] | None:
+    """Find the first <img> in a page that points at a real photo (not the
+    placeholder SVG). Returns (src, alt) or None if there isn't one."""
+    if not html_path.exists():
+        return None
+    soup = BeautifulSoup(html_path.read_text(encoding="utf-8"), "html.parser")
+    for img in soup.find_all("img"):
+        src = (img.get("src") or "").strip()
+        if not src or "_add-photo.svg" in src:
+            continue
+        # Skip header/footer/nav imgs (logo, social icons, etc.) — only
+        # body content imgs are good cat-card candidates.
+        if img.find_parent(["header", "footer", "nav"]):
+            continue
+        return (src, (img.get("alt") or "").strip())
+    return None
+
+
+def sync_cat_grid_for_new_pages(new_page_entries: list[dict]) -> int:
+    """Append a cat-card to index.html's .cat-grid for each new page.
+    Existing cards are left alone — Paul's hand-crafted ordering wins.
+    Returns the number of cards added."""
+    if not new_page_entries:
+        return 0
+    index_path = SITE / "index.html"
+    if not index_path.exists():
+        return 0
+    soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
+    grid = soup.find("div", class_="cat-grid")
+    if not grid:
+        return 0
+    existing_hrefs = {
+        (a.get("href") or "").strip()
+        for a in grid.find_all("a", class_="cat-card")
+    }
+    added = 0
+    for np in new_page_entries:
+        href = np.get("file", "")
+        if not href or href in existing_hrefs:
+            continue
+        page_path = SITE / href
+        first = _first_real_img_src(page_path)
+        if first:
+            card_src, card_alt = first
+        else:
+            card_src = "images/_add-photo.svg?slot=card-" + np.get("id", "new")
+            card_alt = np.get("label", np.get("id", ""))
+        nav = np.get("nav") or {}
+        title = np.get("label", np.get("id", ""))
+        meta = nav.get("note", "Click to explore")
+        # Build the card with the same shape as Paul's existing cat-cards.
+        new_card_html = (
+            f'<a href="{href}" class="cat-card">'
+            f'<div class="cat-card__img"><img src="{card_src}" alt="{card_alt}" loading="lazy" /></div>'
+            f'<div class="cat-card__body">'
+            f'<div class="cat-card__title">{title}</div>'
+            f'<div class="cat-card__meta">{meta}</div>'
+            f'</div>'
+            f'</a>'
+        )
+        grid.append(BeautifulSoup(new_card_html, "html.parser"))
+        added += 1
+    if added:
+        index_path.write_text(str(soup), encoding="utf-8")
+    return added
+
+
 # ─── Main ──────────────────────────────────────────────────────────────
 def apply_draft(draft_path: Path) -> None:
     draft = json.loads(draft_path.read_text(encoding="utf-8"))
@@ -352,10 +464,31 @@ def apply_draft(draft_path: Path) -> None:
                 new_path.write_bytes(tpl_path.read_bytes())
                 print(f"  + created /{new_file} from /{template_file}")
             if nid not in existing_ids:
-                registry.setdefault("pages", []).append({
+                entry = {
                     "id": nid, "file": new_file, "label": np.get("label", nid),
                     "published": bool(np.get("published", False)), "generated": False,
-                })
+                }
+                # Optional nav placement chosen in NewPageModal: section is
+                # one of "cakes" / "weddings" / "bakes" / None. If supplied,
+                # auto-pick an order at the bottom of that section so the
+                # new page lands last in the dropdown.
+                section = np.get("section")
+                if section:
+                    existing_orders = [
+                        (p.get("nav") or {}).get("order", 0)
+                        for p in registry.get("pages", [])
+                        if (p.get("nav") or {}).get("section") == section
+                    ]
+                    next_order = (max(existing_orders) if existing_orders else 0) + 10
+                    entry["nav"] = {
+                        "section": section,
+                        "label": np.get("label", nid),
+                        "order": next_order,
+                    }
+                    note = (np.get("note") or "").strip()
+                    if note:
+                        entry["nav"]["note"] = note
+                registry.setdefault("pages", []).append(entry)
                 registry_dirty = True
                 # Make this page editable in subsequent runs
                 PAGE_FILES[nid] = new_file
@@ -363,7 +496,7 @@ def apply_draft(draft_path: Path) -> None:
             PAGES_JSON.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"  ✓ _data/pages.json updated ({len(new_pages)} new page(s))")
 
-    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "images_deleted": 0, "page_status": 0, "styles_ok": 0, "styles_skipped": []}
+    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "images_deleted": 0, "page_status": 0, "styles_ok": 0, "styles_skipped": [], "nav_synced": 0, "cards_added": 0}
 
     # Latent landmine check: warn about _pages/*.yml files that are NOT in
     # GENERATED. They aren't consumed today, but if anyone re-adds them to
@@ -508,6 +641,27 @@ def apply_draft(draft_path: Path) -> None:
                 src_path.unlink()
                 print(f"  ✓ unlinked orphan file '{clean_src}'")
 
+    # ── 2c. Nav + homepage cat-grid sync ───────────────────────────
+    # Only fires when the editor's draft created at least one new page —
+    # otherwise the existing hand-crafted nav and cat-grid are left alone.
+    # Runs AFTER image swaps so the cat-card image-lookup sees Helen's
+    # latest uploaded photo (not the template's stale one).
+    if new_pages:
+        nav_changed = sync_navs()
+        if nav_changed:
+            summary["nav_synced"] = nav_changed
+            print(f"  ✓ site nav synced across {nav_changed} HTML file(s)")
+        # Reload the registry so we know each new page's final nav metadata
+        # (the entry we wrote in section 0). Pass those entries to the
+        # cat-grid syncer so the homepage gets matching cards.
+        registry_now = json.loads(PAGES_JSON.read_text(encoding="utf-8")) if PAGES_JSON.exists() else {"pages": []}
+        new_ids = {np["id"] for np in new_pages}
+        new_entries = [p for p in registry_now.get("pages", []) if p.get("id") in new_ids]
+        cards_added = sync_cat_grid_for_new_pages(new_entries)
+        if cards_added:
+            summary["cards_added"] = cards_added
+            print(f"  ✓ homepage cat-grid: +{cards_added} card(s)")
+
     # ── 3. Page status ─────────────────────────────────────────────
     for page_id, published in page_status.items():
         if update_page_status(page_id, bool(published)):
@@ -521,6 +675,10 @@ def apply_draft(draft_path: Path) -> None:
     print(f"           {summary['yaml_updated']} YAML field(s) updated")
     print(f"           {summary['images']} image swap(s)")
     print(f"           {summary['images_deleted']} image delete(s)")
+    if summary["nav_synced"]:
+        print(f"           nav synced across {summary['nav_synced']} file(s)")
+    if summary["cards_added"]:
+        print(f"           {summary['cards_added']} new card(s) on homepage")
     print(f"           {summary['page_status']} page-status change(s)")
     print(f"           {summary['styles_ok']} per-element style change(s)")
     if summary["text_skipped"]:

@@ -570,7 +570,7 @@ function App() {
     }
   }
 
-  function createNewPage({ label, slug, templateId }) {
+  function createNewPage({ label, slug, templateId, section, note }) {
     const tpl = PAGES.find(p => p.id === templateId);
     if (!tpl) { toast('Pick a template', 'error'); return; }
     const id = slug.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -579,6 +579,13 @@ function App() {
     const newPage = {
       id, file: id + '.html', label: label.trim() || id, template: templateId,
       published: false, draftNew: true,
+      // section is one of "cakes" | "weddings" | "bakes" | "" (none).
+      // apply-draft.py reads this and writes nav metadata into pages.json,
+      // then rewrites every hand-crafted page's nav block from there so
+      // the new page appears in the correct dropdown sitewide. note is the
+      // small grey subtitle that shows under the page label in the dropdown.
+      section: section || '',
+      note: (note || '').trim(),
     };
     setDraft(d => ({ ...d, newPages: [...(d.newPages || []), newPage] }));
     setActivePageId(id);
@@ -1097,6 +1104,8 @@ function NewPageModal({ pages, onCancel, onCreate }) {
   const [label, setLabel] = useState('');
   const [slug, setSlug] = useState('');
   const [templateId, setTemplateId] = useState(pages[0]?.id || '');
+  const [section, setSection] = useState('cakes');
+  const [note, setNote] = useState('');
   const slugFromLabel = label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   const effectiveSlug = slug || slugFromLabel;
   return (
@@ -1123,9 +1132,24 @@ function NewPageModal({ pages, onCancel, onCreate }) {
           </select>
           <div className="field__hint">Tip: pick a page whose shape matches what you have in mind.</div>
         </div>
+        <div className="field">
+          <label className="field__label">Add to menu under</label>
+          <select value={section} onChange={(e) => setSection(e.target.value)}>
+            <option value="cakes">Cakes</option>
+            <option value="weddings">Weddings</option>
+            <option value="bakes">Bakes</option>
+            <option value="">— Don't add to menu —</option>
+          </select>
+          <div className="field__hint">Where the new page lives in the top nav. Also adds a card to the homepage.</div>
+        </div>
+        <div className="field">
+          <label className="field__label">Subtitle in menu (optional)</label>
+          <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Two-tier · celebration" />
+          <div className="field__hint">The small grey line under the page name in the dropdown. Leave blank for a clean entry.</div>
+        </div>
         <div className="drawer__actions">
           <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
-          <button className="btn btn--primary" disabled={!label.trim() || !effectiveSlug} onClick={() => onCreate({ label, slug: effectiveSlug, templateId })}>Create draft page</button>
+          <button className="btn btn--primary" disabled={!label.trim() || !effectiveSlug} onClick={() => onCreate({ label, slug: effectiveSlug, templateId, section, note })}>Create draft page</button>
         </div>
       </div>
     </div>
