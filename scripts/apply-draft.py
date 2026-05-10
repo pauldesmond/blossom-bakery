@@ -127,19 +127,39 @@ def find_by_selector(soup: BeautifulSoup, selector: str):
         return None
 
 
-def replace_text(el, new_text: str) -> bool:
+def _el_text_with_br(el) -> str:
+    """Return el's text with '\\n' wherever a <br> appears among its
+    immediate children. Inverse of replace_text — used for honest equality
+    checks before rewriting.
+    """
+    parts = []
+    for child in el.children:
+        if getattr(child, 'name', None) == 'br':
+            parts.append('\n')
+        else:
+            parts.append(child.get_text() if hasattr(child, 'get_text') else str(child))
+    return ''.join(parts) if parts else el.get_text()
+
+
+def replace_text(soup: BeautifulSoup, el, new_text: str) -> bool:
     """Replace the visible text of `el` with `new_text`, preserving its tag.
+    Newlines in new_text become <br> elements so multi-line edits roundtrip.
     Returns True if something changed.
     """
     if el is None:
         return False
-    current = el.get_text()
+    current = _el_text_with_br(el)
     if current.strip() == new_text.strip():
         return False
-    # Clear children, set text. This drops any nested formatting (em, strong).
-    # The editor only edits leaf-ish elements so this is usually fine.
+    # Clear and rebuild as text nodes interleaved with <br>. Drops any inner
+    # formatting (em, strong) — the iframe-side isEditable guard prevents
+    # this for compound elements with non-<br> children.
     el.clear()
-    el.append(new_text)
+    parts = new_text.split('\n')
+    for i, line in enumerate(parts):
+        if i > 0:
+            el.append(soup.new_tag('br'))
+        el.append(line)
     return True
 
 
@@ -354,8 +374,8 @@ def apply_draft(draft_path: Path) -> None:
             if el is None:
                 summary["text_skipped"].append((page_id, sel, new_val, "selector did not match"))
                 continue
-            original = el.get_text()
-            if replace_text(el, new_val):
+            original = _el_text_with_br(el)
+            if replace_text(soup, el, new_val):
                 summary["text_ok"] += 1
                 # Mirror to YAML for generated pages — if this fails, CI
                 # will overwrite the HTML edit on the next build. Loud warn.

@@ -115,15 +115,45 @@ const IFRAME_INJECT = `
     //   "Beautiful bakes,<br><em>baked at home</em>"
     // would collapse to one line, single colour. Helen edits the inner
     // <em> directly instead; the wrapping h1 stays as-is.
-    if (el.children.length > 0) return false;
+    // Exception: <br> children are fine — they're how multi-line edits land
+    // in the DOM, and the live-update path can losslessly rewrite them.
+    const kids = Array.from(el.children);
+    if (kids.some(c => c.tagName !== 'BR')) return false;
     return el.matches(SELECTORS);
+  }
+
+  // Render a string with \\n line breaks into an element as text nodes
+  // interleaved with <br> elements. Safe (no HTML parsing).
+  function renderText(el, text) {
+    el.textContent = '';
+    const parts = String(text).split('\\n');
+    parts.forEach((line, i) => {
+      if (i > 0) el.appendChild(document.createElement('br'));
+      el.appendChild(document.createTextNode(line));
+    });
+  }
+  // Read the element's text with \\n where <br> elements appear. Inverse
+  // of renderText. Plain textContent strips <br> entirely (would lose
+  // multi-line edits on round-trip), so we walk children manually.
+  function textWithBreaks(el) {
+    let out = '';
+    el.childNodes.forEach(node => {
+      if (node.nodeType === 3) out += node.textContent;
+      else if (node.tagName === 'BR') out += '\\n';
+      else if (node.tagName === 'DIV') {
+        // Safari's contentEditable wraps Enter in <div>. Treat as line break.
+        if (out && !out.endsWith('\\n')) out += '\\n';
+        out += textWithBreaks(node);
+      } else out += node.textContent;
+    });
+    return out;
   }
 
   function applyEdits(edits) {
     Object.entries(edits || {}).forEach(([sel, val]) => {
       try {
         const el = document.querySelector(sel);
-        if (el && el.textContent !== val) el.textContent = val;
+        if (el && textWithBreaks(el) !== val) renderText(el, val);
       } catch(e) {}
     });
   }
@@ -170,22 +200,29 @@ const IFRAME_INJECT = `
     e.preventDefault(); e.stopPropagation();
     const el = e.target;
     const sel = pathFor(el);
-    const original = el.textContent;
+    const original = textWithBreaks(el);
     el.contentEditable = 'true';
     el.style.outline = '2px solid #b56a78';
     el.style.outlineOffset = '2px';
     el.style.background = 'rgba(245,219,217,.6)';
     el.focus();
-    // Select all
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    const ssel = window.getSelection();
-    ssel.removeAllRanges();
-    ssel.addRange(range);
+    // Place caret at the click position so Helen can insert text where
+    // she clicked. Falls back to end-of-text on browsers without
+    // caretRangeFromPoint (uncommon).
+    try {
+      const range = document.caretRangeFromPoint
+        ? document.caretRangeFromPoint(e.clientX, e.clientY)
+        : null;
+      if (range) {
+        const ssel = window.getSelection();
+        ssel.removeAllRanges();
+        ssel.addRange(range);
+      }
+    } catch (_e) {}
     window.parent.postMessage({ type: 'edit-start', selector: sel, original }, '*');
 
     function commit() {
-      const next = el.textContent;
+      const next = textWithBreaks(el);
       el.contentEditable = 'false';
       el.style.outline = '';
       el.style.background = '';
@@ -197,7 +234,7 @@ const IFRAME_INJECT = `
     }
     function onKey(ev) {
       if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); el.blur(); }
-      if (ev.key === 'Escape') { el.textContent = original; el.blur(); }
+      if (ev.key === 'Escape') { renderText(el, original); el.blur(); }
     }
     el.addEventListener('blur', commit);
     el.addEventListener('keydown', onKey);
@@ -763,7 +800,17 @@ function App() {
                   }));
                   try {
                     const el = iframeRef.current.contentDocument.querySelector(selection.selector);
-                    if (el) el.textContent = v;
+                    if (el) {
+                      // Render with <br> for each \n so the iframe preview
+                      // reflects line breaks (matches what apply-draft.py
+                      // will write). Plain textContent collapses newlines
+                      // to whitespace.
+                      el.textContent = '';
+                      v.split('\n').forEach((line, i) => {
+                        if (i > 0) el.appendChild(el.ownerDocument.createElement('br'));
+                        el.appendChild(el.ownerDocument.createTextNode(line));
+                      });
+                    }
                   } catch {}
                 }}
               />
