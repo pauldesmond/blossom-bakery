@@ -65,6 +65,52 @@ def _load_pages_registry():
 PAGE_FILES, GENERATED = _load_pages_registry()
 
 
+# ─── Theme palettes (mirror of edit-blossom/editor-app.jsx THEMES) ───
+# Keep these in sync with the editor's THEMES constant. When Helen picks a
+# palette in the editor, draft.site.theme = '<id>' lands here, and we rewrite
+# the matching CSS variables in styles.css.
+THEMES = {
+    'blossom':    {'--cream': '#faf6f0', '--rose': '#d89396', '--rose-dark': '#b8676a', '--rose-soft': '#e8c5c4', '--sage': '#9bb098'},
+    'sage':       {'--cream': '#f7f4ec', '--rose': '#a8c3a4', '--rose-dark': '#6b8966', '--rose-soft': '#c9dcc6', '--sage': '#d89396'},
+    'lavender':   {'--cream': '#f8f5f1', '--rose': '#b9a4c7', '--rose-dark': '#7a5c8e', '--rose-soft': '#d8c8e0', '--sage': '#9bb098'},
+    'terracotta': {'--cream': '#faf3ec', '--rose': '#c98e76', '--rose-dark': '#9a5a3f', '--rose-soft': '#e0bca8', '--sage': '#9bb098'},
+    'honey':      {'--cream': '#fbf6ec', '--rose': '#d4a85c', '--rose-dark': '#9a7833', '--rose-soft': '#ecd9a8', '--sage': '#9bb098'},
+}
+
+
+def apply_theme(theme_id: str) -> bool:
+    """Rewrite the matching CSS variables inside styles.css :root { ... }.
+    Only touches lines for variables in THEMES[theme_id] — leaves --ink,
+    --paper, --muted, etc. alone. Returns True if anything changed.
+    """
+    palette = THEMES.get(theme_id)
+    if not palette:
+        print(f"! Unknown theme '{theme_id}' — skipping", file=sys.stderr)
+        return False
+    css_path = SITE / 'styles.css'
+    if not css_path.exists():
+        print("! styles.css not found — cannot apply theme", file=sys.stderr)
+        return False
+    text = css_path.read_text(encoding='utf-8')
+    m = re.search(r':root\s*\{([^}]*)\}', text, re.DOTALL)
+    if not m:
+        print("! styles.css has no :root { } block — cannot apply theme", file=sys.stderr)
+        return False
+    block = m.group(1)
+    new_block = block
+    for var, value in palette.items():
+        var_re = re.compile(r'(\s*)' + re.escape(var) + r'\s*:\s*[^;]+;')
+        if var_re.search(new_block):
+            new_block = var_re.sub(lambda mm, v=value, k=var: f"{mm.group(1)}{k}: {v};", new_block)
+        else:
+            new_block = new_block.rstrip() + f"\n  {var}: {value};\n"
+    if new_block == block:
+        return False
+    new_text = text[:m.start(1)] + new_block + text[m.end(1):]
+    css_path.write_text(new_text, encoding='utf-8')
+    return True
+
+
 # ─── Selector parser ───────────────────────────────────────────────────
 # The editor emits selectors like:
 #   "main > section:nth-of-type(2) > div > h2"
@@ -230,6 +276,7 @@ def apply_draft(draft_path: Path) -> None:
     images: dict[str, dict[str, str]] = draft.get("images", {}) or {}
     page_status: dict[str, bool] = draft.get("pageStatus", {}) or {}
     new_pages: list[dict] = draft.get("newPages", []) or []
+    site: dict = draft.get("site", {}) or {}
 
     # ── 0. Materialise new pages (copy template HTML, register in pages.json)
     if new_pages:
@@ -264,7 +311,13 @@ def apply_draft(draft_path: Path) -> None:
             PAGES_JSON.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"  ✓ _data/pages.json updated ({len(new_pages)} new page(s))")
 
-    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "page_status": 0}
+    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "page_status": 0, "theme": None}
+
+    # ── 0a. Theme (site-wide colour palette) ────────────────
+    if site.get('theme'):
+        if apply_theme(site['theme']):
+            summary['theme'] = site['theme']
+            print(f"  ✓ theme → {site['theme']} (styles.css :root rewritten)")
 
     # Latent landmine check: warn about _pages/*.yml files that are NOT in
     # GENERATED. They aren't consumed today, but if anyone re-adds them to

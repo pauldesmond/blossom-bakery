@@ -24,6 +24,43 @@ const BASE_PATH = '../';
 // apply-helen-draft GitHub Actions workflow. Replace the URL after deploy.
 const PUBLISH_ENDPOINT = 'https://rvokskoevmcekkgiglpa.supabase.co/functions/v1/publish-draft';
 
+// ──────────────────────────────────────────────────────────────────
+// Theme palettes — curated, cohesive sets that swap the accent triple
+// (--rose, --rose-dark, --rose-soft) and tint the cream background.
+// Adding new palettes: keep the triple harmonious (light → mid → dark
+// of the same hue family), and apply-draft.py will rewrite the matching
+// vars in styles.css when Helen picks one.
+// ──────────────────────────────────────────────────────────────────
+const THEMES = [
+  {
+    id: 'blossom', name: 'Blossom', desc: 'Soft rose · the original',
+    vars: { '--cream': '#faf6f0', '--rose': '#d89396', '--rose-dark': '#b8676a', '--rose-soft': '#e8c5c4', '--sage': '#9bb098' },
+  },
+  {
+    id: 'sage', name: 'Sage Garden', desc: 'Calm green · pastoral',
+    vars: { '--cream': '#f7f4ec', '--rose': '#a8c3a4', '--rose-dark': '#6b8966', '--rose-soft': '#c9dcc6', '--sage': '#d89396' },
+  },
+  {
+    id: 'lavender', name: 'Lavender', desc: 'Romantic purple · gentle',
+    vars: { '--cream': '#f8f5f1', '--rose': '#b9a4c7', '--rose-dark': '#7a5c8e', '--rose-soft': '#d8c8e0', '--sage': '#9bb098' },
+  },
+  {
+    id: 'terracotta', name: 'Terracotta', desc: 'Warm earth · autumnal',
+    vars: { '--cream': '#faf3ec', '--rose': '#c98e76', '--rose-dark': '#9a5a3f', '--rose-soft': '#e0bca8', '--sage': '#9bb098' },
+  },
+  {
+    id: 'honey', name: 'Honey', desc: 'Golden warm · summery',
+    vars: { '--cream': '#fbf6ec', '--rose': '#d4a85c', '--rose-dark': '#9a7833', '--rose-soft': '#ecd9a8', '--sage': '#9bb098' },
+  },
+];
+const DEFAULT_THEME_ID = 'blossom';
+
+function themeCss(themeId) {
+  const t = THEMES.find(x => x.id === themeId) || THEMES[0];
+  const decls = Object.entries(t.vars).map(([k, v]) => `  ${k}: ${v};`).join('\n');
+  return `:root {\n${decls}\n}\n`;
+}
+
 // CSS injected into the iframe so editing UI is unambiguous.
 // The live site's chrome is already well-proportioned — leave it alone.
 const IFRAME_CSS = `
@@ -238,8 +275,10 @@ function App() {
     : (activePage?.file || 'index.html');
   const pageEdits = draft.edits[activePageId] || {};
   const pageImages = draft.images || {};
+  const themeChanged = draft.site?.theme && draft.site.theme !== DEFAULT_THEME_ID;
   const totalEditsCount = Object.values(draft.edits).reduce((s, e) => s + Object.keys(e).length, 0)
-    + Object.keys(draft.images || {}).length;
+    + Object.keys(draft.images || {}).length
+    + (themeChanged ? 1 : 0);
 
   // Persist draft on change
   useEffect(() => { saveDraft(draft); }, [draft]);
@@ -287,12 +326,42 @@ function App() {
       const style = doc.createElement('style');
       style.textContent = IFRAME_CSS;
       doc.head.appendChild(style);
+      // Theme override — appended LAST so it wins over styles.css :root.
+      // The live-update useEffect below mutates this same node when Helen
+      // picks a different palette (no iframe reload needed).
+      const themeStyle = doc.createElement('style');
+      themeStyle.id = '__blossom-theme-override';
+      themeStyle.textContent = themeCss(draft.site?.theme || DEFAULT_THEME_ID);
+      doc.head.appendChild(themeStyle);
       const s = doc.createElement('script');
       s.textContent = IFRAME_INJECT;
       doc.body.appendChild(s);
     } catch (err) {
       console.error('Inject failed', err);
     }
+  }
+
+  // Live-update theme override when Helen picks a new palette (no iframe
+  // reload — instant preview).
+  useEffect(() => {
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    try {
+      const doc = win.document;
+      let s = doc.getElementById('__blossom-theme-override');
+      if (!s) {
+        s = doc.createElement('style');
+        s.id = '__blossom-theme-override';
+        doc.head.appendChild(s);
+      }
+      s.textContent = themeCss(draft.site?.theme || DEFAULT_THEME_ID);
+    } catch {}
+  }, [draft.site?.theme, activePageId]);
+
+  function setTheme(themeId) {
+    setDraft(d => ({ ...d, site: { ...(d.site || {}), theme: themeId } }));
+    const t = THEMES.find(x => x.id === themeId);
+    toast(`Theme: ${t?.name || themeId}`, 'success');
   }
 
   // Page status
@@ -464,6 +533,7 @@ function App() {
       edits: draft.edits,
       pageStatus: draft.pageStatus,
       newPages: draft.newPages || [],
+      site: draft.site || {},  // includes theme picker; harmless if empty
       images: {}, // images stripped server-side too; explicit here for clarity
     };
     try {
@@ -625,6 +695,35 @@ function App() {
           <button className="new-page-btn" style={{ marginTop: 12 }} onClick={() => setShowNewPage(true)}>
             + New page (duplicate &amp; fill)
           </button>
+        </div>
+
+        <div className="sidebar__section" style={{ borderTop: '1px solid var(--line)', marginTop: 8 }}>
+          <div className="sidebar__title">Site appearance</div>
+          <div style={{ fontSize: 11, color: 'var(--ink-soft)', lineHeight: 1.5, marginBottom: 12 }}>
+            Pick a colour palette. Applies across the whole site.
+          </div>
+          <div className="theme-grid">
+            {THEMES.map(t => {
+              const isActive = (draft.site?.theme || DEFAULT_THEME_ID) === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  className={'theme-swatch' + (isActive ? ' active' : '')}
+                  onClick={() => setTheme(t.id)}
+                  title={t.desc}
+                >
+                  <span className="theme-swatch__row">
+                    <span className="theme-swatch__dot" style={{ background: t.vars['--cream'], border: '1px solid rgba(0,0,0,.08)' }}></span>
+                    <span className="theme-swatch__dot" style={{ background: t.vars['--rose'] }}></span>
+                    <span className="theme-swatch__dot" style={{ background: t.vars['--rose-dark'] }}></span>
+                  </span>
+                  <span className="theme-swatch__name">{t.name}</span>
+                  {isActive && <span className="theme-swatch__check">✓</span>}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

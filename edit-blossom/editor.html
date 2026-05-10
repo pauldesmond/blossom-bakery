@@ -73,6 +73,16 @@
     .new-page-btn { width: 100%; padding: 10px; border: 1px dashed var(--line); border-radius: var(--r-sm); background: transparent; color: var(--ink-soft); font-size: 13px; }
     .new-page-btn:hover { border-color: var(--rose-deep); color: var(--rose-deep); border-style: solid; }
 
+    /* Theme picker */
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .theme-swatch { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 10px 9px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--paper); text-align: left; transition: border-color .15s, transform .15s; }
+    .theme-swatch:hover { border-color: var(--ink); }
+    .theme-swatch.active { border-color: var(--rose-deep); box-shadow: 0 0 0 2px rgba(181,106,120,.15); }
+    .theme-swatch__row { display: flex; gap: 4px; }
+    .theme-swatch__dot { width: 14px; height: 14px; border-radius: 50%; display: block; }
+    .theme-swatch__name { font-size: 11px; color: var(--ink); font-weight: 500; letter-spacing: .01em; }
+    .theme-swatch__check { position: absolute; top: 6px; right: 8px; font-size: 11px; color: var(--rose-deep); }
+
     /* Stage (preview) — iframe rendered at fixed desktop width (1280) and scaled to fit
        so nav stays desktop, never falls back to hamburger. */
     .stage { background: linear-gradient(180deg, #ece4d6 0%, #d8cebd 100%); overflow: auto; padding: 20px; position: relative; }
