@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+  <rect x="3" y="3" width="394" height="394" fill="#fdf7f3" stroke="#b56a78" stroke-width="3" stroke-dasharray="14 8" rx="6"/>
+  <line x1="200" y1="155" x2="200" y2="225" stroke="#b56a78" stroke-width="6" stroke-linecap="round"/>
+  <line x1="165" y1="190" x2="235" y2="190" stroke="#b56a78" stroke-width="6" stroke-linecap="round"/>
+  <text x="200" y="275" text-anchor="middle" fill="#b56a78" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="600">Tap to add photo</text>
+</svg>

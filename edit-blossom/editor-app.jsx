@@ -66,6 +66,11 @@ const IFRAME_CSS = `
   *:focus-within { outline: none !important; }
   /* Make sure long content can scroll without clipping inside the editor stage */
   html, body { overflow-x: hidden; }
+  /* Reveal "Tap to add photo" placeholder slots — production CSS hides
+     these so the public never sees them, but inside the editor Helen
+     needs to see and click them. Once she swaps a placeholder for a
+     real photo, the src changes and this rule no longer applies. */
+  .wb-gallery img[src*="_add-photo.svg"] { display: block !important; }
 `;
 
 // ──────────────────────────────────────────────────────────────────

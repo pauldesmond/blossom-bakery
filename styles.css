@@ -884,6 +884,11 @@ section.alt { background: #fff; }
 @media (max-width: 760px) {
   .wb-gallery { grid-template-columns: repeat(2, 1fr); }
 }
+/* Empty placeholder slots — visible only inside the editor (override
+   injected by editor-app.jsx). Once Helen swaps a placeholder for a
+   real photo, the src no longer matches and the rule lapses on its
+   own, so the swapped image renders normally on the public site. */
+.wb-gallery img[src*="_add-photo.svg"] { display: none; }
 
 
 /* Customer Reviews — editorial grid of testimonial cards */
