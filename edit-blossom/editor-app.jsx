@@ -476,7 +476,11 @@ function App() {
       setImageEdit(null);
       return;
     }
-    const MAX = 1600;
+    // 1200px instead of 1600 — gallery imgs render at ~400-600px in the
+    // browser, the bigger source was overkill. Cuts dataUrl size by 40-50%
+    // so the publish POST fits inside iPad Safari's fetch-body tolerance
+    // (which seems to give up around 1-1.5MB on cellular/weak WiFi).
+    const MAX = 1200;
     const targetSrc = imageEdit.src;
     setImageEdit(null); // close the inspector immediately so Helen sees progress
     toast('Resizing photo…', 'info');
@@ -523,7 +527,7 @@ function App() {
           } else {
             ctx.drawImage(probeImg, 0, 0, w, h);
           }
-          dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          dataUrl = canvas.toDataURL('image/jpeg', 0.78);
         } finally {
           URL.revokeObjectURL(blobUrl);
         }
