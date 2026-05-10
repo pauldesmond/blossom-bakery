@@ -85,9 +85,19 @@ function loadDraft() {
 function saveDraft(d) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
   catch (e) {
-    // Quota exceeded (e.g. accumulated photo data URLs). Don't let it
-    // propagate into the render loop and blank the editor.
-    console.warn('[Blossom] draft save failed:', e?.message || e);
+    // Quota exceeded (e.g. accumulated photo data URLs). Drop the old
+    // entry first — without this the SAME stale payload stays in storage
+    // so on reopen loadDraft restores entries the user thought were
+    // discarded. Then retry, and surface to the user if it still fails.
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+    } catch (e2) {
+      console.warn('[Blossom] draft save failed even after clear:', e2?.message || e2);
+      // Surface so the editor can show a banner — the user is editing
+      // against a draft that won't survive the next page reload.
+      try { window.dispatchEvent(new CustomEvent('blossom:save-failed', { detail: e2?.message || String(e2) })); } catch (_) {}
+    }
   }
 }
 
@@ -549,6 +559,13 @@ function App() {
 
   function clearAllDrafts() {
     if (!confirm('Discard all draft edits? This cannot be undone.')) return;
+    // Wipe localStorage FIRST, then update React state. Belt-and-braces:
+    // setDraft normally triggers saveDraft via useEffect, but if the OLD
+    // payload was over the quota, the save can silently fail and leave
+    // stale entries behind — so on next reload loadDraft reads them back
+    // and the user thinks Discard didn't work. Explicit removeItem
+    // guarantees the storage slot is empty before any retries.
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
     setDraft({ edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {} });
     const win = iframeRef.current?.contentWindow;
     if (win) win.location.reload();
