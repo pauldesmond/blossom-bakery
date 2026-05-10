@@ -517,6 +517,9 @@ function App() {
     if (!confirm(`Undo publish "${entry.message}"? This will revert the live site to the previous state.`)) return;
     const password = localStorage.getItem(PASSWORD_KEY) || prompt('Publish password:');
     if (!password) return;
+    // Close Recent, open Publish modal so the user can see the progress.
+    setShowRecent(false);
+    setShowPublish(true);
     setPublishStatus({ phase: 'sending' });
     try {
       const resp = await fetch(PUBLISH_ENDPOINT, {
@@ -524,9 +527,9 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password, revertSha: sha }),
       });
-      const data = await resp.json();
+      const data = await resp.json().catch(() => ({}));
       if (!resp.ok || !data.ok) {
-        setPublishStatus({ phase: 'failed', error: data.error || `HTTP ${resp.status}` });
+        setPublishStatus({ phase: 'failed', error: (data && data.error) || `HTTP ${resp.status}` });
         return;
       }
       setPublishStatus({ phase: 'queued', runUrl: data.runUrl, runId: data.runId });
