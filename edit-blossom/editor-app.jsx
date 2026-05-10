@@ -696,7 +696,10 @@ function App() {
     if (!runId) return;
     const start = Date.now();
     const poll = async () => {
-      if (Date.now() - start > 90_000) {
+      // CI typically finishes 60-120s but can spike on cold-start. 5 min
+      // window covers all observed runs; was 90s, which left publishes
+      // hanging in 'unknown' so the draft never cleared even on success.
+      if (Date.now() - start > 300_000) {
         setPublishStatus({ phase: 'unknown', runUrl });
         return;
       }
