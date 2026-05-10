@@ -325,6 +325,7 @@ def apply_draft(draft_path: Path) -> None:
     draft = json.loads(draft_path.read_text(encoding="utf-8"))
     edits: dict[str, dict[str, str]] = draft.get("edits", {}) or {}
     images: dict[str, dict[str, str]] = draft.get("images", {}) or {}
+    image_deletes: list[str] = draft.get("imageDeletes", []) or []
     page_status: dict[str, bool] = draft.get("pageStatus", {}) or {}
     new_pages: list[dict] = draft.get("newPages", []) or []
     styles: dict[str, dict] = draft.get("styles", {}) or {}
@@ -362,7 +363,7 @@ def apply_draft(draft_path: Path) -> None:
             PAGES_JSON.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"  ✓ _data/pages.json updated ({len(new_pages)} new page(s))")
 
-    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "page_status": 0, "styles_ok": 0, "styles_skipped": []}
+    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "images_deleted": 0, "page_status": 0, "styles_ok": 0, "styles_skipped": []}
 
     # Latent landmine check: warn about _pages/*.yml files that are NOT in
     # GENERATED. They aren't consumed today, but if anyone re-adds them to
@@ -468,6 +469,45 @@ def apply_draft(draft_path: Path) -> None:
                 continue
         print(f"  ✓ image '{old_src}' → '{new_src}' (rewrote {files_touched} file{'s' if files_touched != 1 else ''})")
 
+    # ── 2b. Image deletes ──────────────────────────────────────────
+    # Helen flagged photos to remove (e.g. cloning a template page that
+    # had more photos than her new page needs). Strip the matching <img>
+    # tags from every HTML file. If the underlying image file is no
+    # longer referenced anywhere, unlink it from disk too.
+    for del_src in image_deletes:
+        files_touched = 0
+        total_removed = 0
+        for html_path in SITE.glob("*.html"):
+            if "edit-blossom" in html_path.parts:
+                continue
+            soup_d = BeautifulSoup(html_path.read_text(encoding="utf-8"), "html.parser")
+            removed_here = 0
+            for img in list(soup_d.find_all("img")):
+                src = img.get("src", "")
+                if src == del_src or src.endswith("/" + del_src):
+                    img.decompose()
+                    removed_here += 1
+            if removed_here:
+                html_path.write_text(str(soup_d), encoding="utf-8")
+                files_touched += 1
+                total_removed += removed_here
+        if total_removed:
+            summary["images_deleted"] += total_removed
+            print(f"  ✓ photo '{del_src}' removed ({total_removed} occurrence(s) across {files_touched} file(s))")
+        # Unlink the file too if it's now orphaned. Only consider srcs
+        # that look like real image files (skip placeholder SVG with
+        # ?slot= query strings — those resolve to a file used elsewhere).
+        clean_src = del_src.split("?")[0]
+        src_path = SITE / clean_src
+        if src_path.exists() and src_path.is_file():
+            still_used = any(
+                clean_src in h.read_text(encoding="utf-8")
+                for h in SITE.glob("*.html") if "edit-blossom" not in h.parts
+            )
+            if not still_used and "_add-photo.svg" not in clean_src:
+                src_path.unlink()
+                print(f"  ✓ unlinked orphan file '{clean_src}'")
+
     # ── 3. Page status ─────────────────────────────────────────────
     for page_id, published in page_status.items():
         if update_page_status(page_id, bool(published)):
@@ -480,6 +520,7 @@ def apply_draft(draft_path: Path) -> None:
     print(f"  Applied: {summary['text_ok']} text edit(s)")
     print(f"           {summary['yaml_updated']} YAML field(s) updated")
     print(f"           {summary['images']} image swap(s)")
+    print(f"           {summary['images_deleted']} image delete(s)")
     print(f"           {summary['page_status']} page-status change(s)")
     print(f"           {summary['styles_ok']} per-element style change(s)")
     if summary["text_skipped"]:

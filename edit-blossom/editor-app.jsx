@@ -78,7 +78,7 @@ const IFRAME_CSS = `
 // Draft store — localStorage persistence
 // ──────────────────────────────────────────────────────────────────
 function loadDraft() {
-  const blank = { edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [], styles: {} };
+  const blank = { edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {} };
   try { return { ...blank, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) }; }
   catch { return blank; }
 }
@@ -170,12 +170,20 @@ const IFRAME_INJECT = `
     });
   }
 
-  function applyImages(images) {
+  function applyImages(images, deletes) {
     Object.entries(images || {}).forEach(([oldSrc, newSrc]) => {
       document.querySelectorAll('img').forEach(img => {
         const cur = img.getAttribute('src');
         if (cur && (cur === oldSrc || cur.endsWith('/' + oldSrc))) {
           img.setAttribute('src', newSrc);
+        }
+      });
+    });
+    (deletes || []).forEach(delSrc => {
+      document.querySelectorAll('img').forEach(img => {
+        const cur = img.getAttribute('src');
+        if (cur && (cur === delSrc || cur.endsWith('/' + delSrc))) {
+          if (img.parentNode) img.parentNode.removeChild(img);
         }
       });
     });
@@ -278,7 +286,7 @@ const IFRAME_INJECT = `
 
   window.__applyDraft = function(draft) {
     applyEdits(draft.edits);
-    applyImages(draft.images);
+    applyImages(draft.images, draft.imageDeletes);
     applyStyles(draft.styles);
   };
 
@@ -399,7 +407,7 @@ function App() {
       if (m.type === 'iframe-ready') {
         // Push current draft into iframe
         const win = iframeRef.current?.contentWindow;
-        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages, styles: pageStyles });
+        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages, imageDeletes: draft.imageDeletes || [], styles: pageStyles });
       }
       if (m.type === 'edit-start') {
         const existing = (draft.styles?.[activePageId] || {})[m.selector] || {};
@@ -523,7 +531,7 @@ function App() {
       toast('Photo swapped (draft)', 'success');
       const win = iframeRef.current?.contentWindow;
       if (win && win.__applyDraft) {
-        win.__applyDraft({ edits: pageEdits, images: { ...pageImages, [targetSrc]: dataUrl }, styles: pageStyles });
+        win.__applyDraft({ edits: pageEdits, images: { ...pageImages, [targetSrc]: dataUrl }, imageDeletes: draft.imageDeletes || [], styles: pageStyles });
       }
     } catch (err) {
       console.error('[Blossom] image swap failed:', err);
@@ -533,10 +541,33 @@ function App() {
 
   function clearAllDrafts() {
     if (!confirm('Discard all draft edits? This cannot be undone.')) return;
-    setDraft({ edits: {}, images: {}, pageStatus: {}, site: {}, newPages: [], styles: {} });
+    setDraft({ edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {} });
     const win = iframeRef.current?.contentWindow;
     if (win) win.location.reload();
     toast('Drafts cleared', 'success');
+  }
+
+  // Remove the photo currently selected in the inspector. Adds its src
+  // to draft.imageDeletes; the iframe applyImages call removes the
+  // <img> from the live preview, and apply-draft.py strips the tag
+  // from the source HTML on publish (and unlinks the file if no
+  // other page still references it).
+  function removeCurrentPhoto() {
+    if (!imageEdit) return;
+    if (!confirm('Remove this photo from the page? On publish it will be deleted from the site.')) return;
+    const targetSrc = imageEdit.src;
+    const nextDeletes = Array.from(new Set([...(draft.imageDeletes || []), targetSrc]));
+    // If there was a pending swap on this src, drop it — delete supersedes.
+    const nextImages = Object.fromEntries(
+      Object.entries(draft.images || {}).filter(([k]) => k !== targetSrc)
+    );
+    setImageEdit(null);
+    setDraft(d => ({ ...d, imageDeletes: nextDeletes, images: nextImages }));
+    toast('Photo removed (draft)', 'success');
+    const win = iframeRef.current?.contentWindow;
+    if (win && win.__applyDraft) {
+      win.__applyDraft({ edits: pageEdits, images: nextImages, imageDeletes: nextDeletes, styles: pageStyles });
+    }
   }
 
   function createNewPage({ label, slug, templateId }) {
@@ -967,12 +998,19 @@ function App() {
           </div>
         ) : imageEdit ? (
           <div className="inspector__section">
-            <h2 className="inspector__title">Swap photo</h2>
-            <p className="inspector__sub">Upload a new photo to replace this one in the draft.</p>
+            <h2 className="inspector__title">Edit photo</h2>
+            <p className="inspector__sub">Upload a new photo to replace this one, or remove it from the page.</p>
             <img src={pageImages[imageEdit.src] || imageEdit.src} alt="" style={{ width: '100%', borderRadius: 6, marginBottom: 12 }} />
             <input type="file" accept="image/*" onChange={(e) => applyImageSwap(e.target.files[0])} />
             <div className="field__hint" style={{ marginTop: 12 }}>Tip: use a square or 4:3 photo for galleries.</div>
-            <button className="btn" style={{ marginTop: 14 }} onClick={() => setImageEdit(null)}>Cancel</button>
+            <button
+              className="btn"
+              style={{ marginTop: 18, color: '#b03030', borderColor: '#b03030', background: 'transparent' }}
+              onClick={removeCurrentPhoto}
+            >
+              Remove this photo
+            </button>
+            <button className="btn" style={{ marginTop: 8 }} onClick={() => setImageEdit(null)}>Cancel</button>
           </div>
         ) : (
           <div className="inspector__empty">
@@ -1013,6 +1051,7 @@ function App() {
             <div style={{ background: 'var(--bg-soft)', padding: 14, borderRadius: 6, fontSize: 12, marginTop: 14 }}>
               <strong>{totalEditsCount} change{totalEditsCount === 1 ? '' : 's'}</strong> across {Object.keys(draft.edits).filter(k => Object.keys(draft.edits[k]).length).length} page{Object.keys(draft.edits).filter(k => Object.keys(draft.edits[k]).length).length === 1 ? '' : 's'}
               {Object.keys(draft.images || {}).length > 0 && <> · {Object.keys(draft.images).length} photo swap{Object.keys(draft.images).length === 1 ? '' : 's'}</>}
+              {(draft.imageDeletes || []).length > 0 && <> · {(draft.imageDeletes || []).length} photo remove{(draft.imageDeletes || []).length === 1 ? '' : 's'}</>}
             </div>
             <div className="drawer__actions">
               <button className="btn btn--ghost" onClick={() => setShowExport(false)}>Cancel</button>
