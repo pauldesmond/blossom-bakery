@@ -838,11 +838,21 @@ function App() {
         imageDeletes: [],
         images: {}, // image swaps now go through publish via _drafts/ staging
       }));
-      // Reload iframe after a short delay (Pages needs to rebuild)
+      // Reload iframe after a short delay so Helen sees the live result.
+      // Setting src to itself doesn't bust cache — browsers re-use the
+      // cached page content. Append a fresh query param so the new fetch
+      // doesn't share a cache key with the pre-publish view.
       setTimeout(() => {
-        if (iframeRef.current) {
-          // Cache-bust by toggling key; React remounts the iframe on key change
-          iframeRef.current.src = iframeRef.current.src;
+        const f = iframeRef.current;
+        if (!f) return;
+        try {
+          const u = new URL(f.src, window.location.href);
+          u.searchParams.set('_pub', String(Date.now()));
+          f.src = u.toString();
+        } catch (_) {
+          // Older Safari sometimes throws on URL with relative iframe src;
+          // fall back to manual cache-bust string.
+          f.src = (f.src.split('?')[0]) + '?_pub=' + Date.now();
         }
       }, 60_000);
     }
@@ -1110,7 +1120,7 @@ function App() {
             <p>Hover any text or photo on the page. When it lights pink, click it.</p>
             <div className="tip">
               <strong>Saved as a draft.</strong><br/>
-              Nothing goes live until you click <em>"Save draft for review"</em> and Paul approves it.
+              Nothing goes live until you click <em>"Publish to live"</em> in the top bar.
             </div>
             {totalEditsCount > 0 && (
               <div style={{ marginTop: 20, textAlign: 'left', fontSize: 12 }}>
