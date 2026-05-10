@@ -14,9 +14,15 @@ if (!PAGES.length) {
 }
 
 const STORAGE_KEY = 'blossom-editor-draft-v1';
+const PASSWORD_KEY = 'blossom-publish-password';
+const PUBLISHES_KEY = 'blossom-recent-publishes';
 // Editor lives at /edit-blossom/editor.html; the live site is one level up
 // so iframe srcs need '../' to escape the editor folder.
 const BASE_PATH = '../';
+
+// publish-draft Supabase edge function — broker that triggers the
+// apply-helen-draft GitHub Actions workflow. Replace the URL after deploy.
+const PUBLISH_ENDPOINT = 'https://rvokskoevmcekkgiglpa.supabase.co/functions/v1/publish-draft';
 
 // CSS injected into the iframe so editing UI is unambiguous.
 // The live site's chrome is already well-proportioned — leave it alone.
@@ -171,6 +177,13 @@ function App() {
   const [selection, setSelection] = useState(null); // { type, selector, value, image }
   const [toasts, setToasts] = useState([]);
   const [showExport, setShowExport] = useState(false);
+  const [showPublish, setShowPublish] = useState(false);
+  const [publishStatus, setPublishStatus] = useState(null); // null | { phase, runUrl?, runId?, error? }
+  const [showRecent, setShowRecent] = useState(false);
+  const [recentPublishes, setRecentPublishes] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(PUBLISHES_KEY) || '[]'); }
+    catch { return []; }
+  });
   const [showNewPage, setShowNewPage] = useState(false);
   const [imageEdit, setImageEdit] = useState(null);
   const iframeRef = useRef(null);
@@ -363,6 +376,141 @@ function App() {
     setShowExport(false);
   }
 
+  // ──────────────────────────────────────────────────────────────────
+  // Publish flow — POST text edits + page status to publish-draft edge
+  // function, which dispatches the GitHub Actions workflow. Image swaps
+  // still go via Save draft for review (Paul-in-the-loop).
+  // ──────────────────────────────────────────────────────────────────
+  const totalImagesCount = Object.keys(draft.images || {}).length;
+  const editPages = Object.entries(draft.edits || {}).filter(([, e]) => Object.keys(e).length > 0);
+  const newPagesCount = (draft.newPages || []).length;
+
+  function pushRecentPublish(entry) {
+    setRecentPublishes(prev => {
+      const next = [entry, ...prev].slice(0, 10);
+      localStorage.setItem(PUBLISHES_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  async function pollRunStatus(runId, runUrl) {
+    if (!runId) return;
+    const start = Date.now();
+    const poll = async () => {
+      if (Date.now() - start > 90_000) {
+        setPublishStatus({ phase: 'unknown', runUrl });
+        return;
+      }
+      try {
+        const r = await fetch(`https://api.github.com/repos/pauldesmond/blossom-bakery/actions/runs/${runId}`);
+        if (r.ok) {
+          const data = await r.json();
+          if (data.status === 'completed') {
+            if (data.conclusion === 'success') {
+              setPublishStatus({ phase: 'done', runUrl, sha: data.head_sha });
+              return;
+            }
+            setPublishStatus({ phase: 'failed', runUrl, error: data.conclusion });
+            return;
+          }
+        }
+      } catch {}
+      setTimeout(poll, 5000);
+    };
+    setTimeout(poll, 4000);
+  }
+
+  async function publishNow({ password, message }) {
+    setPublishStatus({ phase: 'sending' });
+    const slimDraft = {
+      _meta: { publishedAt: new Date().toISOString(), version: 1 },
+      edits: draft.edits,
+      pageStatus: draft.pageStatus,
+      newPages: draft.newPages || [],
+      images: {}, // images stripped server-side too; explicit here for clarity
+    };
+    try {
+      const resp = await fetch(PUBLISH_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, message, draft: slimDraft }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data.ok) {
+        if (resp.status === 401) localStorage.removeItem(PASSWORD_KEY);
+        setPublishStatus({ phase: 'failed', error: data.error || `HTTP ${resp.status}` });
+        return;
+      }
+      localStorage.setItem(PASSWORD_KEY, password);
+      setPublishStatus({ phase: 'queued', runUrl: data.runUrl, runId: data.runId });
+      pushRecentPublish({
+        at: new Date().toISOString(),
+        message: message || 'helen edits',
+        runUrl: data.runUrl,
+        runId: data.runId,
+        edits: editPages.length,
+        newPages: newPagesCount,
+      });
+      // Optimistically clear text edits + page status from draft. If the
+      // workflow fails, Helen still has the JSON in localStorage (no, we
+      // just cleared it — keep around for now until polling confirms).
+      pollRunStatus(data.runId, data.runUrl);
+    } catch (err) {
+      setPublishStatus({ phase: 'failed', error: String(err) });
+    }
+  }
+
+  // When the run reports success, clear the published portion of the draft
+  // and refresh the iframe so Helen sees the live result.
+  useEffect(() => {
+    if (publishStatus?.phase === 'done') {
+      setDraft(d => ({
+        ...d,
+        edits: {},
+        pageStatus: {},
+        newPages: [],
+        // images preserved — they didn't go in this publish
+      }));
+      // Reload iframe after a short delay (Pages needs to rebuild)
+      setTimeout(() => {
+        if (iframeRef.current) {
+          // Cache-bust by toggling key; React remounts the iframe on key change
+          iframeRef.current.src = iframeRef.current.src;
+        }
+      }, 60_000);
+    }
+  }, [publishStatus?.phase]);
+
+  async function revertPublish(entry) {
+    if (!entry?.sha && !entry?.runId) return;
+    const sha = entry.sha;
+    if (!sha) {
+      // Older entries didn't capture SHA; ask the user to revert via GitHub
+      window.open(entry.runUrl, '_blank');
+      return;
+    }
+    if (!confirm(`Undo publish "${entry.message}"? This will revert the live site to the previous state.`)) return;
+    const password = localStorage.getItem(PASSWORD_KEY) || prompt('Publish password:');
+    if (!password) return;
+    setPublishStatus({ phase: 'sending' });
+    try {
+      const resp = await fetch(PUBLISH_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, revertSha: sha }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data.ok) {
+        setPublishStatus({ phase: 'failed', error: data.error || `HTTP ${resp.status}` });
+        return;
+      }
+      setPublishStatus({ phase: 'queued', runUrl: data.runUrl, runId: data.runId });
+      pollRunStatus(data.runId, data.runUrl);
+    } catch (err) {
+      setPublishStatus({ phase: 'failed', error: String(err) });
+    }
+  }
+
   return (
     <div className="app">
       {/* Top bar */}
@@ -380,9 +528,15 @@ function App() {
           {totalEditsCount ? `${totalEditsCount} change${totalEditsCount === 1 ? '' : 's'} in draft` : 'No changes'}
         </div>
         <a className="btn btn--ghost" href="helen-guide.html" target="_blank" rel="noopener" title="How to update your website" style={{ textDecoration: 'none' }}>Help</a>
+        {recentPublishes.length > 0 && (
+          <button className="btn btn--ghost" onClick={() => setShowRecent(true)} title="Recent publishes — undo if needed">Recent</button>
+        )}
         <button className="btn btn--ghost" onClick={clearAllDrafts}>Discard drafts</button>
-        <button className="btn btn--primary" onClick={() => setShowExport(true)} disabled={!totalEditsCount}>
-          Save draft for review
+        <button className="btn btn--ghost" onClick={() => setShowExport(true)} disabled={!totalEditsCount} title="Send the draft to Paul">
+          Save draft
+        </button>
+        <button className="btn btn--primary" onClick={() => setShowPublish(true)} disabled={!totalEditsCount} title="Publish edits straight to the live site">
+          Publish to live
         </button>
       </div>
 
@@ -528,6 +682,28 @@ function App() {
         </div>
       )}
 
+      {/* Publish modal */}
+      {showPublish && (
+        <PublishModal
+          editsCount={totalEditsCount}
+          editPages={editPages.map(([id]) => ALL_PAGES.find(p => p.id === id)?.label || id)}
+          imagesCount={totalImagesCount}
+          newPagesCount={newPagesCount}
+          status={publishStatus}
+          onCancel={() => { setShowPublish(false); setPublishStatus(null); }}
+          onConfirm={publishNow}
+        />
+      )}
+
+      {/* Recent publishes modal */}
+      {showRecent && (
+        <RecentPublishesModal
+          publishes={recentPublishes}
+          onClose={() => setShowRecent(false)}
+          onRevert={revertPublish}
+        />
+      )}
+
       {/* Toasts */}
       <div className="toasts">
         {toasts.map(t => <div key={t.id} className={'toast ' + t.kind}>{t.msg}</div>)}
@@ -571,6 +747,148 @@ function NewPageModal({ pages, onCancel, onCreate }) {
         <div className="drawer__actions">
           <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
           <button className="btn btn--primary" disabled={!label.trim() || !effectiveSlug} onClick={() => onCreate({ label, slug: effectiveSlug, templateId })}>Create draft page</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PublishModal({ editsCount, editPages, imagesCount, newPagesCount, status, onCancel, onConfirm }) {
+  const [password, setPassword] = useState(() => localStorage.getItem(PASSWORD_KEY) || '');
+  const [message, setMessage] = useState('');
+
+  // Phases: null/undefined → form; sending/queued → working; done → success; failed → error
+  const phase = status?.phase;
+  const working = phase === 'sending' || phase === 'queued';
+  const done = phase === 'done';
+  const failed = phase === 'failed' || phase === 'unknown';
+
+  return (
+    <div className="drawer-bg" onClick={working ? undefined : onCancel}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+        <h2>Publish to live site</h2>
+
+        {!phase && (
+          <>
+            <p style={{ color: 'var(--ink-soft)', fontSize: 13, lineHeight: 1.6 }}>
+              This will push your text edits straight to <strong>myblossombakery.co.uk</strong>. Live within about a minute.
+            </p>
+            <div style={{ background: 'var(--bg-soft)', padding: 14, borderRadius: 6, fontSize: 13, marginTop: 14 }}>
+              About to publish: <strong>{editsCount} text edit{editsCount === 1 ? '' : 's'}</strong>{editPages.length ? <> across <strong>{editPages.length} page{editPages.length === 1 ? '' : 's'}</strong></> : null}
+              {newPagesCount > 0 && <><br/>Plus <strong>{newPagesCount} new page{newPagesCount === 1 ? '' : 's'}</strong> to add to the site.</>}
+              {imagesCount > 0 && (
+                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)', color: 'var(--rose-deep)' }}>
+                  <strong>Note:</strong> {imagesCount} photo swap{imagesCount === 1 ? '' : 's'} won't go through this — they need Paul. Use <em>Save draft</em> for those.
+                </div>
+              )}
+            </div>
+            <div className="field" style={{ marginTop: 16 }}>
+              <label className="field__label">Description (optional)</label>
+              <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="e.g. updated wedding cake prices" />
+              <div className="field__hint">Shows in the publish history so you can find it later.</div>
+            </div>
+            <div className="field">
+              <label className="field__label">Publish password</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="ask Paul" autoFocus />
+              <div className="field__hint">You only need to type this the first time on each device.</div>
+            </div>
+            <div className="drawer__actions">
+              <button className="btn btn--ghost" onClick={onCancel}>Cancel</button>
+              <button className="btn btn--primary" disabled={!password.trim() || !editsCount} onClick={() => onConfirm({ password: password.trim(), message: message.trim() })}>
+                Yes, publish now
+              </button>
+            </div>
+          </>
+        )}
+
+        {working && (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: 22, fontStyle: 'italic', margin: '0 0 8px', color: 'var(--ink)' }}>
+              {phase === 'sending' ? 'Sending edits…' : 'Building the site…'}
+            </h3>
+            <p style={{ color: 'var(--ink-soft)', fontSize: 13 }}>
+              This usually takes about a minute. You can close this dialog and keep working.
+            </p>
+            {status?.runUrl && (
+              <p style={{ marginTop: 14 }}>
+                <a href={status.runUrl} target="_blank" rel="noopener" style={{ color: 'var(--rose-deep)', fontSize: 12 }}>Watch progress on GitHub →</a>
+              </p>
+            )}
+            <div className="drawer__actions" style={{ justifyContent: 'center' }}>
+              <button className="btn btn--ghost" onClick={onCancel}>Close</button>
+            </div>
+          </div>
+        )}
+
+        {done && (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>✨</div>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontStyle: 'italic', margin: '0 0 8px', color: 'var(--ink)' }}>Published.</h3>
+            <p style={{ color: 'var(--ink-soft)', fontSize: 13 }}>
+              Your changes are on the live site now. The preview will refresh in a moment.
+            </p>
+            <div className="drawer__actions" style={{ justifyContent: 'center' }}>
+              <button className="btn btn--primary" onClick={onCancel}>Done</button>
+            </div>
+          </div>
+        )}
+
+        {failed && (
+          <div style={{ padding: '8px 0' }}>
+            <div style={{ fontSize: 28, textAlign: 'center', marginBottom: 10 }}>⚠️</div>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: 20, margin: '0 0 8px', color: 'var(--ink)', textAlign: 'center' }}>
+              {phase === 'unknown' ? "Couldn't confirm" : 'Publish failed'}
+            </h3>
+            <p style={{ color: 'var(--ink-soft)', fontSize: 13, textAlign: 'center' }}>
+              {phase === 'unknown'
+                ? 'The publish was sent but we lost track of it. Check the link below to see if it went through.'
+                : (status?.error || 'Something went wrong.') + ' Try again, or send the draft to Paul instead.'}
+            </p>
+            {status?.runUrl && (
+              <p style={{ textAlign: 'center', marginTop: 10 }}>
+                <a href={status.runUrl} target="_blank" rel="noopener" style={{ color: 'var(--rose-deep)', fontSize: 12 }}>See details on GitHub →</a>
+              </p>
+            )}
+            <div className="drawer__actions" style={{ justifyContent: 'center' }}>
+              <button className="btn btn--ghost" onClick={onCancel}>Close</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RecentPublishesModal({ publishes, onClose, onRevert }) {
+  return (
+    <div className="drawer-bg" onClick={onClose}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+        <h2>Recent publishes</h2>
+        <p style={{ color: 'var(--ink-soft)', fontSize: 13, lineHeight: 1.6, margin: '0 0 14px' }}>
+          Last 10 things you've published. Hit <strong>Undo</strong> to revert one back to how it was.
+        </p>
+        {publishes.length === 0 && (
+          <p style={{ color: 'var(--ink-soft)', fontSize: 13, fontStyle: 'italic' }}>Nothing yet.</p>
+        )}
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {publishes.map((p, i) => (
+            <li key={i} style={{ padding: '12px 0', borderTop: i ? '1px solid var(--line)' : 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 500 }}>{p.message || 'helen edits'}</div>
+                <div style={{ fontSize: 11, color: 'var(--ink-soft)', marginTop: 2 }}>
+                  {new Date(p.at).toLocaleString()} · {p.edits || 0} edit{p.edits === 1 ? '' : 's'}
+                  {p.newPages > 0 && <> · {p.newPages} new page{p.newPages === 1 ? '' : 's'}</>}
+                </div>
+              </div>
+              <button className="btn btn--ghost" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => onRevert(p)} title={p.sha ? 'Revert this publish' : 'Open on GitHub'}>
+                {p.sha ? 'Undo' : 'View'}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="drawer__actions">
+          <button className="btn btn--ghost" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>

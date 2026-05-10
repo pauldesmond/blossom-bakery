@@ -1,0 +1,84 @@
+name: Apply Helen's draft (publish)
+
+# Triggered by the Supabase publish-draft edge function via workflow_dispatch.
+# Two modes:
+#   - draft_b64 set, revert_sha empty: decode draft, run apply-draft.py, push
+#   - revert_sha set: git revert that SHA, push (used by the editor's
+#     "undo last publish" button)
+#
+# Aborts if apply-draft.py reports a YAML-mirror miss for scones/about —
+# without that guard CI's build.py would silently overwrite Helen's edit
+# on the next run.
+
+on:
+  workflow_dispatch:
+    inputs:
+      draft_b64:
+        description: 'Base64 of the draft JSON'
+        required: false
+        default: ''
+      message:
+        description: 'Short description of what Helen changed'
+        required: false
+        default: ''
+      revert_sha:
+        description: 'Commit SHA to revert (alternative to draft_b64)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: ${{ inputs.revert_sha == '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Configure git
+        run: |
+          git config user.name "blossom-publish-bot"
+          git config user.email "blossom-publish-bot@users.noreply.github.com"
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install pyyaml beautifulsoup4
+      - name: Decode draft
+        run: |
+          mkdir -p /tmp/blossom
+          printf '%s' "${{ inputs.draft_b64 }}" | base64 -d > /tmp/blossom/draft.json
+          python -c "import json; json.load(open('/tmp/blossom/draft.json'))"
+      - name: Apply draft (fail loud on YAML miss)
+        run: |
+          set -o pipefail
+          python scripts/apply-draft.py /tmp/blossom/draft.json 2>&1 | tee /tmp/blossom/output.txt
+          if grep -q "YAML mirror MISSED" /tmp/blossom/output.txt; then
+            echo "::error::YAML mirror miss for a generated page (scones/about). Refusing to publish — message Paul to hand-fix."
+            exit 1
+          fi
+      - name: Commit and push
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo "Nothing to publish."
+            exit 0
+          fi
+          MSG="${{ inputs.message }}"
+          [ -z "$MSG" ] && MSG="helen's edits"
+          git commit -m "publish: $MSG"
+          git push
+
+  revert:
+    if: ${{ inputs.revert_sha != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Configure git
+        run: |
+          git config user.name "blossom-publish-bot"
+          git config user.email "blossom-publish-bot@users.noreply.github.com"
+      - name: Revert and push
+        run: |
+          git revert --no-edit "${{ inputs.revert_sha }}"
+          git push
