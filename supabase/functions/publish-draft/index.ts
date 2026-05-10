@@ -43,7 +43,15 @@ serve(async (req) => {
     return json({ ok: false, error: "Server not configured (missing secrets)." }, 500);
   }
 
-  let body: { password?: string; draft?: unknown; message?: string; revertSha?: string };
+  let body: {
+    password?: string;
+    draft?: unknown;
+    message?: string;
+    revertSha?: string;
+    mode?: string;
+    oldSrc?: string;
+    dataUrl?: string;
+  };
   try {
     body = await req.json();
   } catch {
@@ -52,6 +60,61 @@ serve(async (req) => {
 
   if (body.password !== PUBLISH_PASSWORD) {
     return json({ ok: false, error: "Wrong password." }, 401);
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // Image upload mode — single photo per request, so iPad Safari's
+  // fetch-body wobble on multi-MB POSTs never bites. Editor calls this
+  // once per swapped photo BEFORE the publish call. We commit the
+  // image straight to /images/<derived-name>.<ext> via the GitHub
+  // Contents API and return the new src path, which the editor then
+  // substitutes into draft.images as a plain string. The publish call
+  // ends up text-only and tiny.
+  // ──────────────────────────────────────────────────────────────────
+  if (body.mode === "upload") {
+    const oldSrc = String(body.oldSrc ?? "").trim();
+    const dataUrl = String(body.dataUrl ?? "");
+    if (!oldSrc || !dataUrl) {
+      return json({ ok: false, error: "oldSrc and dataUrl required" }, 400);
+    }
+    const m = dataUrl.match(/^data:(image\/[^;]+);base64,(.+)$/);
+    if (!m) return json({ ok: false, error: "Invalid dataUrl" }, 400);
+    const mime = m[1];
+    const b64data = m[2];
+    const ext = mime === "image/jpeg"
+      ? "jpg"
+      : mime === "image/png"
+      ? "png"
+      : mime === "image/webp"
+      ? "webp"
+      : "bin";
+    // Strip any existing -edit / -edit-XXX suffix so repeat swaps don't
+    // accumulate ("foo-edit-abc.jpg" becomes "foo" → "foo-edit-NEW.jpg").
+    const base = oldSrc.replace(/^.*\//, "").replace(/\.[^.]+$/, "")
+      .replace(/-edit(-[0-9a-z]+)?$/i, "");
+    const stamp = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const newName = `${base}-edit-${stamp}.${ext}`;
+    const newPath = `images/${newName}`;
+    const writeResp = await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${newPath}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${GH_TOKEN}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+        body: JSON.stringify({
+          message: `[image] upload via editor: ${newName}`,
+          content: b64data,
+        }),
+      },
+    );
+    if (!writeResp.ok) {
+      const text = await writeResp.text();
+      return json({ ok: false, error: "Upload failed.", details: text.slice(0, 500) }, 502);
+    }
+    return json({ ok: true, newSrc: newPath });
   }
 
   const inputs: Record<string, string> = { draft_path: "", message: "", revert_sha: "" };

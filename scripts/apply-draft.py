@@ -598,6 +598,28 @@ def apply_draft(draft_path: Path) -> None:
         if old_src.startswith("data:"):
             print(f"  ! image entry with data:URL key — chained re-swap, skipping (the prior swap on this image still lands)")
             continue
+        # Pre-uploaded path: the editor uploaded the photo to the repo
+        # via publish-draft mode=upload before publishing, and stored the
+        # returned newSrc string as the dict value here. The file already
+        # exists on disk; we just need to rewrite refs and clean up the
+        # old original.
+        if isinstance(info, str) and not info.startswith("data:"):
+            new_src = info
+            new_path = SITE / new_src
+            files_touched = rewrite_image_refs(old_src, new_src)
+            summary["images"] += 1
+            old_path_abs = SITE / old_src
+            if old_path_abs.exists() and old_path_abs.resolve() != new_path.resolve():
+                still_used = any(
+                    f'src="{old_src}"' in h.read_text(encoding="utf-8")
+                    for h in SITE.glob("*.html") if "edit-blossom" not in h.parts
+                )
+                if not still_used:
+                    old_path_abs.unlink()
+                    print(f"  ✓ image '{old_src}' → '{new_src}' (pre-uploaded; rewrote {files_touched}, removed old)")
+                    continue
+            print(f"  ✓ image '{old_src}' → '{new_src}' (pre-uploaded; rewrote {files_touched} file(s))")
+            continue
         result = save_image(old_src, info)
         if not result:
             continue

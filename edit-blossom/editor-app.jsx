@@ -737,6 +737,44 @@ function App() {
     setPublishStatus({ phase: 'sending' });
     let stage = 'building draft';
     try {
+      // Pre-upload any photo swaps as separate small POSTs. Putting full
+      // photo dataUrls (1MB+) inside the publish payload made iPad Safari
+      // throw "Load failed" reliably; per-photo uploads to /publish-draft
+      // mode=upload return the new src as a tiny JSON ref. The publish
+      // call itself ends up text-only and well under any size limit.
+      const rawImages = draft.images || {};
+      const resolvedImages = {};
+      const imageEntries = Object.entries(rawImages);
+      for (let i = 0; i < imageEntries.length; i++) {
+        const [oldSrc, val] = imageEntries[i];
+        // Skip chained re-swap entries (key is itself a data URL — these
+        // can't be applied server-side, see apply-draft.py for context).
+        if (oldSrc.startsWith('data:')) continue;
+        // Already a string newSrc from a previous publish attempt? Pass through.
+        if (typeof val === 'string' && !val.startsWith('data:')) {
+          resolvedImages[oldSrc] = val;
+          continue;
+        }
+        // Extract the dataUrl: legacy dict format {filename, dataUrl} OR
+        // plain dataUrl string (current format).
+        const dataUrl = (val && typeof val === 'object') ? val.dataUrl : val;
+        if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) continue;
+        stage = `uploading photo ${i + 1}/${imageEntries.length}`;
+        setPublishStatus({ phase: 'sending', detail: stage });
+        const upResp = await fetch(PUBLISH_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, mode: 'upload', oldSrc, dataUrl }),
+        });
+        if (!upResp.ok) {
+          const upData = await upResp.json().catch(() => ({}));
+          throw new Error(`upload ${i + 1} failed: ${upData.error || `HTTP ${upResp.status}`}`);
+        }
+        const upData = await upResp.json();
+        if (!upData.ok || !upData.newSrc) throw new Error(`upload ${i + 1}: no newSrc returned`);
+        resolvedImages[oldSrc] = upData.newSrc;
+      }
+      stage = 'building draft';
       const slimDraft = {
         _meta: { publishedAt: new Date().toISOString(), version: 1 },
         edits: draft.edits,
@@ -744,10 +782,10 @@ function App() {
         newPages: draft.newPages || [],
         styles: draft.styles || {},
         imageDeletes: draft.imageDeletes || [],
-        // Image swaps now go through publish too — the edge function stages
-        // the full draft as a file in the repo and passes a path to the
-        // workflow, sidestepping the 65KB workflow_dispatch input cap.
-        images: draft.images || {},
+        // Image swaps now point at already-uploaded files (string newSrc)
+        // rather than inline data URLs. apply-draft.py special-cases string
+        // values to skip save_image() and just rewrite refs.
+        images: resolvedImages,
       };
       stage = 'serialising';
       const body = JSON.stringify({ password, message, draft: slimDraft });
