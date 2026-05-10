@@ -327,6 +327,12 @@ function App() {
   const [showNewPage, setShowNewPage] = useState(false);
   const [imageEdit, setImageEdit] = useState(null);
   const iframeRef = useRef(null);
+  // Cache-bust suffix for the iframe src. Initialised at app mount so
+  // every editor session loads pages fresh from the CDN (rather than
+  // serving Safari's cached version of the page from earlier in the day,
+  // which made the preview lag behind reality after publishes). Bumped
+  // again on publish-done so the post-publish reload refetches.
+  const [iframeBust, setIframeBust] = useState(() => Date.now());
   const deviceRef = useRef(null);
   const scalerRef = useRef(null);
 
@@ -856,22 +862,11 @@ function App() {
         images: {}, // image swaps now go through publish via _drafts/ staging
       }));
       // Reload iframe after a short delay so Helen sees the live result.
-      // Setting src to itself doesn't bust cache — browsers re-use the
-      // cached page content. Append a fresh query param so the new fetch
-      // doesn't share a cache key with the pre-publish view.
-      setTimeout(() => {
-        const f = iframeRef.current;
-        if (!f) return;
-        try {
-          const u = new URL(f.src, window.location.href);
-          u.searchParams.set('_pub', String(Date.now()));
-          f.src = u.toString();
-        } catch (_) {
-          // Older Safari sometimes throws on URL with relative iframe src;
-          // fall back to manual cache-bust string.
-          f.src = (f.src.split('?')[0]) + '?_pub=' + Date.now();
-        }
-      }, 60_000);
+      // Bumping iframeBust changes both the src query string AND the React
+      // key, which forces a full remount + fresh CDN fetch (no shared cache
+      // key with the pre-publish view). Pages typically rebuilds in ~30-45s
+      // after the publish commit lands, so 60s is the conservative window.
+      setTimeout(() => setIframeBust(Date.now()), 60_000);
     }
   }, [publishStatus?.phase]);
 
@@ -999,9 +994,9 @@ function App() {
             <iframe
               ref={iframeRef}
               className="stage__frame"
-              src={BASE_PATH + activeIframeFile}
+              src={BASE_PATH + activeIframeFile + '?_v=' + iframeBust}
               onLoad={onIframeLoad}
-              key={activePageId}
+              key={activePageId + '/' + iframeBust}
             ></iframe>
           </div>
         </div>
