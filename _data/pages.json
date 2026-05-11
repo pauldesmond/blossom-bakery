@@ -214,7 +214,7 @@
       "id": "two-tier-cakes",
       "file": "two-tier-cakes.html",
       "label": "Two Tier Cakes",
-      "published": false,
+      "published": true,
       "generated": false,
       "nav": {
         "section": "cakes",

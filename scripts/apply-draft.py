@@ -391,12 +391,17 @@ def archive_and_unlink_page(page_id: str) -> tuple[bool, str]:
 # These two helpers regenerate them from _data/pages.json so a new page
 # created via the editor automatically wires into the menus and homepage.
 
-# Match the EXACT block render_nav() emits in build.py: mobile-toggle
-# button followed (after whitespace) by <nav class="site-nav">…</nav>.
-# We replace that whole region; everything outside it (brand link,
-# Enquire button, etc.) stays untouched.
+# Match the block render_nav() emits in build.py: mobile-toggle button
+# followed (after whitespace) by <nav class="site-nav">…</nav>. We
+# replace that whole region; everything outside it (brand link, Enquire
+# button, etc.) stays untouched.
+#
+# Attribute order in the opening <button> tag is order-agnostic — the
+# repo's auto-formatter sometimes reorders attrs so `class="mobile-toggle"`
+# ends up after `aria-controls`, etc. Previous regex required class= to
+# come first, which silently skipped ~9 pages on each nav sync.
 _NAV_BLOCK_RE = re.compile(
-    r'<button class="mobile-toggle"[^>]*>.*?</button>\s*<nav class="site-nav">.*?</nav>',
+    r'<button[^>]*class="mobile-toggle"[^>]*>.*?</button>\s*<nav class="site-nav">.*?</nav>',
     re.DOTALL,
 )
 
@@ -521,8 +526,15 @@ def apply_draft(draft_path: Path) -> None:
                 print(f"  + created /{new_file} from /{template_file}")
             if nid not in existing_ids:
                 entry = {
+                    # New page is being PROMOTED to the live site right now,
+                    # so it goes into pages.json as published=true regardless
+                    # of the draft entry's value (the draft's `published`
+                    # flag means "not yet on live" while it's still in
+                    # editor state — once apply-draft runs, that's no
+                    # longer true). Helen can hide later via the Hide
+                    # toggle if she wants.
                     "id": nid, "file": new_file, "label": np.get("label", nid),
-                    "published": bool(np.get("published", False)), "generated": False,
+                    "published": True, "generated": False,
                 }
                 # Optional nav placement chosen in NewPageModal: section is
                 # one of "cakes" / "weddings" / "bakes" / None. If supplied,
