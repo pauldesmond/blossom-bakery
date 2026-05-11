@@ -155,6 +155,101 @@ function normaliseImageDrafts(images) {
   return next;
 }
 
+// Page-scoped swap/delete keying.
+//
+// Background: previously draft.images was {rawSrc → val} and imageDeletes
+// was [rawSrc, …]. When Helen duplicates a page (template + new ID) the
+// two pages share the same image srcs, so a delete keyed by rawSrc on
+// the duplicate also stripped the photo from the template. Fix: prefix
+// the storage key with the page id so each page has its own swap/delete
+// namespace.
+//
+// New shape:
+//   draft.images        = { "<pageId>:<rawSrc>" → val }
+//   draft.imageDeletes  = [ "<pageId>:<rawSrc>", … ]
+//
+// Backward compat: entries written by older builds had no prefix (the
+// key began with "images/" or "data:"). parseImageKey returns pageId
+// = null for those; apply-draft.py applies them globally just like
+// today. Helen's in-flight iPad draft survives without surgery.
+function parseImageKey(key) {
+  if (typeof key !== 'string') return [null, key];
+  if (key.startsWith('images/') || key.startsWith('data:')) return [null, key];
+  const idx = key.indexOf(':');
+  if (idx === -1) return [null, key];
+  const head = key.slice(0, idx);
+  if (!/^[a-z0-9-]+$/i.test(head)) return [null, key];
+  return [head, key.slice(idx + 1)];
+}
+function imageKey(pageId, rawSrc) {
+  return pageId + ':' + rawSrc;
+}
+function getPageImages(allImages, pageId) {
+  const out = {};
+  for (const [k, v] of Object.entries(allImages || {})) {
+    const [pid, src] = parseImageKey(k);
+    if (pid === pageId || pid === null) out[src] = v;
+  }
+  return out;
+}
+function getPageDeletes(allDeletes, pageId) {
+  const out = [];
+  for (const k of (allDeletes || [])) {
+    const [pid, src] = parseImageKey(k);
+    if (pid === pageId || pid === null) out.push(src);
+  }
+  return out;
+}
+// Merge a page-scoped {rawSrc → val} map back into the global draft.images.
+// Drops any prior entry for this page (prefixed) plus any legacy unprefixed
+// entry whose rawSrc is being re-written, then re-prefixes the new entries.
+function setPageImages(allImages, pageId, pageImages) {
+  const pageSrcs = new Set(Object.keys(pageImages));
+  const others = Object.fromEntries(
+    Object.entries(allImages || {}).filter(([k]) => {
+      const [pid, src] = parseImageKey(k);
+      if (pid === pageId) return false;
+      if (pid === null && pageSrcs.has(src)) return false;
+      return true;
+    })
+  );
+  return {
+    ...others,
+    ...Object.fromEntries(
+      Object.entries(pageImages).map(([src, val]) => [imageKey(pageId, src), val])
+    ),
+  };
+}
+function setPageDeletes(allDeletes, pageId, pageDeletes) {
+  const pageSrcs = new Set(pageDeletes);
+  const others = (allDeletes || []).filter(k => {
+    const [pid, src] = parseImageKey(k);
+    if (pid === pageId) return false;
+    if (pid === null && pageSrcs.has(src)) return false;
+    return true;
+  });
+  return [...others, ...pageDeletes.map(src => imageKey(pageId, src))];
+}
+// Like normaliseImageDrafts but page-scoped — chain walks don't cross page
+// boundaries. Called from publishNow + exportDraft so chained re-swaps on
+// one page can't accidentally consolidate into another page's entry.
+function normaliseImageDraftsByPage(allImages) {
+  const groups = new Map();
+  for (const [k, v] of Object.entries(allImages || {})) {
+    const [pid, src] = parseImageKey(k);
+    if (!groups.has(pid)) groups.set(pid, {});
+    groups.get(pid)[src] = v;
+  }
+  const out = {};
+  for (const [pid, pageMap] of groups.entries()) {
+    const normalised = normaliseImageDrafts(pageMap);
+    for (const [src, val] of Object.entries(normalised)) {
+      out[pid === null ? src : imageKey(pid, src)] = val;
+    }
+  }
+  return out;
+}
+
 // ──────────────────────────────────────────────────────────────────
 // Inject editor logic into the iframe
 // ──────────────────────────────────────────────────────────────────
@@ -574,7 +669,8 @@ function App() {
     ? (PAGES.find(p => p.id === activePage.template)?.file || 'index.html')
     : (activePage?.file || 'index.html');
   const pageEdits = draft.edits[activePageId] || {};
-  const pageImages = draft.images || {};
+  const pageImages = getPageImages(draft.images || {}, activePageId);
+  const pageImageDeletes = getPageDeletes(draft.imageDeletes || [], activePageId);
   const totalEditsCount = Object.values(draft.edits).reduce((s, e) => s + Object.keys(e).length, 0)
     + Object.keys(draft.images || {}).length
     + Object.values(draft.styles || {}).reduce((s, e) => s + Object.keys(e).length, 0)
@@ -669,7 +765,7 @@ function App() {
       if (m.type === 'iframe-ready') {
         // Push current draft into iframe
         const win = iframeRef.current?.contentWindow;
-        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages, imageDeletes: draft.imageDeletes || [], styles: pageStyles });
+        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages, imageDeletes: pageImageDeletes, styles: pageStyles });
       }
       if (m.type === 'edit-start') {
         const existing = (draft.styles?.[activePageId] || {})[m.selector] || {};
@@ -767,11 +863,12 @@ function App() {
       const { [id]: _e, ...edits } = d.edits || {};
       const { [id]: _s, ...styles } = d.styles || {};
       const images = Object.fromEntries(
-        Object.entries(d.images || {}).filter(([k]) => !k.startsWith(id + ':'))
+        Object.entries(d.images || {}).filter(([k]) => parseImageKey(k)[0] !== id)
       );
+      const imageDeletes = (d.imageDeletes || []).filter(k => parseImageKey(k)[0] !== id);
       const pageStatus = { ...(d.pageStatus || {}) };
       delete pageStatus[id];
-      return { ...d, deletedPages, edits, styles, images, pageStatus };
+      return { ...d, deletedPages, edits, styles, images, imageDeletes, pageStatus };
     });
     if (activePageId === id) {
       const next = ALL_PAGES.find(p => p.id !== id && p.id !== 'index');
@@ -801,7 +898,11 @@ function App() {
     // sees the preview, then re-swaps that preview to B) records the
     // second swap under the preview's data:URL — apply-draft drops
     // those silently. See resolveImageDraftRoot's commentary.
-    const targetSrc = resolveImageDraftRoot(imageEdit.src, draft.images || {});
+    // Resolve against THIS PAGE's swap chain — keeps duplicate pages
+    // independent from their template (otherwise both pages share src
+    // namespace and a swap on the duplicate also rewrites the template).
+    const currentPageImages = getPageImages(draft.images || {}, activePageId);
+    const targetSrc = resolveImageDraftRoot(imageEdit.src, currentPageImages);
     setImageEdit(null); // close the inspector immediately so Helen sees progress
     toast('Resizing photo…', 'info');
     try {
@@ -855,22 +956,22 @@ function App() {
         URL.revokeObjectURL(blobUrl);
         throw innerErr;
       }
-      // Normalise existing draft.images entries by their chain root
-      // BEFORE merging the new swap. Catches any stale chained-preview
-      // keys from older drafts (pre-normalisation editor versions) so
-      // the new entry replaces the right one, and drops orphaned chain
-      // links the publish couldn't apply anyway.
-      const nextImages = {
+      // Normalise THIS PAGE's existing entries by their chain root BEFORE
+      // merging the new swap. Catches any stale chained-preview keys from
+      // older drafts so the new entry replaces the right one, and drops
+      // orphaned chain links the publish couldn't apply anyway.
+      const nextPageImages = {
         ...Object.fromEntries(
-          Object.entries(normaliseImageDrafts(draft.images || {})).filter(([k]) => k !== targetSrc)
+          Object.entries(normaliseImageDrafts(currentPageImages)).filter(([k]) => k !== targetSrc)
         ),
         [targetSrc]: dataUrl,
       };
+      const nextImages = setPageImages(draft.images || {}, activePageId, nextPageImages);
       setDraft(d => ({ ...d, images: nextImages }));
       toast('Photo swapped (draft)', 'success');
       const win = iframeRef.current?.contentWindow;
       if (win && win.__applyDraft) {
-        win.__applyDraft({ edits: pageEdits, images: nextImages, imageDeletes: draft.imageDeletes || [], styles: pageStyles });
+        win.__applyDraft({ edits: pageEdits, images: nextPageImages, imageDeletes: pageImageDeletes, styles: pageStyles });
       }
     } catch (err) {
       console.error('[Blossom] image swap failed:', err);
@@ -901,22 +1002,40 @@ function App() {
   function removeCurrentPhoto() {
     if (!imageEdit) return;
     if (!confirm('Remove this photo from the page? On publish it will be deleted from the site.')) return;
-    // Re-key the delete by the chain root — same rationale as the swap
-    // path. Deleting a preview-URL entry wouldn't match anything in the
-    // live HTML.
-    const targetSrc = resolveImageDraftRoot(imageEdit.src, draft.images || {});
-    const nextDeletes = Array.from(new Set([...(draft.imageDeletes || []), targetSrc]));
+    // Re-key the delete by the chain root within THIS page only —
+    // duplicate pages share src namespace with their template, so a
+    // global delete would also strip the photo from the template page.
+    const currentPageImages = getPageImages(draft.images || {}, activePageId);
+    const targetSrc = resolveImageDraftRoot(imageEdit.src, currentPageImages);
+    const currentPageDeletes = getPageDeletes(draft.imageDeletes || [], activePageId);
+    const nextPageDeletes = Array.from(new Set([...currentPageDeletes, targetSrc]));
+    const nextDeletes = setPageDeletes(draft.imageDeletes || [], activePageId, nextPageDeletes);
     // If there was a pending swap on this src, drop it — delete supersedes.
-    const nextImages = Object.fromEntries(
-      Object.entries(normaliseImageDrafts(draft.images || {})).filter(([k]) => k !== targetSrc)
+    const nextPageImages = Object.fromEntries(
+      Object.entries(normaliseImageDrafts(currentPageImages)).filter(([k]) => k !== targetSrc)
     );
+    const nextImages = setPageImages(draft.images || {}, activePageId, nextPageImages);
     setImageEdit(null);
     setDraft(d => ({ ...d, imageDeletes: nextDeletes, images: nextImages }));
     toast('Photo removed (draft)', 'success');
     const win = iframeRef.current?.contentWindow;
     if (win && win.__applyDraft) {
-      win.__applyDraft({ edits: pageEdits, images: nextImages, imageDeletes: nextDeletes, styles: pageStyles });
+      win.__applyDraft({ edits: pageEdits, images: nextPageImages, imageDeletes: nextPageDeletes, styles: pageStyles });
     }
+  }
+
+  // The deleted-photo list shows full storage keys ("<pageId>:<src>" for
+  // new entries, plain "<src>" for legacy unprefixed ones); we filter the
+  // global imageDeletes by exact key match so only the chosen entry is
+  // restored, never another page's same-src delete.
+  function restoreDeletedPhoto(entryKey) {
+    setDraft(d => ({
+      ...d,
+      imageDeletes: (d.imageDeletes || []).filter(k => k !== entryKey),
+    }));
+    const win = iframeRef.current?.contentWindow;
+    if (win) win.location.reload();
+    toast('Photo restored — click it to swap a new one', 'success');
   }
 
   function createNewPage({ label, slug, templateId, section, note }) {
@@ -971,7 +1090,9 @@ function App() {
   }
 
   function exportDraft() {
-    const exportImages = normaliseImageDrafts(draft.images || {});
+    // Per-page chain normalisation so chained re-swaps on page A don't
+    // collapse into page B's entry.
+    const exportImages = normaliseImageDraftsByPage(draft.images || {});
     const payload = {
       _meta: { exportedAt: new Date().toISOString(), version: 1 },
       edits: draft.edits,
@@ -1010,7 +1131,7 @@ function App() {
   // function, which dispatches the GitHub Actions workflow. Image swaps
   // still go via Save draft for review (Paul-in-the-loop).
   // ──────────────────────────────────────────────────────────────────
-  const totalImagesCount = Object.keys(normaliseImageDrafts(draft.images || {})).length;
+  const totalImagesCount = Object.keys(normaliseImageDraftsByPage(draft.images || {})).length;
   const editPages = Object.entries(draft.edits || {}).filter(([, e]) => Object.keys(e).length > 0);
   const newPagesCount = (draft.newPages || []).length;
 
@@ -1091,20 +1212,25 @@ function App() {
       // throw "Load failed" reliably; per-photo uploads to /publish-draft
       // mode=upload return the new src as a tiny JSON ref. The publish
       // call itself ends up text-only and well under any size limit.
-      // Normalise first — collapses any chained preview-URL keys back to
-      // the original src so the per-photo upload loop never tries to
-      // POST a data:URL-keyed orphan that apply-draft.py would skip.
-      const rawImages = normaliseImageDrafts(draft.images || {});
+      // Normalise per-page first — collapses any chained preview-URL keys
+      // back to the original src within each page, so the per-photo upload
+      // loop never tries to POST a data:URL-keyed orphan that apply-draft.py
+      // would skip. Per-page so the chain walk can't bleed across pages.
+      const rawImages = normaliseImageDraftsByPage(draft.images || {});
       const resolvedImages = {};
       const imageEntries = Object.entries(rawImages);
       for (let i = 0; i < imageEntries.length; i++) {
-        const [oldSrc, val] = imageEntries[i];
-        // Skip chained re-swap entries (key is itself a data URL — these
-        // can't be applied server-side, see apply-draft.py for context).
-        if (oldSrc.startsWith('data:')) continue;
+        const [entryKey, val] = imageEntries[i];
+        // entryKey is "<pageId>:<rawSrc>" for new entries or "<rawSrc>" for
+        // legacy unprefixed ones. The upload endpoint names the new file
+        // from the rawSrc only, so split here.
+        const [, rawSrc] = parseImageKey(entryKey);
+        // Skip chained re-swap entries (raw src is itself a data URL —
+        // these can't be applied server-side, see apply-draft.py).
+        if (rawSrc.startsWith('data:')) continue;
         // Already a string newSrc from a previous publish attempt? Pass through.
         if (typeof val === 'string' && !val.startsWith('data:')) {
-          resolvedImages[oldSrc] = val;
+          resolvedImages[entryKey] = val;
           continue;
         }
         // Extract the dataUrl: legacy dict format {filename, dataUrl} OR
@@ -1116,7 +1242,7 @@ function App() {
         const upResp = await fetch(PUBLISH_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, mode: 'upload', oldSrc, dataUrl }),
+          body: JSON.stringify({ password, mode: 'upload', oldSrc: rawSrc, dataUrl }),
         });
         if (!upResp.ok) {
           const upData = await upResp.json().catch(() => ({}));
@@ -1124,19 +1250,17 @@ function App() {
         }
         const upData = await upResp.json();
         if (!upData.ok || !upData.newSrc) throw new Error(`upload ${i + 1}: no newSrc returned`);
-        resolvedImages[oldSrc] = upData.newSrc;
+        resolvedImages[entryKey] = upData.newSrc;
         // Persist the upload result into the draft immediately. The image
         // file has already been committed to the repo (orphan if the
         // publish call below fails); without persisting we'd re-upload it
         // under a new filename on retry, leaving stale orphans behind.
         // Now: a retry sees a string newSrc, skips the upload, and the
-        // existing file is reused.
+        // existing file is reused. Use per-page normalisation on the
+        // previous value so chains stay contained within their page.
         setDraft(d => ({
           ...d,
-          // normaliseImageDrafts on the previous value ensures we don't
-          // resurrect stale chained-preview entries that might be sitting
-          // in the draft from older editor versions.
-          images: { ...normaliseImageDrafts(d.images || {}), [oldSrc]: upData.newSrc },
+          images: { ...normaliseImageDraftsByPage(d.images || {}), [entryKey]: upData.newSrc },
         }));
       }
       stage = 'building draft';
@@ -1550,6 +1674,43 @@ function App() {
                 {Object.keys(draft.images || {}).length > 0 && (
                   <div style={{ padding: '4px 0', color: 'var(--ink)' }}>· Photos: <strong>{Object.keys(draft.images).length}</strong></div>
                 )}
+              </div>
+            )}
+            {(draft.imageDeletes || []).length > 0 && (
+              <div style={{ marginTop: 20, textAlign: 'left' }}>
+                <div className="field__label">Deleted photos</div>
+                <div style={{ fontSize: 12, color: 'var(--ink-soft)', margin: '4px 0 10px' }}>
+                  These will be removed on publish. Restore one to put it back — then click it on the page to swap in a new photo.
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {(draft.imageDeletes || []).map(entryKey => {
+                    const [pid, rawSrc] = parseImageKey(entryKey);
+                    const pageLabel = pid
+                      ? (ALL_PAGES.find(p => p.id === pid)?.label || pid)
+                      : null;
+                    return (
+                      <li key={entryKey} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderTop: '1px solid var(--line)' }}>
+                        <img
+                          src={'../' + rawSrc.replace(/^\.\.?\//, '')}
+                          alt=""
+                          style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 4, background: 'var(--bg-soft)' }}
+                          onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
+                        />
+                        <span style={{ flex: 1, fontSize: 11, color: 'var(--ink-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {rawSrc.split('/').pop()}
+                          {pageLabel && <span style={{ marginLeft: 6, opacity: 0.7 }}>· {pageLabel}</span>}
+                        </span>
+                        <button
+                          className="btn btn--ghost"
+                          style={{ fontSize: 11, padding: '4px 10px' }}
+                          onClick={() => restoreDeletedPhoto(entryKey)}
+                        >
+                          Restore
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             )}
           </div>

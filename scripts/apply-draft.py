@@ -366,12 +366,39 @@ def save_image(old_src: str, info: dict[str, str]) -> tuple[str, Path] | None:
     return new_src, out
 
 
-def rewrite_image_refs(old_src: str, new_src: str) -> int:
-    """Walk every HTML file at the repo root and rewrite all references
-    pointing at old_src — both <img src="…"> and the absolute-URL form
-    <meta content="https://…/old_src"> used for og:image. Missing the
-    meta-tag variant previously left og:image pointing at deleted files
-    after a swap, so social-share previews 404'd until manual fix-up.
+_PAGE_KEY_HEAD_RE = re.compile(r"^[A-Za-z0-9-]+$")
+
+
+def parse_image_key(key: str) -> tuple[str | None, str]:
+    """Split a draft-image storage key into (page_id, raw_src).
+
+    Editor builds since 2026-05-11 prefix the storage key with the page id
+    ("<pageId>:<rawSrc>") so swaps/deletes don't cross page boundaries.
+    Older drafts have an unprefixed key — those return (None, key) and the
+    swap/delete is applied globally just like before.
+    """
+    if not isinstance(key, str):
+        return None, key
+    if key.startswith("images/") or key.startswith("data:"):
+        return None, key
+    if ":" not in key:
+        return None, key
+    head, rest = key.split(":", 1)
+    if not _PAGE_KEY_HEAD_RE.match(head):
+        return None, key
+    return head, rest
+
+
+def rewrite_image_refs(old_src: str, new_src: str, page_file: str | None = None) -> int:
+    """Walk repo-root HTML files and rewrite references to old_src — both
+    <img src="…"> and the absolute-URL form <meta content="https://…/old_src">
+    used for og:image. Missing the meta-tag variant previously left og:image
+    pointing at deleted files after a swap, so social-share previews 404'd.
+
+    When page_file is set, only rewrite within that single page's HTML file —
+    used for page-scoped swaps so the duplicate page's edit doesn't bleed
+    into the template.
+
     Returns number of files changed.
     """
     n = 0
@@ -380,6 +407,8 @@ def rewrite_image_refs(old_src: str, new_src: str) -> int:
     for html in SITE.glob("*.html"):
         if "edit-blossom" in html.parts:
             continue  # don't touch the editor itself
+        if page_file and html.name != page_file:
+            continue
         text = html.read_text(encoding="utf-8")
         new = (text
                .replace(f'src="{old_src}"', f'src="{new_src}"')
@@ -765,7 +794,13 @@ def apply_draft(draft_path: Path) -> None:
             print(f"  ✓ styles applied to /{file} ({n_ok} element{'s' if n_ok != 1 else ''})")
 
     # ── 2. Image swaps ─────────────────────────────────────────────
-    for old_src, info in images.items():
+    for entry_key, info in images.items():
+        # Editor builds since 2026-05-11 prefix each swap key with the page
+        # id so duplicated pages have their own swap namespace. parse out
+        # the page (None = legacy / global swap).
+        scope_page_id, old_src = parse_image_key(entry_key)
+        page_file = PAGE_FILES.get(scope_page_id) if scope_page_id else None
+        scope_label = f" [{scope_page_id}]" if scope_page_id else ""
         # Skip "chained" re-swap entries where the old_src is itself a data
         # URL. These happen when Helen swaps photo A → B → C — the second
         # entry has dataUrl-of-B as its key. There's no HTML reference to
@@ -783,7 +818,7 @@ def apply_draft(draft_path: Path) -> None:
         if isinstance(info, str) and not info.startswith("data:"):
             new_src = info
             new_path = SITE / new_src
-            files_touched = rewrite_image_refs(old_src, new_src)
+            files_touched = rewrite_image_refs(old_src, new_src, page_file=page_file)
             summary["images"] += 1
             old_path_abs = SITE / old_src
             if old_path_abs.exists() and old_path_abs.resolve() != new_path.resolve():
@@ -793,18 +828,20 @@ def apply_draft(draft_path: Path) -> None:
                 )
                 if not still_used:
                     old_path_abs.unlink()
-                    print(f"  ✓ image '{old_src}' → '{new_src}' (pre-uploaded; rewrote {files_touched}, removed old)")
+                    print(f"  ✓ image '{old_src}'{scope_label} → '{new_src}' (pre-uploaded; rewrote {files_touched}, removed old)")
                     continue
-            print(f"  ✓ image '{old_src}' → '{new_src}' (pre-uploaded; rewrote {files_touched} file(s))")
+            print(f"  ✓ image '{old_src}'{scope_label} → '{new_src}' (pre-uploaded; rewrote {files_touched} file(s))")
             continue
         result = save_image(old_src, info)
         if not result:
             continue
         new_src, new_path = result
-        files_touched = rewrite_image_refs(old_src, new_src)
+        files_touched = rewrite_image_refs(old_src, new_src, page_file=page_file)
         summary["images"] += 1
         # If the old image is no longer referenced anywhere and isn't the
         # same file we just wrote, remove it so disk doesn't accumulate cruft.
+        # (For page-scoped swaps, the template page may still reference the
+        # old src — the still_used check correctly keeps the file in that case.)
         old_path_abs = SITE / old_src
         if old_path_abs.exists() and old_path_abs.resolve() != new_path.resolve():
             still_used = any(
@@ -813,20 +850,27 @@ def apply_draft(draft_path: Path) -> None:
             )
             if not still_used:
                 old_path_abs.unlink()
-                print(f"  ✓ image '{old_src}' → '{new_src}' (rewrote {files_touched}, removed old)")
+                print(f"  ✓ image '{old_src}'{scope_label} → '{new_src}' (rewrote {files_touched}, removed old)")
                 continue
-        print(f"  ✓ image '{old_src}' → '{new_src}' (rewrote {files_touched} file{'s' if files_touched != 1 else ''})")
+        print(f"  ✓ image '{old_src}'{scope_label} → '{new_src}' (rewrote {files_touched} file{'s' if files_touched != 1 else ''})")
 
     # ── 2b. Image deletes ──────────────────────────────────────────
     # Helen flagged photos to remove (e.g. cloning a template page that
     # had more photos than her new page needs). Strip the matching <img>
-    # tags from every HTML file. If the underlying image file is no
-    # longer referenced anywhere, unlink it from disk too.
-    for del_src in image_deletes:
+    # tags from the relevant HTML file(s). For prefixed entries the scope
+    # is just the named page; legacy unprefixed entries fall back to
+    # touching every page. If the underlying image file is no longer
+    # referenced anywhere afterwards, unlink it from disk too.
+    for del_entry in image_deletes:
+        scope_page_id, del_src = parse_image_key(del_entry)
+        scope_file = PAGE_FILES.get(scope_page_id) if scope_page_id else None
+        scope_label = f" [{scope_page_id}]" if scope_page_id else ""
         files_touched = 0
         total_removed = 0
         for html_path in SITE.glob("*.html"):
             if "edit-blossom" in html_path.parts:
+                continue
+            if scope_file and html_path.name != scope_file:
                 continue
             soup_d = BeautifulSoup(html_path.read_text(encoding="utf-8"), "html.parser")
             removed_here = 0
@@ -841,7 +885,7 @@ def apply_draft(draft_path: Path) -> None:
                 total_removed += removed_here
         if total_removed:
             summary["images_deleted"] += total_removed
-            print(f"  ✓ photo '{del_src}' removed ({total_removed} occurrence(s) across {files_touched} file(s))")
+            print(f"  ✓ photo '{del_src}'{scope_label} removed ({total_removed} occurrence(s) across {files_touched} file(s))")
         # Unlink the file too if it's now orphaned. Only consider srcs
         # that look like real image files (skip placeholder SVG with
         # ?slot= query strings — those resolve to a file used elsewhere).
