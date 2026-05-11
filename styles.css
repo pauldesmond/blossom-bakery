@@ -653,6 +653,14 @@ section.alt { background: #fff; }
 .prose-section__head:not(:has(.eyebrow-v2:not(:empty), .prose-section__heading:not(:empty))) {
   display: none;
 }
+/* Tighten the section's own padding-top when its head has collapsed.
+   The full --space-section gap is there to breathe a heading off from
+   the section above; with no heading at all there's nothing to breathe,
+   so drop to --space-block (~half the gap). */
+.prose-section:has(.prose-section__head:not(:has(.eyebrow-v2:not(:empty), .prose-section__heading:not(:empty)))),
+.prose-section:not(:has(.prose-section__head)) {
+  padding-top: var(--space-block);
+}
 
 /* Prose section */
 .prose-section { padding: var(--space-section) 0 0; }
