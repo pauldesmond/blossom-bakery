@@ -393,7 +393,7 @@ const IFRAME_INJECT = `
   function applyStyles(styles) {
     // styles: { selector: { color?, fontSize?, textAlign? } }
     // Missing/null props clear that override.
-    var KNOWN = { color: 'color', fontSize: 'font-size', textAlign: 'text-align', backgroundColor: 'background-color' };
+    var KNOWN = { color: 'color', fontSize: 'font-size', textAlign: 'text-align', backgroundColor: 'background-color', lineHeight: 'line-height', letterSpacing: 'letter-spacing' };
     Object.entries(styles || {}).forEach(([sel, decls]) => {
       try {
         const el = document.querySelector(sel);
@@ -704,6 +704,51 @@ function App() {
     setSelectionStyle('fontSize', next + 'px');
   }
 
+  // Leading — line-height as a unitless multiplier. Reads the live
+  // computed value on first press so the nudge starts from where the
+  // element actually sits (CSS default, inherited, whatever) instead of
+  // snapping to a preset. Clamped 0.8–3.0 in 0.05 steps. Matches the
+  // publish-side allow-list in apply-draft.py.
+  function stepLineHeight(delta) {
+    if (!selection || selection.type !== 'text') return;
+    const cur = selection.lineHeight || null;
+    let base = cur ? parseFloat(cur) : null;
+    if (!base || Number.isNaN(base)) {
+      try {
+        const el = iframeRef.current.contentDocument.querySelector(selection.selector);
+        if (el) {
+          const cs = iframeRef.current.contentWindow.getComputedStyle(el);
+          const lh = parseFloat(cs.lineHeight);
+          const fs = parseFloat(cs.fontSize);
+          if (lh && fs) base = lh / fs;
+        }
+      } catch {}
+    }
+    if (!base || Number.isNaN(base)) base = 1.4;
+    const next = Math.max(0.8, Math.min(3.0, Math.round((base + delta) * 20) / 20));
+    setSelectionStyle('lineHeight', String(next));
+  }
+
+  // Tracking — letter-spacing in 0.01em steps (sub-px, smooth at any
+  // font size). Clamped -0.1em … 0.5em; 0 collapses to the default
+  // (clears the override) so the inspector readback shows "default".
+  function stepLetterSpacing(delta) {
+    if (!selection || selection.type !== 'text') return;
+    const cur = selection.letterSpacing || null;
+    let base = 0;
+    if (cur && /^-?\d+(\.\d+)?em$/.test(cur)) {
+      base = parseFloat(cur);
+    } else if (cur && /^-?\d+(\.\d+)?px$/.test(cur)) {
+      try {
+        const el = iframeRef.current.contentDocument.querySelector(selection.selector);
+        const fs = parseFloat(iframeRef.current.contentWindow.getComputedStyle(el).fontSize);
+        base = parseFloat(cur) / fs;
+      } catch {}
+    }
+    const next = Math.max(-0.1, Math.min(0.5, Math.round((base + delta) * 100) / 100));
+    setSelectionStyle('letterSpacing', next === 0 ? null : next.toFixed(2) + 'em');
+  }
+
   // Send a format command to the active edit inside the iframe. Used by
   // the inspector B/I/U/list/table buttons — Helen on iPad has no Cmd
   // keyboard shortcut, so all formatting routes through here. The iframe
@@ -784,6 +829,8 @@ function App() {
           backgroundColor: existing.backgroundColor || null,
           fontSize: existing.fontSize || null,
           textAlign: existing.textAlign || null,
+          lineHeight: existing.lineHeight || null,
+          letterSpacing: existing.letterSpacing || null,
           fmt: { bold: false, italic: false, underline: false, inList: false },
         });
       }
@@ -1631,6 +1678,31 @@ function App() {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            <div className="field">
+              <label className="field__label">Leading (line spacing)</label>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepLineHeight(-0.05)} title="Tighter">−</button>
+                <span style={{ flex: 1, textAlign: 'center', fontSize: 12, color: 'var(--ink-soft)' }}>
+                  {selection.lineHeight || 'default'}
+                </span>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepLineHeight(0.05)} title="Looser">+</button>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => setSelectionStyle('lineHeight', null)} title="Reset">↺</button>
+              </div>
+              <div className="field__hint">Space between horizontal lines of text.</div>
+            </div>
+
+            <div className="field">
+              <label className="field__label">Tracking (letter spacing)</label>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepLetterSpacing(-0.01)} title="Tighter">−</button>
+                <span style={{ flex: 1, textAlign: 'center', fontSize: 12, color: 'var(--ink-soft)' }}>
+                  {selection.letterSpacing || 'default'}
+                </span>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepLetterSpacing(0.01)} title="Looser">+</button>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => setSelectionStyle('letterSpacing', null)} title="Reset">↺</button>
               </div>
             </div>
 

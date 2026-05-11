@@ -141,6 +141,28 @@ def _validate_font_size(size: str) -> bool:
     return ALLOWED_FONT_SIZE_MIN <= n <= ALLOWED_FONT_SIZE_MAX
 
 
+def _validate_line_height(value: str) -> bool:
+    """Accept a unitless multiplier in [0.8, 3.0]. The editor stores
+    line-height unitless (matches how the inspector stepper writes it)
+    so anything with a unit suffix gets rejected here."""
+    m = re.fullmatch(r'\d+(?:\.\d+)?', value.strip())
+    if not m:
+        return False
+    n = float(value)
+    return 0.8 <= n <= 3.0
+
+
+def _validate_letter_spacing(value: str) -> bool:
+    """Accept '<n>em' with n in [-0.1, 0.5]. The inspector clears the
+    override entirely when the user lands on 0 so we never see '0em'
+    here, but the bounds tolerate it."""
+    m = re.fullmatch(r'(-?\d+(?:\.\d+)?)em', value.strip().lower())
+    if not m:
+        return False
+    n = float(m.group(1))
+    return -0.1 <= n <= 0.5
+
+
 # Quick check: does a draft text value contain any HTML tags? If yes, it
 # goes through the rich-text path in replace_text; otherwise plain-text
 # with \n→<br> roundtripping. Cheap, never false-positives on text like
@@ -208,6 +230,26 @@ def apply_element_styles(soup, decls_by_selector: dict) -> tuple[int, list]:
                 skipped.append(f"background-color '{bg}' not in palette: {sel}")
                 continue
             cur['background-color'] = bg
+        # Leading — unitless line-height in [0.8, 3.0].
+        lh = d.get('lineHeight')
+        if lh is None or lh == '':
+            cur.pop('line-height', None)
+        else:
+            lh = str(lh).strip()
+            if not _validate_line_height(lh):
+                skipped.append(f"line-height '{lh}' out of band [0.8–3.0]: {sel}")
+                continue
+            cur['line-height'] = lh
+        # Tracking — letter-spacing in em, range [-0.1, 0.5].
+        ls = d.get('letterSpacing')
+        if ls is None or ls == '':
+            cur.pop('letter-spacing', None)
+        else:
+            ls = str(ls).strip().lower()
+            if not _validate_letter_spacing(ls):
+                skipped.append(f"letter-spacing '{ls}' out of band [-0.1em–0.5em]: {sel}")
+                continue
+            cur['letter-spacing'] = ls
         if cur:
             el['style'] = '; '.join(f"{k}: {v}" for k, v in cur.items())
         elif 'style' in el.attrs:
