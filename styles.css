@@ -633,6 +633,27 @@ section.alt { background: #fff; }
   margin: 0 auto;
 }
 
+/* Collapse template-scaffold placeholders that Helen left empty. The
+   page hero lede, eyebrow rows and section headings are still in the
+   HTML so the editor's selectors keep matching — but when nothing has
+   been typed in, the element should claim no vertical space. Without
+   this, an unused eyebrow still renders its decorative ::before stub
+   and an empty h2 still claims a line-height worth of gap, which
+   stacks alongside the section padding to produce an alarming void
+   below the page title. */
+.page-hero-v2__numeral:empty,
+.page-hero-v2__lede:empty,
+.eyebrow-v2:empty,
+.prose-section__heading:empty {
+  display: none;
+}
+/* When BOTH children of a prose-section head are empty the head itself
+   should collapse — :empty alone won't match because the element still
+   contains its (now display:none) children. :has lets us look inside. */
+.prose-section__head:not(:has(.eyebrow-v2:not(:empty), .prose-section__heading:not(:empty))) {
+  display: none;
+}
+
 /* Prose section */
 .prose-section { padding: var(--space-section) 0 0; }
 .prose-section__head { text-align: center; margin-bottom: var(--space-block); }
