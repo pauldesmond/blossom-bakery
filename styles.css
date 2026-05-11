@@ -290,6 +290,12 @@ section.alt { background: #fff; }
 .taster-price-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -16px rgba(74, 30, 26, 0.2); }
 .taster-price-card strong { display: block; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.3rem; color: var(--ink); font-weight: 500; }
 .taster-price-card span { display: block; margin-top: 6px; color: var(--rose-dark); font-size: 1.4rem; font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+/* Taster cupcakes price cards — v2 variant used on wedding-cakes
+   (moved here 2026-05-11 from wedding-bakes inline styles). */
+.taster-prices-v2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 480px; margin: 36px auto 0; }
+.taster-prices-v2__card { text-align: center; padding: 28px 16px; border: 1px solid var(--border); border-radius: 4px; }
+.taster-prices-v2__qty { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 28px; color: var(--rose-dark); margin-bottom: 8px; }
+.taster-prices-v2__price { font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
 
 /* Sweet-treat list */
 .treat-list { list-style: none; padding: 0; max-width: 580px; margin: 24px auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px 18px; }
