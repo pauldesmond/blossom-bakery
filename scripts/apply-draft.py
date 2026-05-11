@@ -96,6 +96,15 @@ ALLOWED_FONT_SIZE_MAX = 120
 # Mirrors editor-app.jsx TEXT_ALIGNS — keep in sync.
 ALLOWED_TEXT_ALIGNS = {'left', 'center', 'right'}
 
+# Mirrors editor-app.jsx BG_COLOURS — brand-locked palette of background
+# tints. Anything outside this set is rejected by the publish path so
+# Helen can't smuggle a hand-edited #ff00ff through a copy-pasted draft.
+ALLOWED_BG_COLOURS = {
+    '#fffdfb', '#f3ece2', '#e6dccf',
+    '#f5dbd9', '#e7b6b6', '#b56a78',
+    '#cdd9c2',
+}
+
 # Inline / list / table tags Helen can produce via the editor's floating
 # toolbar (or via the browser's native contentEditable shortcuts —
 # Cmd-B, Cmd-I etc.). Anything else gets unwrapped before being written
@@ -187,6 +196,17 @@ def apply_element_styles(soup, decls_by_selector: dict) -> tuple[int, list]:
                 skipped.append(f"text-align '{align}' not allowed: {sel}")
                 continue
             cur['text-align'] = align
+        # Background colour — same shape as `color` but validated against
+        # ALLOWED_BG_COLOURS (the rose-accent + neutrals palette).
+        bg = d.get('backgroundColor')
+        if bg is None or bg == '':
+            cur.pop('background-color', None)
+        else:
+            bg = bg.strip().lower()
+            if bg not in ALLOWED_BG_COLOURS:
+                skipped.append(f"background-color '{bg}' not in palette: {sel}")
+                continue
+            cur['background-color'] = bg
         if cur:
             el['style'] = '; '.join(f"{k}: {v}" for k, v in cur.items())
         elif 'style' in el.attrs:

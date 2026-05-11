@@ -40,6 +40,20 @@ const TEXT_COLOURS = [
   { id: 'muted',     label: 'Muted',     value: '#7a7068' },
 ];
 
+// Per-element background colour palette. Brand-locked rose accents +
+// neutrals. Mirror this list in apply-draft.py ALLOWED_BG_COLOURS so
+// the publish side accepts the same set.
+const BG_COLOURS = [
+  { id: 'default',   label: 'Clear',     value: null },
+  { id: 'paper',     label: 'Paper',     value: '#fffdfb' },
+  { id: 'cream',     label: 'Cream',     value: '#f3ece2' },
+  { id: 'sand',      label: 'Sand',      value: '#e6dccf' },
+  { id: 'rose-soft', label: 'Blush',     value: '#f5dbd9' },
+  { id: 'rose',      label: 'Rose',      value: '#e7b6b6' },
+  { id: 'rose-deep', label: 'Deep rose', value: '#b56a78' },
+  { id: 'sage',      label: 'Sage',      value: '#cdd9c2' },
+];
+
 // Per-element font-size palette. Values should match the sizes used in
 // styles.css. Mirror in apply-draft.py ALLOWED_FONT_SIZES.
 const TEXT_SIZES = [
@@ -284,7 +298,7 @@ const IFRAME_INJECT = `
   function applyStyles(styles) {
     // styles: { selector: { color?, fontSize?, textAlign? } }
     // Missing/null props clear that override.
-    var KNOWN = { color: 'color', fontSize: 'font-size', textAlign: 'text-align' };
+    var KNOWN = { color: 'color', fontSize: 'font-size', textAlign: 'text-align', backgroundColor: 'background-color' };
     Object.entries(styles || {}).forEach(([sel, decls]) => {
       try {
         const el = document.querySelector(sel);
@@ -660,6 +674,7 @@ function App() {
           tagName: m.tagName || null,
           allowBlockFormat: m.tagName ? BLOCK_CAPABLE.has(m.tagName) : false,
           color: existing.color || null,
+          backgroundColor: existing.backgroundColor || null,
           fontSize: existing.fontSize || null,
           textAlign: existing.textAlign || null,
           fmt: { bold: false, italic: false, underline: false, inList: false },
@@ -1413,6 +1428,32 @@ function App() {
                   );
                 })}
               </div>
+            </div>
+
+            <div className="field">
+              <label className="field__label">Background</label>
+              <div className="colour-row">
+                {BG_COLOURS.map(c => {
+                  const isActive = (selection.backgroundColor || null) === c.value;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={'colour-swatch' + (isActive ? ' active' : '')}
+                      onClick={() => setSelectionStyle('backgroundColor', c.value)}
+                      title={c.label}
+                    >
+                      <span
+                        className="colour-swatch__dot"
+                        style={c.value
+                          ? { background: c.value, border: '1px solid var(--line)' }
+                          : { background: 'transparent', backgroundImage: 'linear-gradient(45deg, transparent 45%, var(--ink-soft) 45%, var(--ink-soft) 55%, transparent 55%)' }}
+                      ></span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="field__hint">"Clear" removes the override.</div>
             </div>
 
             <div className="field">
