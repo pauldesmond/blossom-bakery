@@ -420,7 +420,8 @@ function App() {
   const totalEditsCount = Object.values(draft.edits).reduce((s, e) => s + Object.keys(e).length, 0)
     + Object.keys(draft.images || {}).length
     + Object.values(draft.styles || {}).reduce((s, e) => s + Object.keys(e).length, 0)
-    + (draft.deletedPages || []).length;
+    + (draft.deletedPages || []).length
+    + (draft.newPages || []).length;
   const pageStyles = (draft.styles || {})[activePageId] || {};
 
   // Generic style setter — Helen picks colour/size/etc. → write to
