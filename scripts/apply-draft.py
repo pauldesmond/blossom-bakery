@@ -562,6 +562,43 @@ def _first_real_img_src(html_path: Path) -> tuple[str, str] | None:
     return None
 
 
+def heal_empty_cat_card_imgs() -> int:
+    """Re-inject the placeholder SVG into any .cat-card__img on index.html
+    that's missing its <img>. Helen can't click an empty div to swap a
+    photo, so a missing img leaves the tile permanently un-editable from
+    the editor. Runs on every publish (idempotent — cards with an existing
+    <img> are skipped). Returns number of cards healed.
+    """
+    index_path = SITE / "index.html"
+    if not index_path.exists():
+        return 0
+    soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
+    grid = soup.find("div", class_="cat-grid")
+    if not grid:
+        return 0
+    healed = 0
+    for card in grid.find_all("a", class_="cat-card"):
+        img_slot = card.find("div", class_="cat-card__img")
+        if not img_slot:
+            continue
+        if img_slot.find("img"):
+            continue
+        # Derive a slot id from the card's href (e.g. two-tier-cakes.html → two-tier-cakes)
+        href = (card.get("href") or "").strip()
+        slot_id = re.sub(r"\.html$", "", href) or "card"
+        title_div = card.find("div", class_="cat-card__title")
+        alt_text = (title_div.get_text(strip=True) if title_div else slot_id) or slot_id
+        placeholder = BeautifulSoup(
+            f'<img src="images/_add-photo.svg?slot=card-{slot_id}" alt="{alt_text}" loading="lazy" />',
+            "html.parser",
+        )
+        img_slot.append(placeholder)
+        healed += 1
+    if healed:
+        index_path.write_text(str(soup), encoding="utf-8")
+    return healed
+
+
 def sync_cat_grid_for_new_pages(new_page_entries: list[dict]) -> int:
     """Append a cat-card to index.html's .cat-grid for each new page.
     Existing cards are left alone — Paul's hand-crafted ordering wins.
@@ -920,6 +957,13 @@ def apply_draft(draft_path: Path) -> None:
         if cards_added:
             summary["cards_added"] = cards_added
             print(f"  ✓ homepage cat-grid: +{cards_added} card(s)")
+
+    # Heal any cat-card on the homepage whose <img> got stripped — runs
+    # on every publish (not just new-page ones) since the missing img
+    # might be the result of a stray edit on an existing card.
+    healed = heal_empty_cat_card_imgs()
+    if healed:
+        print(f"  ✓ homepage cat-grid: re-inserted placeholder on {healed} empty card(s)")
 
     # ── 3. Page status ─────────────────────────────────────────────
     for page_id, published in page_status.items():
