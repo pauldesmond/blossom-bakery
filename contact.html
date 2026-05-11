@@ -428,7 +428,13 @@
 <div id="toast" role="status" aria-live="polite">Thank you. Helen has your enquiry and will reply within a day.</div>
 
 <script>
-  const CONTACT_ENDPOINT = 'https://rvokskoevmcekkgiglpa.supabase.co/functions/v1/contact-enquiry';
+  // Form submission is handled higher up in the file via Formspree
+  // (the AJAX block right after the form). The CONTACT_ENDPOINT path
+  // below was a legacy Supabase edge-function approach that was never
+  // deployed — when both handlers fired together, the legacy one's
+  // failure toast clobbered the successful Formspree submission and
+  // surfaced "Sorry, something went wrong" even though the email DID
+  // arrive in Helen's inbox. Keep only the FAQ accordion rendering.
   const FAQS = [
     ["How far in advance should I order a wedding cake?", "I usually take wedding bookings 4–9 months out for peak summer dates, but I'll always try to fit you in if I can — even short notice. For celebration cakes, 2–3 weeks is ideal."],
     ["Can you do gluten-free or vegan?", "Yes — most of my cakes can be adapted. Just mention it in the enquiry and I'll send the GF/V options for that design."],
@@ -444,52 +450,6 @@
     </div>
   `).join('');
   host.querySelectorAll('.faq').forEach(f => f.addEventListener('click', () => f.classList.toggle('open')));
-
-  document.getElementById('enquiryForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const data = new FormData(form);
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const t = document.getElementById('toast');
-    const payload = {
-      name: String(data.get('name') || '').trim(),
-      email: String(data.get('email') || '').trim(),
-      phone: String(data.get('phone') || '').trim(),
-      date: String(data.get('date') || '').trim(),
-      type: String(data.get('type') || '').trim(),
-      guests: String(data.get('guests') || '').trim(),
-      message: String(data.get('message') || '').trim(),
-      website: String(data.get('website') || '').trim(),
-    };
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
-
-    fetch(CONTACT_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-      .then(async (resp) => {
-        const json = await resp.json().catch(() => ({}));
-        if (!resp.ok || !json.ok) {
-          throw new Error(json.error || `HTTP ${resp.status}`);
-        }
-        t.textContent = 'Thank you. Helen has your enquiry and will reply within a day.';
-        t.classList.add('show');
-        form.reset();
-      })
-      .catch((err) => {
-        console.error('[contact enquiry]', err);
-        t.textContent = "Sorry, something went wrong. Please email blossombakedgoods@gmail.com directly.";
-        t.classList.add('show');
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send enquiry';
-        setTimeout(() => t.classList.remove('show'), 5000);
-      });
-  });
 </script>
 
 <footer class="site-footer">
