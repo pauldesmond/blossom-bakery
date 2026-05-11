@@ -101,6 +101,46 @@ function saveDraft(d) {
   }
 }
 
+// When Helen swaps the same image twice before publishing, the second
+// swap's targetSrc is the FIRST swap's preview value (a data: URL or an
+// uploaded newSrc string) — not the original image src that's actually
+// in the live HTML. Recording the second swap keyed by the preview src
+// produces an entry the publish pipeline can't apply: apply-draft.py
+// skips data:URL keys outright, and newSrc-keyed entries don't match
+// anything in the rendered HTML. Result: the second swap silently
+// drops on publish and Helen's "latest" photo never lands.
+//
+// resolveImageDraftRoot walks back up the chain — whichever current
+// draft.images value matches `src`, follow its key, then check if that
+// key is itself the value of another entry, and so on — to find the
+// ORIGINAL source path that's in the live HTML. The visited-set guard
+// keeps cyclic data safe; in practice the chain is one or two hops.
+function resolveImageDraftRoot(src, images) {
+  let cur = src;
+  const seen = new Set();
+  while (typeof cur === 'string' && cur && !seen.has(cur)) {
+    seen.add(cur);
+    const parent = Object.entries(images || {}).find(([, val]) => {
+      if (typeof val === 'string') return val === cur;
+      return val && typeof val === 'object' && val.dataUrl === cur;
+    })?.[0];
+    if (!parent) break;
+    cur = parent;
+  }
+  return cur;
+}
+
+// Rebuild draft.images so every key is the chain-root (original src).
+// Idempotent: keys that are already roots pass through unchanged.
+function normaliseImageDrafts(images) {
+  const next = {};
+  for (const [src, val] of Object.entries(images || {})) {
+    const root = resolveImageDraftRoot(src, images);
+    next[root] = val;
+  }
+  return next;
+}
+
 // ──────────────────────────────────────────────────────────────────
 // Inject editor logic into the iframe
 // ──────────────────────────────────────────────────────────────────
@@ -497,7 +537,12 @@ function App() {
     // so the publish POST fits inside iPad Safari's fetch-body tolerance
     // (which seems to give up around 1-1.5MB on cellular/weak WiFi).
     const MAX = 1200;
-    const targetSrc = imageEdit.src;
+    // Re-key the swap by the chain ROOT, not the current preview src.
+    // Without this, swapping the same image twice (Helen edits cake A,
+    // sees the preview, then re-swaps that preview to B) records the
+    // second swap under the preview's data:URL — apply-draft drops
+    // those silently. See resolveImageDraftRoot's commentary.
+    const targetSrc = resolveImageDraftRoot(imageEdit.src, draft.images || {});
     setImageEdit(null); // close the inspector immediately so Helen sees progress
     toast('Resizing photo…', 'info');
     try {
@@ -551,11 +596,22 @@ function App() {
         URL.revokeObjectURL(blobUrl);
         throw innerErr;
       }
-      setDraft(d => ({ ...d, images: { ...d.images, [targetSrc]: dataUrl } }));
+      // Normalise existing draft.images entries by their chain root
+      // BEFORE merging the new swap. Catches any stale chained-preview
+      // keys from older drafts (pre-normalisation editor versions) so
+      // the new entry replaces the right one, and drops orphaned chain
+      // links the publish couldn't apply anyway.
+      const nextImages = {
+        ...Object.fromEntries(
+          Object.entries(normaliseImageDrafts(draft.images || {})).filter(([k]) => k !== targetSrc)
+        ),
+        [targetSrc]: dataUrl,
+      };
+      setDraft(d => ({ ...d, images: nextImages }));
       toast('Photo swapped (draft)', 'success');
       const win = iframeRef.current?.contentWindow;
       if (win && win.__applyDraft) {
-        win.__applyDraft({ edits: pageEdits, images: { ...pageImages, [targetSrc]: dataUrl }, imageDeletes: draft.imageDeletes || [], styles: pageStyles });
+        win.__applyDraft({ edits: pageEdits, images: nextImages, imageDeletes: draft.imageDeletes || [], styles: pageStyles });
       }
     } catch (err) {
       console.error('[Blossom] image swap failed:', err);
@@ -586,11 +642,14 @@ function App() {
   function removeCurrentPhoto() {
     if (!imageEdit) return;
     if (!confirm('Remove this photo from the page? On publish it will be deleted from the site.')) return;
-    const targetSrc = imageEdit.src;
+    // Re-key the delete by the chain root — same rationale as the swap
+    // path. Deleting a preview-URL entry wouldn't match anything in the
+    // live HTML.
+    const targetSrc = resolveImageDraftRoot(imageEdit.src, draft.images || {});
     const nextDeletes = Array.from(new Set([...(draft.imageDeletes || []), targetSrc]));
     // If there was a pending swap on this src, drop it — delete supersedes.
     const nextImages = Object.fromEntries(
-      Object.entries(draft.images || {}).filter(([k]) => k !== targetSrc)
+      Object.entries(normaliseImageDrafts(draft.images || {})).filter(([k]) => k !== targetSrc)
     );
     setImageEdit(null);
     setDraft(d => ({ ...d, imageDeletes: nextDeletes, images: nextImages }));
@@ -653,6 +712,7 @@ function App() {
   }
 
   function exportDraft() {
+    const exportImages = normaliseImageDrafts(draft.images || {});
     const payload = {
       _meta: { exportedAt: new Date().toISOString(), version: 1 },
       edits: draft.edits,
@@ -660,9 +720,15 @@ function App() {
       site: draft.site,
       newPages: draft.newPages || [],
       styles: draft.styles || {},
-      // Images: include ref + base64 — Paul/Claude Code will save these to disk
+      // Images: include ref + base64 for local-only swaps, but preserve
+      // already-uploaded repo paths (string values) so a failed publish
+      // can still be exported and retried without losing track of the
+      // replacement file that's already on disk.
       images: Object.fromEntries(
-        Object.entries(draft.images || {}).map(([oldSrc, dataUrl]) => {
+        Object.entries(exportImages).map(([oldSrc, dataUrl]) => {
+          if (typeof dataUrl === 'string' && !dataUrl.startsWith('data:')) {
+            return [oldSrc, dataUrl];
+          }
           const filename = (oldSrc.split('/').pop() || 'image') + '.replace.' + Date.now();
           return [oldSrc, { filename, dataUrl }];
         })
@@ -684,7 +750,7 @@ function App() {
   // function, which dispatches the GitHub Actions workflow. Image swaps
   // still go via Save draft for review (Paul-in-the-loop).
   // ──────────────────────────────────────────────────────────────────
-  const totalImagesCount = Object.keys(draft.images || {}).length;
+  const totalImagesCount = Object.keys(normaliseImageDrafts(draft.images || {})).length;
   const editPages = Object.entries(draft.edits || {}).filter(([, e]) => Object.keys(e).length > 0);
   const newPagesCount = (draft.newPages || []).length;
 
@@ -765,7 +831,10 @@ function App() {
       // throw "Load failed" reliably; per-photo uploads to /publish-draft
       // mode=upload return the new src as a tiny JSON ref. The publish
       // call itself ends up text-only and well under any size limit.
-      const rawImages = draft.images || {};
+      // Normalise first — collapses any chained preview-URL keys back to
+      // the original src so the per-photo upload loop never tries to
+      // POST a data:URL-keyed orphan that apply-draft.py would skip.
+      const rawImages = normaliseImageDrafts(draft.images || {});
       const resolvedImages = {};
       const imageEntries = Object.entries(rawImages);
       for (let i = 0; i < imageEntries.length; i++) {
@@ -804,7 +873,10 @@ function App() {
         // existing file is reused.
         setDraft(d => ({
           ...d,
-          images: { ...(d.images || {}), [oldSrc]: upData.newSrc },
+          // normaliseImageDrafts on the previous value ensures we don't
+          // resurrect stale chained-preview entries that might be sitting
+          // in the draft from older editor versions.
+          images: { ...normaliseImageDrafts(d.images || {}), [oldSrc]: upData.newSrc },
         }));
       }
       stage = 'building draft';
