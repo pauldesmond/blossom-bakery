@@ -472,7 +472,11 @@ const IFRAME_INJECT = `
   // keep the rendered block consistent everywhere. Colours match the
   // site palette (rose-deep border, ink for text, cream backdrop).
   function buildListHTML() {
-    return '<ul style="max-width: 540px; margin: 16px auto; padding-left: 32px; text-align: left; line-height: 1.6;">'
+    // list-style-position: inside keeps the bullet glued to the text
+    // when Helen later changes the LI's text-align — with the CSS default
+    // (outside) the text shifts but the marker stays put, which looks
+    // broken on a centred or right-aligned list.
+    return '<ul style="max-width: 540px; margin: 16px auto; padding: 0; list-style-position: inside; text-align: left; line-height: 1.6;">'
       + '<li>List item</li>'
       + '</ul>';
   }

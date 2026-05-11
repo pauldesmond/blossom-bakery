@@ -137,8 +137,8 @@ def _sanitise_fragment(html: str) -> BeautifulSoup:
 # Keeps the rendered block consistent across pages whose surrounding CSS
 # doesn't define a generic list/table style.
 INSERTED_BLOCK_STYLES = {
-    'ul':    'max-width: 540px; margin: 16px auto; padding-left: 32px; text-align: left; line-height: 1.6;',
-    'ol':    'max-width: 540px; margin: 16px auto; padding-left: 32px; text-align: left; line-height: 1.6;',
+    'ul':    'max-width: 540px; margin: 16px auto; padding: 0; list-style-position: inside; text-align: left; line-height: 1.6;',
+    'ol':    'max-width: 540px; margin: 16px auto; padding: 0; list-style-position: inside; text-align: left; line-height: 1.6;',
     'table': 'border-collapse: collapse; margin: 16px auto; width: 100%; max-width: 540px;',
     'th':    'border: 1px solid #b56a78; padding: 10px 14px; text-align: left; font-weight: 600; background: #f5dbd9;',
     'td':    'border: 1px solid #d9c9b5; padding: 10px 14px; min-width: 80px;',
