@@ -87,17 +87,56 @@ ALLOWED_TEXT_COLOURS = {
     '#7a7068',  # muted
 }
 
-# Mirrors editor-app.jsx TEXT_SIZES — keep in sync.
-ALLOWED_FONT_SIZES = {
-    '14px',  # small
-    '17px',  # body
-    '28px',  # subhead
-    '48px',  # heading
-    '80px',  # display
-}
+# Mirrors editor-app.jsx FONT_SIZE_MIN/MAX — apply-draft validates that
+# any per-element font-size is "Npx" with N inside this band. Picked to
+# match the styles.css scale plus generous head/footroom for nudges.
+ALLOWED_FONT_SIZE_MIN = 10
+ALLOWED_FONT_SIZE_MAX = 120
 
 # Mirrors editor-app.jsx TEXT_ALIGNS — keep in sync.
 ALLOWED_TEXT_ALIGNS = {'left', 'center', 'right'}
+
+# Inline / list / table tags Helen can produce via the editor's floating
+# toolbar (or via the browser's native contentEditable shortcuts —
+# Cmd-B, Cmd-I etc.). Anything else gets unwrapped before being written
+# to disk — defence-in-depth in case a draft was hand-edited or arrived
+# carrying unexpected markup from a paste.
+ALLOWED_INLINE_TAGS = {
+    'b', 'strong', 'i', 'em', 'u', 'br', 'span',
+    'ul', 'ol', 'li',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+}
+
+
+def _sanitise_fragment(html: str) -> BeautifulSoup:
+    """Parse `html`, unwrap any tags not in ALLOWED_INLINE_TAGS, strip every
+    attribute except `colspan` on th/td. Returns a fresh soup fragment."""
+    frag = BeautifulSoup(html, 'html.parser')
+    for tag in list(frag.find_all(True)):
+        if tag.name not in ALLOWED_INLINE_TAGS:
+            tag.unwrap()
+            continue
+        for attr in list(tag.attrs):
+            if not (tag.name in ('td', 'th') and attr == 'colspan'):
+                del tag.attrs[attr]
+    return frag
+
+
+def _validate_font_size(size: str) -> bool:
+    """Accept any 'Npx' string whose N is inside [MIN, MAX]."""
+    m = re.fullmatch(r'(\d+(?:\.\d+)?)px', size.strip().lower())
+    if not m:
+        return False
+    n = float(m.group(1))
+    return ALLOWED_FONT_SIZE_MIN <= n <= ALLOWED_FONT_SIZE_MAX
+
+
+# Quick check: does a draft text value contain any HTML tags? If yes, it
+# goes through the rich-text path in replace_text; otherwise plain-text
+# with \n→<br> roundtripping. Cheap, never false-positives on text like
+# "less than > greater than" because we require '<' followed by a letter
+# or '/'.
+_HTML_TAG_RE = re.compile(r'<\/?[a-z][\s\S]*?>', re.IGNORECASE)
 
 
 def apply_element_styles(soup, decls_by_selector: dict) -> tuple[int, list]:
@@ -132,8 +171,11 @@ def apply_element_styles(soup, decls_by_selector: dict) -> tuple[int, list]:
             cur.pop('font-size', None)
         else:
             size = size.strip().lower()
-            if size not in ALLOWED_FONT_SIZES:
-                skipped.append(f"font-size '{size}' not in palette: {sel}")
+            if not _validate_font_size(size):
+                skipped.append(
+                    f"font-size '{size}' out of band "
+                    f"[{ALLOWED_FONT_SIZE_MIN}–{ALLOWED_FONT_SIZE_MAX}px]: {sel}"
+                )
                 continue
             cur['font-size'] = size
         align = d.get('textAlign')
@@ -183,25 +225,52 @@ def _el_text_with_br(el) -> str:
     return ''.join(parts) if parts else el.get_text()
 
 
-def replace_text(soup: BeautifulSoup, el, new_text: str) -> bool:
-    """Replace the visible text of `el` with `new_text`, preserving its tag.
-    Newlines in new_text become <br> elements so multi-line edits roundtrip.
+def replace_text(soup: BeautifulSoup, el, new_value: str) -> bool:
+    """Replace the visible contents of `el` with `new_value`, preserving its tag.
+
+    `new_value` is one of two shapes:
+      - plain text, possibly with embedded `\n` line breaks (legacy path —
+        the editor's textWithBreaks emits this for any compound-free edit)
+      - a small HTML fragment containing only ALLOWED_INLINE_TAGS (rich
+        text path — bold/italic/lists/tables produced by the editor's
+        floating toolbar or browser-native contentEditable shortcuts)
+
+    The plain-text branch keeps byte-for-byte the previous behaviour so
+    older drafts apply identically. The rich-text branch sanitises the
+    fragment first (unwrap unknown tags, strip every attribute except
+    colspan on th/td) before grafting it in.
+
     Returns True if something changed.
     """
     if el is None:
         return False
-    current = _el_text_with_br(el)
-    if current.strip() == new_text.strip():
+
+    has_markup = bool(_HTML_TAG_RE.search(new_value or ''))
+
+    if not has_markup:
+        # Plain-text path — preserve the existing \n→<br> roundtripping
+        # exactly so older drafts apply identically.
+        current = _el_text_with_br(el)
+        if current.strip() == (new_value or '').strip():
+            return False
+        el.clear()
+        parts = (new_value or '').split('\n')
+        for i, line in enumerate(parts):
+            if i > 0:
+                el.append(soup.new_tag('br'))
+            el.append(line)
+        return True
+
+    # Rich-text path — sanitise the fragment, then graft its contents into
+    # `el` so the tag itself (h1/p/li/etc) is preserved.
+    frag = _sanitise_fragment(new_value)
+    new_html = frag.decode().strip()
+    cur_html = el.decode_contents().strip()
+    if cur_html == new_html:
         return False
-    # Clear and rebuild as text nodes interleaved with <br>. Drops any inner
-    # formatting (em, strong) — the iframe-side isEditable guard prevents
-    # this for compound elements with non-<br> children.
     el.clear()
-    parts = new_text.split('\n')
-    for i, line in enumerate(parts):
-        if i > 0:
-            el.append(soup.new_tag('br'))
-        el.append(line)
+    for node in list(frag.contents):
+        el.append(node)
     return True
 
 

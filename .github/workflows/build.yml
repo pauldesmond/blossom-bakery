@@ -33,7 +33,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install pyyaml
+        run: pip install pyyaml beautifulsoup4
 
       - name: Build pages
         run: python3 scripts/build.py

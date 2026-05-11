@@ -272,6 +272,41 @@ WEDDING_PROCESS = '''<section class="section-ink">
       </div>
     </section>'''
 
+_INLINE_TAGS_RE = re.compile(
+    r'</?(?:b|strong|i|em|u|br|span|ul|ol|li|table|thead|tbody|tr|th|td)\b[^>]*>',
+    re.IGNORECASE,
+)
+
+
+def _sanitise_intro(intro: str) -> str:
+    """If `intro` contains any of the editor's allowed inline tags, parse
+    it, drop anything else, return the safe HTML to embed raw. Otherwise
+    return html-escaped plain text (legacy behaviour).
+
+    This bridges the rich-text editor flow (apply-draft.py writes the
+    full HTML fragment into the YAML mirror for about / scones) and
+    build.py's render — without this, Cmd-B / Cmd-I edits to those
+    generated pages would render as literal `&lt;strong&gt;` text on
+    next build.
+    """
+    if not intro or not _INLINE_TAGS_RE.search(intro):
+        return ihtml.escape(intro or '')
+    # Match the apply-draft.py allow-list exactly. Anything else gets
+    # unwrapped; every attribute except colspan on th/td gets stripped.
+    from bs4 import BeautifulSoup as _BS
+    allowed = {'b', 'strong', 'i', 'em', 'u', 'br', 'span',
+               'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td'}
+    frag = _BS(intro, 'html.parser')
+    for tag in list(frag.find_all(True)):
+        if tag.name not in allowed:
+            tag.unwrap()
+            continue
+        for attr in list(tag.attrs):
+            if not (tag.name in ('td', 'th') and attr == 'colspan'):
+                del tag.attrs[attr]
+    return frag.decode()
+
+
 def render_page(filename, title, eyebrow, intro, images):
     description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Desmond.'
     og_image = f'images/{images[0]}' if images else 'images/blossom_logo.png'
@@ -281,7 +316,7 @@ def render_page(filename, title, eyebrow, intro, images):
     if intro and len(intro.strip()) > 30:
         blocks.append(f'''<section>
       <div class="container container--narrow">
-        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">{ihtml.escape(intro)}</p>
+        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">{_sanitise_intro(intro)}</p>
       </div>
     </section>''')
     if images:
