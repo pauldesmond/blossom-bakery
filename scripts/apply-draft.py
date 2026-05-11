@@ -87,11 +87,12 @@ ALLOWED_TEXT_COLOURS = {
     '#7a7068',  # muted
 }
 
-# Mirrors editor-app.jsx FONT_SIZE_MIN/MAX — apply-draft validates that
-# any per-element font-size is "Npx" with N inside this band. Picked to
-# match the styles.css scale plus generous head/footroom for nudges.
-ALLOWED_FONT_SIZE_MIN = 10
-ALLOWED_FONT_SIZE_MAX = 120
+# Matches the editor's A−/A+ fine-tuner clamp (8–160px). Widened from
+# the previous 10–120 band when Codex shipped 1px-step nudging — any
+# in-band integer the editor can produce, the publish side now accepts.
+# Anything outside is rejected as out-of-band.
+ALLOWED_FONT_SIZE_MIN = 8
+ALLOWED_FONT_SIZE_MAX = 160
 
 # Mirrors editor-app.jsx TEXT_ALIGNS — keep in sync.
 ALLOWED_TEXT_ALIGNS = {'left', 'center', 'right'}

@@ -582,19 +582,30 @@ function App() {
     + (draft.newPages || []).length;
   const pageStyles = (draft.styles || {})[activePageId] || {};
 
-  // Step font-size up/down through TEXT_SIZES (skipping the "default" slot).
-  // Driven by the A−/A+ buttons in the inspector format row — gives Helen
-  // a one-tap nudger instead of opening the full size palette below.
+  // Fine-tune font size in 1px steps. Reads the live computed size from
+  // the iframe so the first press nudges from wherever the element
+  // actually sits (preset, inherited, whatever) rather than snapping to
+  // a preset bucket. Clamped to 8–160px so a stuck-on button can't push
+  // the element to absurd extremes; matches the publish-side allow-list
+  // in apply-draft.py.
   function stepFontSize(direction) {
     if (!selection || selection.type !== 'text') return;
     const cur = selection.fontSize || null;
-    const realSizes = TEXT_SIZES.filter(s => s.value !== null);
-    const idx = realSizes.findIndex(s => s.value === cur);
-    // If no explicit override yet, treat the current size as "Body" so
-    // pressing A+ jumps to Subhead, not to Display.
-    const baseIdx = idx === -1 ? realSizes.findIndex(s => s.id === 'md') : idx;
-    const next = Math.max(0, Math.min(realSizes.length - 1, baseIdx + direction));
-    setSelectionStyle('fontSize', realSizes[next].value);
+    let basePx = null;
+    if (cur && /^\d+(\.\d+)?px$/.test(cur)) {
+      basePx = parseFloat(cur);
+    } else {
+      try {
+        const el = iframeRef.current.contentDocument.querySelector(selection.selector);
+        if (el) {
+          const cs = iframeRef.current.contentWindow.getComputedStyle(el);
+          basePx = parseFloat(cs.fontSize);
+        }
+      } catch {}
+    }
+    if (!basePx || Number.isNaN(basePx)) basePx = 16;
+    const next = Math.max(8, Math.min(160, Math.round(basePx + direction)));
+    setSelectionStyle('fontSize', next + 'px');
   }
 
   // Send a format command to the active edit inside the iframe. Used by
