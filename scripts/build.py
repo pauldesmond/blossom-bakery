@@ -199,11 +199,30 @@ HEADER_TPL = '''<!DOCTYPE html>
 
   <main>'''
 
+# Block-level tags from the rich-text allow-list. When intro markup
+# contains any of these we can't put it inside a <p>, because that
+# produces invalid <p><ul>…</p> structures the browser then reparses
+# unpredictably (dropping or splitting the <p>).
+_BLOCK_TAGS_RE = re.compile(
+    r'</?(?:ul|ol|li|table|thead|tbody|tr|th|td)\b[^>]*>',
+    re.IGNORECASE,
+)
+
+
+def _intro_has_block(intro: str) -> bool:
+    return bool(intro and _BLOCK_TAGS_RE.search(intro))
+
+
 def hero_html(eyebrow, title):
+    # Title can carry inline rich text (b/i/u/strong/em/u/span/br). The
+    # sanitiser strips anything else and HTML-escapes plain text, so the
+    # output is always safe to embed raw inside <h1>. Without this a
+    # rich-text title edit (Helen taps Bold) would render as literal
+    # &lt;strong&gt; on next rebuild.
     return f'''<section class="page-hero">
       <div class="container container--narrow">
         <p class="eyebrow">{ihtml.escape(eyebrow)}</p>
-        <h1>{ihtml.escape(title)}</h1>
+        <h1>{_sanitise_intro(title)}</h1>
       </div>
     </section>'''
 
@@ -314,9 +333,24 @@ def render_page(filename, title, eyebrow, intro, images):
                              og_image=og_image, nav=render_nav(filename))
     blocks = [hero_html(eyebrow, title)]
     if intro and len(intro.strip()) > 30:
-        blocks.append(f'''<section>
+        body = _sanitise_intro(intro)
+        # If the intro is plain text or just inline tags, wrap in a <p>
+        # (legacy shape). If it contains block-level rich-text tags
+        # (<ul>/<table>/<li>/etc), DON'T wrap — putting a block element
+        # inside <p> is invalid and the browser will reparse it,
+        # splitting or dropping the paragraph. Render the sanitised
+        # block content directly with a class that carries the same
+        # font-size/line-height the <p> would have given it.
+        if _intro_has_block(intro):
+            blocks.append(f'''<section>
       <div class="container container--narrow">
-        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">{_sanitise_intro(intro)}</p>
+        <div class="prose-intro">{body}</div>
+      </div>
+    </section>''')
+        else:
+            blocks.append(f'''<section>
+      <div class="container container--narrow">
+        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">{body}</p>
       </div>
     </section>''')
     if images:

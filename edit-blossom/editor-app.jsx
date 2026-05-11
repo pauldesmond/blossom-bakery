@@ -455,7 +455,17 @@ const IFRAME_INJECT = `
     // tapping the inspector blurs the iframe; we'd otherwise commit on
     // every inspector tap.
     activeEdit = { el, sel, originalHTML, originalText, savedRange };
-    window.parent.postMessage({ type: 'edit-start', selector: sel, original: originalText }, '*');
+    // Send the tag name so the parent inspector can decide whether
+    // block-level format buttons (List, Table) make sense for this
+    // element. <ul> inside <h1> or <table> inside <a> is invalid HTML
+    // — the browser reparses it unpredictably. We restrict block
+    // commands to elements that can legally hold flow content.
+    window.parent.postMessage({
+      type: 'edit-start',
+      selector: sel,
+      original: originalText,
+      tagName: el.tagName,
+    }, '*');
 
     function onKey(ev) {
       if (ev.key === 'Escape') {
@@ -638,10 +648,17 @@ function App() {
       }
       if (m.type === 'edit-start') {
         const existing = (draft.styles?.[activePageId] || {})[m.selector] || {};
+        // Tags that legally accept flow content (lists, tables) as
+        // children. The inspector hides List/Table buttons on
+        // inline-only and heading elements to avoid Helen producing
+        // <h1><ul>…</ul></h1> or <a><table>…</table></a>.
+        const BLOCK_CAPABLE = new Set(['DIV', 'BLOCKQUOTE', 'LI', 'TD', 'TH', 'SECTION', 'ARTICLE', 'ASIDE', 'MAIN']);
         setSelection({
           type: 'text',
           selector: m.selector,
           value: m.original,
+          tagName: m.tagName || null,
+          allowBlockFormat: m.tagName ? BLOCK_CAPABLE.has(m.tagName) : false,
           color: existing.color || null,
           fontSize: existing.fontSize || null,
           textAlign: existing.textAlign || null,
@@ -1328,15 +1345,17 @@ function App() {
                 <span className="fmt-sep"></span>
                 <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepFontSize(-1)} title="Smaller">A−</button>
                 <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepFontSize(1)} title="Larger">A+</button>
-                <span className="fmt-sep"></span>
-                <button type="button" className={'fmt-btn' + (selection.fmt?.inList ? ' active' : '')} onClick={() => sendFormat('bulletList')} title="Bullet list">• List</button>
-                <span className="fmt-sep"></span>
-                <span className="fmt-label">Table:</span>
-                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 1)} title="Insert 1-column table">1</button>
-                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 2)} title="Insert 2-column table">2</button>
-                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 3)} title="Insert 3-column table">3</button>
+                {selection.allowBlockFormat && (<>
+                  <span className="fmt-sep"></span>
+                  <button type="button" className={'fmt-btn' + (selection.fmt?.inList ? ' active' : '')} onClick={() => sendFormat('bulletList')} title="Bullet list">• List</button>
+                  <span className="fmt-sep"></span>
+                  <span className="fmt-label">Table:</span>
+                  <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 1)} title="Insert 1-column table">1</button>
+                  <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 2)} title="Insert 2-column table">2</button>
+                  <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 3)} title="Insert 3-column table">3</button>
+                </>)}
               </div>
-              <div className="field__hint">Highlight text first for bold / italic / underline. Tables and lists act on the whole element.</div>
+              <div className="field__hint">Highlight text first for bold / italic / underline. {selection.allowBlockFormat ? 'Tables and lists act on the whole element.' : 'Tables and lists are only available on body text (not on headings or links).'}</div>
             </div>
             <div className="field">
               <label className="field__label">Current value</label>

@@ -653,6 +653,16 @@ section.alt { background: #fff; }
   text-wrap: pretty;
 }
 .prose p + p { margin-top: 1.1em; }
+/* Generated-page intro when the rich-text edit contains block tags
+   (<ul>/<table>/etc). Matches the typography the legacy <p>-wrapped
+   intro would have rendered with, but allows block content as a child
+   without producing invalid <p><ul>... markup. Used by build.py's
+   render_page when _intro_has_block is true. */
+.prose-intro { font-size: 1.05rem; color: var(--ink); line-height: 1.85; }
+.prose-intro ul, .prose-intro ol { padding-left: 1.4em; margin: 0.6em 0; }
+.prose-intro li { margin: 0.25em 0; }
+.prose-intro table { width: 100%; border-collapse: collapse; margin: 0.9em 0; }
+.prose-intro th, .prose-intro td { padding: 0.5em 0.75em; border-bottom: 1px solid var(--border, #e6dccf); text-align: left; vertical-align: top; }
 .prose-note {
   max-width: 520px;
   margin: 28px auto 0;
