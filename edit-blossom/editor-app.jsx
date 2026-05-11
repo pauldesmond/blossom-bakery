@@ -462,7 +462,38 @@ const IFRAME_INJECT = `
 
   window.addEventListener('message', (ev) => {
     const m = ev.data || {};
-    if (m.type === 'editor-format' && activeEdit) {
+    if (m.type === 'editor-format') {
+      // Re-acquire activeEdit by selector if it's been lost. Covers the
+      // case where Helen tapped into a block-capable element, the
+      // iframe reloaded for some reason, and her next tap on a format
+      // button finds activeEdit=null. The parent still has the
+      // selection state so it passes the selector along; we look it
+      // up here and rebuild a minimal activeEdit on the fly.
+      if (!activeEdit && m.selector) {
+        try {
+          const el = document.querySelector(m.selector);
+          if (el && isEditable(el)) {
+            el.contentEditable = 'true';
+            el.style.outline = '2px solid #b56a78';
+            el.style.outlineOffset = '2px';
+            el.style.background = 'rgba(245,219,217,.6)';
+            el.focus();
+            activeEdit = {
+              el, sel: m.selector,
+              originalHTML: el.innerHTML,
+              originalText: textWithBreaks(el),
+              savedRange: null,
+            };
+          }
+        } catch (_e) {}
+      }
+      if (!activeEdit) {
+        // Last-resort: tell the parent the format didn't land so it
+        // can prompt Helen to tap the text again. Without this the
+        // tap on the format button is a silent no-op.
+        window.parent.postMessage({ type: 'edit-format-failed', reason: 'no-active-edit' }, '*');
+        return;
+      }
       restoreCaret();
       if (m.cmd === 'bulletList')       wrapAsList(activeEdit.el);
       else if (m.cmd === 'insertTable') insertTableCols(m.value | 0);
@@ -756,7 +787,15 @@ function App() {
   // tap-into-inspector → tap-back-to-iframe round-trip doesn't lose the
   // selection.
   function sendFormat(cmd, value) {
-    iframeRef.current?.contentWindow?.postMessage({ type: 'editor-format', cmd, value }, '*');
+    // Include the current selector so the iframe can re-acquire the edit
+    // target if its activeEdit reference got lost (iframe reload, weird
+    // iPad focus race, etc) — without this the format message hits a
+    // null activeEdit guard and silently no-ops.
+    iframeRef.current?.contentWindow?.postMessage({
+      type: 'editor-format', cmd, value,
+      selector: selection?.selector || null,
+      tagName: selection?.tagName || null,
+    }, '*');
   }
   function commitActiveEdit() {
     iframeRef.current?.contentWindow?.postMessage({ type: 'editor-commit' }, '*');
@@ -838,6 +877,9 @@ function App() {
         setSelection(s => s && s.type === 'text'
           ? { ...s, fmt: { bold: !!m.bold, italic: !!m.italic, underline: !!m.underline, inList: !!m.inList } }
           : s);
+      }
+      if (m.type === 'edit-format-failed') {
+        toast('Tap the text again, then the format button', 'warn');
       }
       if (m.type === 'edit-end') {
         setSelection(null);
