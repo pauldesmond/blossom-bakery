@@ -209,6 +209,19 @@
       "label": "Contact",
       "published": true,
       "generated": false
+    },
+    {
+      "id": "two-tier-cakes",
+      "file": "two-tier-cakes.html",
+      "label": "Two Tier Cakes",
+      "published": false,
+      "generated": false,
+      "nav": {
+        "section": "cakes",
+        "label": "Two Tier Cakes",
+        "order": 60,
+        "note": "Two-tier - celebration"
+      }
     }
   ]
 }
