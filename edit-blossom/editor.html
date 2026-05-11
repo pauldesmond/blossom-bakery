@@ -106,6 +106,24 @@
     .align-btn__icon { font-size: 16px; line-height: 1; color: inherit; }
     .align-btn__label { font-size: 10px; letter-spacing: .04em; color: inherit; }
 
+    /* Format row — B / I / U / List / Table buttons in the inspector.
+       Renders as a single flex row that wraps cleanly on narrow iPad
+       widths. onMouseDown preventDefault stops the iframe from blurring
+       when the user taps a button, which would otherwise lose the
+       current selection range. */
+    .fmt-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+    .fmt-btn { background: transparent; border: 1px solid var(--line); border-radius: var(--r-sm); padding: 6px 11px; font-size: 14px; color: var(--ink-soft); cursor: pointer; line-height: 1; min-width: 34px; transition: border-color .15s, color .15s, background .15s; }
+    .fmt-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .fmt-btn.active { border-color: var(--rose-deep); color: var(--rose-deep); background: var(--bg-soft); }
+    .fmt-btn--mini { padding: 6px 9px; font-size: 12px; min-width: 28px; }
+    .fmt-sep { width: 1px; align-self: stretch; background: var(--line); margin: 2px 4px; }
+    .fmt-label { font-size: 11px; color: var(--ink-soft); padding: 0 6px 0 2px; }
+    /* Pad-friendly note shown in place of the textarea when the current
+       value contains markup — editing rich text via a flat textarea would
+       destroy the tags, so we route Helen to edit on the page directly. */
+    .formatted-note { background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; font-size: 12px; line-height: 1.55; color: var(--ink); }
+    .formatted-note strong { color: var(--rose-deep); }
+
     /* Stage (preview) — iframe rendered at fixed desktop width (1280) and scaled to fit
        so nav stays desktop, never falls back to hamburger. */
     .stage { background: linear-gradient(180deg, #ece4d6 0%, #d8cebd 100%); overflow: auto; padding: 20px; position: relative; }
@@ -219,6 +237,6 @@
        Bump the version each time editor-app.jsx changes meaningfully.
        (iOS WKWebView/Safari ignore Cache-Control on same-origin scripts
        far longer than they should — query string is the reliable break.) -->
-  <script type="text/babel" src="editor-app.jsx?v=20260511-0830"></script>
+  <script type="text/babel" src="editor-app.jsx?v=20260511-1330"></script>
 </body>
 </html>

@@ -214,11 +214,50 @@ const IFRAME_INJECT = `
     return out;
   }
 
+  // Whitelist of inline / list / table tags Helen can produce via the
+  // inspector format row (B/I/U/list/table). Anything else gets stripped
+  // before commit or apply — keeps the wire format safe to hand to
+  // apply-draft.py whose own sanitiser mirrors this allow-list.
+  const ALLOWED_TAGS = new Set(['B','STRONG','I','EM','U','BR','UL','OL','LI','TABLE','THEAD','TBODY','TR','TH','TD','SPAN']);
+  function sanitiseHTML(html) {
+    const tpl = document.createElement('div');
+    tpl.innerHTML = html;
+    (function clean(node){
+      Array.from(node.childNodes).forEach(c => {
+        if (c.nodeType === 1) {
+          if (!ALLOWED_TAGS.has(c.tagName)) {
+            while (c.firstChild) node.insertBefore(c.firstChild, c);
+            node.removeChild(c);
+          } else {
+            Array.from(c.attributes).forEach(a => {
+              if (!((c.tagName === 'TD' || c.tagName === 'TH') && a.name === 'colspan')) {
+                c.removeAttribute(a.name);
+              }
+            });
+            clean(c);
+          }
+        } else if (c.nodeType === 8) {
+          node.removeChild(c);
+        }
+      });
+    })(tpl);
+    return tpl.innerHTML;
+  }
+  function looksLikeHTML(v) {
+    return typeof v === 'string' && /<\\/?[a-z][\\s\\S]*?>/i.test(v);
+  }
+
   function applyEdits(edits) {
     Object.entries(edits || {}).forEach(([sel, val]) => {
       try {
         const el = document.querySelector(sel);
-        if (el && textWithBreaks(el) !== val) renderText(el, val);
+        if (!el) return;
+        if (looksLikeHTML(val)) {
+          const clean = sanitiseHTML(val);
+          if (el.innerHTML !== clean) el.innerHTML = clean;
+        } else if (textWithBreaks(el) !== val) {
+          renderText(el, val);
+        }
       } catch(e) {}
     });
   }
@@ -257,6 +296,97 @@ const IFRAME_INJECT = `
       } catch(e) {}
     });
   }
+
+  // Active-edit registry — shared with the parent so inspector buttons
+  // (B/I/U/list/table on iPad — no Cmd shortcuts available) can re-enter
+  // the same element after the iframe loses focus. selectionchange keeps
+  // savedRange warm so the caret survives a tap into the inspector panel.
+  let activeEdit = null; // { el, sel, originalHTML, originalText, savedRange }
+
+  document.addEventListener('selectionchange', () => {
+    if (!activeEdit) return;
+    const s = document.getSelection();
+    if (s && s.rangeCount && activeEdit.el.contains(s.anchorNode)) {
+      activeEdit.savedRange = s.getRangeAt(0).cloneRange();
+      window.parent.postMessage({
+        type: 'edit-format-state',
+        bold:      document.queryCommandState('bold'),
+        italic:    document.queryCommandState('italic'),
+        underline: document.queryCommandState('underline'),
+        inList:    !!(s.anchorNode && s.anchorNode.parentElement && s.anchorNode.parentElement.closest('ul,ol')),
+      }, '*');
+    }
+  });
+
+  function restoreCaret() {
+    if (!activeEdit) return;
+    activeEdit.el.contentEditable = 'true';
+    activeEdit.el.focus();
+    if (activeEdit.savedRange) {
+      const s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(activeEdit.savedRange);
+    }
+  }
+
+  function wrapAsList(el) {
+    if (!el || el.tagName === 'LI') return;
+    if (el.querySelector('ul')) {
+      const ul = el.querySelector('ul');
+      const lines = Array.from(ul.querySelectorAll('li')).map(li => li.innerHTML).join('<br>');
+      ul.outerHTML = lines;
+    } else {
+      const html = el.innerHTML.trim();
+      const parts = html.split(/<br\\s*\\/?>(?![^<]*<\\/)/i).map(s => s.trim()).filter(Boolean);
+      const lis = (parts.length ? parts : [html || '&nbsp;']).map(p => '<li>' + p + '</li>').join('');
+      el.innerHTML = '<ul>' + lis + '</ul>';
+    }
+  }
+  function insertTableCols(cols) {
+    cols = Math.max(1, Math.min(3, cols | 0));
+    const head = '<tr>' + Array(cols).fill(0).map((_,i)=>'<th>Heading '+(i+1)+'</th>').join('') + '</tr>';
+    const body = Array(2).fill(0).map(() =>
+      '<tr>' + Array(cols).fill(0).map(()=>'<td>Cell</td>').join('') + '</tr>'
+    ).join('');
+    document.execCommand('insertHTML', false, '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>');
+  }
+
+  window.addEventListener('message', (ev) => {
+    const m = ev.data || {};
+    if (m.type === 'editor-format' && activeEdit) {
+      restoreCaret();
+      if (m.cmd === 'bulletList')       wrapAsList(activeEdit.el);
+      else if (m.cmd === 'insertTable') insertTableCols(m.value | 0);
+      else                              document.execCommand(m.cmd, false, m.value || null);
+      const s2 = window.getSelection();
+      if (s2.rangeCount) activeEdit.savedRange = s2.getRangeAt(0).cloneRange();
+    }
+    if (m.type === 'editor-commit' && activeEdit) {
+      const el = activeEdit.el;
+      const sanitised = sanitiseHTML(el.innerHTML);
+      const hasTags = /<[a-z]/i.test(sanitised);
+      const payload = hasTags ? sanitised : textWithBreaks(el);
+      if (payload !== activeEdit.originalText && payload !== activeEdit.originalHTML) {
+        window.parent.postMessage({
+          type: 'edit-commit', selector: activeEdit.sel,
+          original: activeEdit.originalText, next: payload,
+        }, '*');
+      }
+      el.contentEditable = 'false';
+      el.style.outline = '';
+      el.style.background = '';
+      activeEdit = null;
+      window.parent.postMessage({ type: 'edit-end' }, '*');
+    }
+    if (m.type === 'editor-cancel' && activeEdit) {
+      activeEdit.el.innerHTML = activeEdit.originalHTML;
+      activeEdit.el.contentEditable = 'false';
+      activeEdit.el.style.outline = '';
+      activeEdit.el.style.background = '';
+      activeEdit = null;
+      window.parent.postMessage({ type: 'edit-end' }, '*');
+    }
+  });
 
   let highlighted = null;
 
@@ -297,7 +427,8 @@ const IFRAME_INJECT = `
     e.preventDefault(); e.stopPropagation();
     const el = e.target;
     const sel = pathFor(el);
-    const original = textWithBreaks(el);
+    const originalHTML = el.innerHTML;
+    const originalText = textWithBreaks(el);
     el.contentEditable = 'true';
     el.style.outline = '2px solid #b56a78';
     el.style.outlineOffset = '2px';
@@ -306,6 +437,7 @@ const IFRAME_INJECT = `
     // Place caret at the click position so Helen can insert text where
     // she clicked. Falls back to end-of-text on browsers without
     // caretRangeFromPoint (uncommon).
+    let savedRange = null;
     try {
       const range = document.caretRangeFromPoint
         ? document.caretRangeFromPoint(e.clientX, e.clientY)
@@ -314,26 +446,28 @@ const IFRAME_INJECT = `
         const ssel = window.getSelection();
         ssel.removeAllRanges();
         ssel.addRange(range);
+        savedRange = range.cloneRange();
       }
     } catch (_e) {}
-    window.parent.postMessage({ type: 'edit-start', selector: sel, original }, '*');
+    // Register the live edit so the inspector's B/I/U/Done/Cancel buttons
+    // can target it. Auto-commit on blur is gone — Helen now commits via
+    // an explicit Done button. This is the right pattern for iPad where
+    // tapping the inspector blurs the iframe; we'd otherwise commit on
+    // every inspector tap.
+    activeEdit = { el, sel, originalHTML, originalText, savedRange };
+    window.parent.postMessage({ type: 'edit-start', selector: sel, original: originalText }, '*');
 
-    function commit() {
-      const next = textWithBreaks(el);
-      el.contentEditable = 'false';
-      el.style.outline = '';
-      el.style.background = '';
-      if (next !== original) {
-        window.parent.postMessage({ type: 'edit-commit', selector: sel, original, next }, '*');
-      }
-      el.removeEventListener('blur', commit);
-      el.removeEventListener('keydown', onKey);
-    }
     function onKey(ev) {
-      if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); el.blur(); }
-      if (ev.key === 'Escape') { renderText(el, original); el.blur(); }
+      if (ev.key === 'Escape') {
+        el.innerHTML = originalHTML;
+        el.contentEditable = 'false';
+        el.style.outline = '';
+        el.style.background = '';
+        activeEdit = null;
+        window.parent.postMessage({ type: 'edit-end' }, '*');
+        el.removeEventListener('keydown', onKey);
+      }
     }
-    el.addEventListener('blur', commit);
     el.addEventListener('keydown', onKey);
   }, true);
 
@@ -424,6 +558,22 @@ function App() {
     + (draft.newPages || []).length;
   const pageStyles = (draft.styles || {})[activePageId] || {};
 
+  // Send a format command to the active edit inside the iframe. Used by
+  // the inspector B/I/U/list/table buttons — Helen on iPad has no Cmd
+  // keyboard shortcut, so all formatting routes through here. The iframe
+  // restores the saved caret range before running execCommand so the
+  // tap-into-inspector → tap-back-to-iframe round-trip doesn't lose the
+  // selection.
+  function sendFormat(cmd, value) {
+    iframeRef.current?.contentWindow?.postMessage({ type: 'editor-format', cmd, value }, '*');
+  }
+  function commitActiveEdit() {
+    iframeRef.current?.contentWindow?.postMessage({ type: 'editor-commit' }, '*');
+  }
+  function cancelActiveEdit() {
+    iframeRef.current?.contentWindow?.postMessage({ type: 'editor-cancel' }, '*');
+  }
+
   // Generic style setter — Helen picks colour/size/etc. → write to
   // draft.styles[pageId][selector] and live-update the iframe element.
   function setSelectionStyle(prop, value) {
@@ -480,7 +630,16 @@ function App() {
           color: existing.color || null,
           fontSize: existing.fontSize || null,
           textAlign: existing.textAlign || null,
+          fmt: { bold: false, italic: false, underline: false, inList: false },
         });
+      }
+      if (m.type === 'edit-format-state') {
+        setSelection(s => s && s.type === 'text'
+          ? { ...s, fmt: { bold: !!m.bold, italic: !!m.italic, underline: !!m.underline, inList: !!m.inList } }
+          : s);
+      }
+      if (m.type === 'edit-end') {
+        setSelection(null);
       }
       if (m.type === 'edit-commit') {
         setDraft(d => ({
@@ -1144,35 +1303,53 @@ function App() {
         {selection ? (
           <div className="inspector__section">
             <h2 className="inspector__title">Editing text</h2>
-            <p className="inspector__sub">Type into the page directly. Press <strong>Enter</strong> to save, <strong>Esc</strong> to cancel.</p>
+            <p className="inspector__sub">Type into the page, select text and tap a format button. Tap <strong>Done</strong> when finished.</p>
+            <div className="field">
+              <label className="field__label">Format</label>
+              <div className="fmt-row" onMouseDown={(e) => e.preventDefault()} onPointerDown={(e) => e.preventDefault()}>
+                <button type="button" className={'fmt-btn' + (selection.fmt?.bold ? ' active' : '')} onClick={() => sendFormat('bold')} title="Bold"><b>B</b></button>
+                <button type="button" className={'fmt-btn' + (selection.fmt?.italic ? ' active' : '')} onClick={() => sendFormat('italic')} title="Italic"><i>I</i></button>
+                <button type="button" className={'fmt-btn' + (selection.fmt?.underline ? ' active' : '')} onClick={() => sendFormat('underline')} title="Underline"><u>U</u></button>
+                <span className="fmt-sep"></span>
+                <button type="button" className={'fmt-btn' + (selection.fmt?.inList ? ' active' : '')} onClick={() => sendFormat('bulletList')} title="Bullet list">• List</button>
+                <span className="fmt-sep"></span>
+                <span className="fmt-label">Table:</span>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 1)} title="Insert 1-column table">1</button>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 2)} title="Insert 2-column table">2</button>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 3)} title="Insert 3-column table">3</button>
+              </div>
+              <div className="field__hint">Highlight text first for bold / italic / underline. Tables and lists act on the whole element.</div>
+            </div>
             <div className="field">
               <label className="field__label">Current value</label>
-              <textarea
-                value={selection.value || ''}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setSelection(s => ({ ...s, value: v }));
-                  // Live update iframe + draft
-                  setDraft(d => ({
-                    ...d,
-                    edits: { ...d.edits, [activePageId]: { ...(d.edits[activePageId] || {}), [selection.selector]: v } },
-                  }));
-                  try {
-                    const el = iframeRef.current.contentDocument.querySelector(selection.selector);
-                    if (el) {
-                      // Render with <br> for each \n so the iframe preview
-                      // reflects line breaks (matches what apply-draft.py
-                      // will write). Plain textContent collapses newlines
-                      // to whitespace.
-                      el.textContent = '';
-                      v.split('\n').forEach((line, i) => {
-                        if (i > 0) el.appendChild(el.ownerDocument.createElement('br'));
-                        el.appendChild(el.ownerDocument.createTextNode(line));
-                      });
-                    }
-                  } catch {}
-                }}
-              />
+              {/<\/?[a-z][\s\S]*?>/i.test(selection.value || '') ? (
+                <div className="formatted-note">
+                  <strong>Formatted text.</strong> Edit directly on the page — the format buttons above apply <b>bold</b>, <i>italic</i>, lists and tables to your selection.
+                </div>
+              ) : (
+                <textarea
+                  value={selection.value || ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setSelection(s => ({ ...s, value: v }));
+                    // Live update iframe + draft
+                    setDraft(d => ({
+                      ...d,
+                      edits: { ...d.edits, [activePageId]: { ...(d.edits[activePageId] || {}), [selection.selector]: v } },
+                    }));
+                    try {
+                      const el = iframeRef.current.contentDocument.querySelector(selection.selector);
+                      if (el) {
+                        el.textContent = '';
+                        v.split('\n').forEach((line, i) => {
+                          if (i > 0) el.appendChild(el.ownerDocument.createElement('br'));
+                          el.appendChild(el.ownerDocument.createTextNode(line));
+                        });
+                      }
+                    } catch {}
+                  }}
+                />
+              )}
               <div className="field__hint">Saves to draft as you type</div>
             </div>
 
@@ -1244,7 +1421,10 @@ function App() {
               </div>
             </div>
 
-            <button className="btn" onClick={() => setSelection(null)}>Done</button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn btn--ghost" onClick={cancelActiveEdit}>Cancel</button>
+              <button className="btn btn--primary" onClick={commitActiveEdit}>Done</button>
+            </div>
           </div>
         ) : imageEdit ? (
           <div className="inspector__section">
