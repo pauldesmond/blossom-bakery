@@ -69,6 +69,16 @@
     .page-item__name { flex: 1; }
     .page-item__toggle { font-size: 11px; color: var(--ink-soft); padding: 2px 6px; border-radius: 4px; opacity: 0; }
     .page-item:hover .page-item__toggle { opacity: 1; }
+    /* Delete is a destructive action — hidden until hover so it doesn't
+       compete with the everyday Hide toggle, and reddens on hover for
+       intent confirmation. */
+    .page-item__delete {
+      background: transparent; border: 1px solid transparent; padding: 4px 8px;
+      font-size: 11px; color: var(--ink-soft); border-radius: var(--r-sm);
+      cursor: pointer; opacity: 0; transition: opacity .15s, color .15s, border-color .15s;
+    }
+    .page-item:hover .page-item__delete { opacity: 1; }
+    .page-item__delete:hover { color: #b8676a; border-color: #b8676a; }
     .page-item__toggle:hover { background: var(--paper); color: var(--ink); }
     .new-page-btn { width: 100%; padding: 10px; border: 1px dashed var(--line); border-radius: var(--r-sm); background: transparent; color: var(--ink-soft); font-size: 13px; }
     .new-page-btn:hover { border-color: var(--rose-deep); color: var(--rose-deep); border-style: solid; }
@@ -209,6 +219,6 @@
        Bump the version each time editor-app.jsx changes meaningfully.
        (iOS WKWebView/Safari ignore Cache-Control on same-origin scripts
        far longer than they should — query string is the reliable break.) -->
-  <script type="text/babel" src="editor-app.jsx?v=20260511-0540"></script>
+  <script type="text/babel" src="editor-app.jsx?v=20260511-0600"></script>
 </body>
 </html>

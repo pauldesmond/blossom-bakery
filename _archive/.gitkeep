@@ -1,0 +1,4 @@
+# Pages deleted via the editor (Helen) land here as <slug>-YYYYMMDD.html.
+# Recoverable: `mv _archive/<file>.html .` and re-add the entry in
+# _data/pages.json with `published: true`. apply-draft.py writes here
+# via archive_and_unlink_page() — see scripts/apply-draft.py.

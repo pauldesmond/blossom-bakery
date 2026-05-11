@@ -338,6 +338,54 @@ def update_page_status(page_id: str, published: bool) -> bool:
     return False
 
 
+# ─── Page deletion (archive + drop from registry) ────────────────────────
+# Distinct from page-status hide (toggles nav visibility only). Delete
+# physically moves /<slug>.html → _archive/<slug>-YYYYMMDD.html and drops
+# the entry from _data/pages.json. The live URL 404s after this; archived
+# file is recoverable by hand (mv back, re-add to pages.json).
+ARCHIVE_DIR = SITE / "_archive"
+
+
+def _drop_from_registry(page_id: str) -> None:
+    """Remove the page from _data/pages.json so build.py + the editor
+    stop seeing it. No-op if the registry or entry doesn't exist."""
+    if not PAGES_JSON.exists():
+        return
+    reg = json.loads(PAGES_JSON.read_text(encoding="utf-8"))
+    pages = reg.get("pages", [])
+    new_pages = [p for p in pages if p.get("id") != page_id]
+    if len(new_pages) != len(pages):
+        reg["pages"] = new_pages
+        PAGES_JSON.write_text(json.dumps(reg, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def archive_and_unlink_page(page_id: str) -> tuple[bool, str]:
+    """Move /<slug>.html to _archive/<slug>-YYYYMMDD.html, remove its
+    nav entry, drop from pages.json. Returns (ok, message)."""
+    file = PAGE_FILES.get(page_id)
+    if not file:
+        return (False, f"unknown page id '{page_id}'")
+    src = SITE / file
+    if not src.exists():
+        # File already gone — still clean nav + registry, treat as success.
+        update_page_status(page_id, False)
+        _drop_from_registry(page_id)
+        return (True, "file already missing — cleaned nav/registry only")
+
+    ARCHIVE_DIR.mkdir(exist_ok=True)
+    from datetime import date
+    stamp = date.today().strftime("%Y%m%d")
+    dst = ARCHIVE_DIR / f"{Path(file).stem}-{stamp}{Path(file).suffix}"
+    n = 2
+    while dst.exists():
+        dst = ARCHIVE_DIR / f"{Path(file).stem}-{stamp}-{n}{Path(file).suffix}"
+        n += 1
+    src.rename(dst)
+    update_page_status(page_id, False)  # comment out nav entry if site.js-style
+    _drop_from_registry(page_id)
+    return (True, f"archived → _archive/{dst.name}")
+
+
 # ─── Nav + cat-grid sync ────────────────────────────────────────────────
 # Site nav and the homepage cat-grid are hand-coded into every HTML file.
 # These two helpers regenerate them from _data/pages.json so a new page
@@ -447,6 +495,7 @@ def apply_draft(draft_path: Path) -> None:
     image_deletes: list[str] = draft.get("imageDeletes", []) or []
     page_status: dict[str, bool] = draft.get("pageStatus", {}) or {}
     new_pages: list[dict] = draft.get("newPages", []) or []
+    deleted_pages: list = draft.get("deletedPages", []) or []
     styles: dict[str, dict] = draft.get("styles", {}) or {}
 
     # ── 0. Materialise new pages (copy template HTML, register in pages.json)
@@ -503,7 +552,7 @@ def apply_draft(draft_path: Path) -> None:
             PAGES_JSON.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"  ✓ _data/pages.json updated ({len(new_pages)} new page(s))")
 
-    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "images_deleted": 0, "page_status": 0, "styles_ok": 0, "styles_skipped": [], "nav_synced": 0, "cards_added": 0}
+    summary = {"text_ok": 0, "text_skipped": [], "yaml_updated": 0, "yaml_misses": [], "images": 0, "images_deleted": 0, "page_status": 0, "styles_ok": 0, "styles_skipped": [], "nav_synced": 0, "cards_added": 0, "deleted": 0, "delete_skipped": []}
 
     # Latent landmine check: warn about _pages/*.yml files that are NOT in
     # GENERATED. They aren't consumed today, but if anyone re-adds them to
@@ -514,9 +563,32 @@ def apply_draft(draft_path: Path) -> None:
             print("  ⓘ stale YAML files (not consumed by build.py): " + ", ".join(stale))
             print("    safe to delete — they only become a trap if re-added to PAGE_META.")
 
+    # ── 0b. Page deletions ──────────────────────────────────────────
+    # Runs BEFORE text/styles/images so we don't waste cycles editing a
+    # file that's about to be archived. Index/homepage is permanently
+    # exempt — guarded on both sides (editor hides the Delete button;
+    # we double-check here in case the draft somehow contains it).
+    for page_id in deleted_pages:
+        if page_id == "index":
+            summary["delete_skipped"].append((page_id, "homepage cannot be deleted"))
+            print(f"  ! page '{page_id}' → homepage cannot be deleted")
+            continue
+        ok, msg = archive_and_unlink_page(page_id)
+        if ok:
+            summary["deleted"] += 1
+            print(f"  ✓ page '{page_id}' → {msg}")
+        else:
+            summary["delete_skipped"].append((page_id, msg))
+            print(f"  ! page '{page_id}' → {msg}")
+
     # ── 1. Text edits ───────────────────────────────────────────────
     for page_id, page_edits in edits.items():
         if not page_edits:
+            continue
+        # Defensive: if a page was queued for deletion in the same draft,
+        # skip its pending edits. The editor strips these client-side
+        # already, but cheap to belt-and-braces here.
+        if page_id in deleted_pages:
             continue
         file = PAGE_FILES.get(page_id)
         if not file:
@@ -565,6 +637,9 @@ def apply_draft(draft_path: Path) -> None:
     # text-edited state. Validates against ALLOWED_TEXT_COLOURS / _FONT_SIZES.
     for page_id, page_styles in styles.items():
         if not page_styles:
+            continue
+        # Same defensive skip as text edits — page is being archived.
+        if page_id in deleted_pages:
             continue
         file = PAGE_FILES.get(page_id)
         if not file:
@@ -718,6 +793,7 @@ def apply_draft(draft_path: Path) -> None:
     if summary["cards_added"]:
         print(f"           {summary['cards_added']} new card(s) on homepage")
     print(f"           {summary['page_status']} page-status change(s)")
+    print(f"           {summary['deleted']} page deletion(s)")
     print(f"           {summary['styles_ok']} per-element style change(s)")
     if summary["text_skipped"]:
         print(f"  Skipped: {len(summary['text_skipped'])} edit(s) — see below")

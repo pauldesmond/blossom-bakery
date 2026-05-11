@@ -78,7 +78,7 @@ const IFRAME_CSS = `
 // Draft store — localStorage persistence
 // ──────────────────────────────────────────────────────────────────
 function loadDraft() {
-  const blank = { edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {} };
+  const blank = { edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {}, deletedPages: [] };
   try { return { ...blank, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) }; }
   catch { return blank; }
 }
@@ -419,7 +419,8 @@ function App() {
   const pageImages = draft.images || {};
   const totalEditsCount = Object.values(draft.edits).reduce((s, e) => s + Object.keys(e).length, 0)
     + Object.keys(draft.images || {}).length
-    + Object.values(draft.styles || {}).reduce((s, e) => s + Object.keys(e).length, 0);
+    + Object.values(draft.styles || {}).reduce((s, e) => s + Object.keys(e).length, 0)
+    + (draft.deletedPages || []).length;
   const pageStyles = (draft.styles || {})[activePageId] || {};
 
   // Generic style setter — Helen picks colour/size/etc. → write to
@@ -520,6 +521,46 @@ function App() {
       pageStatus: { ...d.pageStatus, [id]: !((d.pageStatus[id] !== undefined ? d.pageStatus[id] : true)) },
     }));
     toast('Page status updated', 'success');
+  }
+
+  // Hard-delete a page. Distinct from Hide (pageStatus=false) which only
+  // takes a page off the nav. Delete moves the HTML into _archive/ on
+  // publish and removes the page from pages.json, so the live URL 404s
+  // properly. Reversible by hand (mv back out of _archive/) — no git
+  // surgery needed. Index is permanently exempt; never deletable.
+  function deletePage(id) {
+    const page = ALL_PAGES.find(p => p.id === id);
+    if (!page) return;
+    const ok = confirm(
+      `Delete "${page.label}"?\n\n` +
+      `The page will be archived (recoverable) and removed from the menu. ` +
+      `Visitors going to /${page.file} will see "page not found".\n\n` +
+      `Use Hide instead if you only want to take it off the menu.`
+    );
+    if (!ok) return;
+    setDraft(d => {
+      // Brand-new page that hasn't been applied yet → just drop from newPages
+      if ((d.newPages || []).some(np => np.id === id)) {
+        return { ...d, newPages: d.newPages.filter(np => np.id !== id) };
+      }
+      const deletedPages = Array.from(new Set([...(d.deletedPages || []), id]));
+      // Clear any pending edits/styles for this page so they don't get
+      // applied to a file that's about to be archived.
+      const { [id]: _e, ...edits } = d.edits || {};
+      const { [id]: _s, ...styles } = d.styles || {};
+      const images = Object.fromEntries(
+        Object.entries(d.images || {}).filter(([k]) => !k.startsWith(id + ':'))
+      );
+      const pageStatus = { ...(d.pageStatus || {}) };
+      delete pageStatus[id];
+      return { ...d, deletedPages, edits, styles, images, pageStatus };
+    });
+    if (activePageId === id) {
+      const next = ALL_PAGES.find(p => p.id !== id && p.id !== 'index');
+      if (next) setActivePageId(next.id);
+      else setActivePageId('index');
+    }
+    toast(`"${page.label}" queued for deletion`, 'warn');
   }
 
   // Image swap
@@ -628,7 +669,7 @@ function App() {
     // and the user thinks Discard didn't work. Explicit removeItem
     // guarantees the storage slot is empty before any retries.
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    setDraft({ edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {} });
+    setDraft({ edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {}, deletedPages: [] });
     const win = iframeRef.current?.contentWindow;
     if (win) win.location.reload();
     toast('Drafts cleared', 'success');
@@ -719,6 +760,7 @@ function App() {
       pageStatus: draft.pageStatus,
       site: draft.site,
       newPages: draft.newPages || [],
+      deletedPages: draft.deletedPages || [],
       styles: draft.styles || {},
       // Images: include ref + base64 for local-only swaps, but preserve
       // already-uploaded repo paths (string values) so a failed publish
@@ -885,6 +927,7 @@ function App() {
         edits: draft.edits,
         pageStatus: draft.pageStatus,
         newPages: draft.newPages || [],
+        deletedPages: draft.deletedPages || [],
         styles: draft.styles || {},
         imageDeletes: draft.imageDeletes || [],
         // Image swaps now point at already-uploaded files (string newSrc)
@@ -939,6 +982,7 @@ function App() {
         edits: {},
         pageStatus: {},
         newPages: [],
+        deletedPages: [],
         styles: {},
         imageDeletes: [],
         images: {}, // image swaps now go through publish via _drafts/ staging
@@ -1026,7 +1070,7 @@ function App() {
         <div className="sidebar__section">
           <div className="sidebar__title">Pages</div>
           <ul className="page-list">
-            {ALL_PAGES.map(p => {
+            {ALL_PAGES.filter(p => !(draft.deletedPages || []).includes(p.id)).map(p => {
               const published = draft.pageStatus[p.id] !== undefined ? draft.pageStatus[p.id] : p.published;
               return (
                 <li
@@ -1053,11 +1097,20 @@ function App() {
                       >Remove</button>
                     </span>
                   ) : (
-                    <button
-                      className="page-item__toggle"
-                      title={published ? 'Hide page' : 'Show page'}
-                      onClick={(e) => { e.stopPropagation(); togglePagePublished(p.id); }}
-                    >{published ? 'Hide' : 'Show'}</button>
+                    <span style={{ display: 'inline-flex', gap: 6 }}>
+                      <button
+                        className="page-item__toggle"
+                        title={published ? 'Hide page' : 'Show page'}
+                        onClick={(e) => { e.stopPropagation(); togglePagePublished(p.id); }}
+                      >{published ? 'Hide' : 'Show'}</button>
+                      {p.id !== 'index' && (
+                        <button
+                          className="page-item__delete"
+                          title="Delete page (archives the file, removes from menu)"
+                          onClick={(e) => { e.stopPropagation(); deletePage(p.id); }}
+                        >Delete</button>
+                      )}
+                    </span>
                   )}
                 </li>
               );
