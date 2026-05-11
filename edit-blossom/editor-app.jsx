@@ -796,6 +796,16 @@ function App() {
         const upData = await upResp.json();
         if (!upData.ok || !upData.newSrc) throw new Error(`upload ${i + 1}: no newSrc returned`);
         resolvedImages[oldSrc] = upData.newSrc;
+        // Persist the upload result into the draft immediately. The image
+        // file has already been committed to the repo (orphan if the
+        // publish call below fails); without persisting we'd re-upload it
+        // under a new filename on retry, leaving stale orphans behind.
+        // Now: a retry sees a string newSrc, skips the upload, and the
+        // existing file is reused.
+        setDraft(d => ({
+          ...d,
+          images: { ...(d.images || {}), [oldSrc]: upData.newSrc },
+        }));
       }
       stage = 'building draft';
       const slimDraft = {

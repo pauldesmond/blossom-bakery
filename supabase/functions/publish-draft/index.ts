@@ -30,9 +30,23 @@ function json(body: unknown, status = 200) {
   });
 }
 
-// Base64 encode a UTF-8 string.
+// Base64 encode a UTF-8 string. The naive `btoa(String.fromCharCode(
+// ...bytes))` pattern blows the JS call stack once the byte array gets
+// moderately large (RangeError at ~64K args in V8 / Deno, hit in
+// practice around a 300KB payload). Chunked encoding works at any
+// size — 32KB chunks keep well clear of any engine's spread limit
+// without making it noticeably slower than the one-shot form.
 function b64(str: string): string {
-  return btoa(String.fromCharCode(...new TextEncoder().encode(str)));
+  const bytes = new TextEncoder().encode(str);
+  const CHUNK = 0x8000; // 32K
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(
+      null,
+      Array.from(bytes.subarray(i, i + CHUNK)),
+    );
+  }
+  return btoa(binary);
 }
 
 serve(async (req) => {
