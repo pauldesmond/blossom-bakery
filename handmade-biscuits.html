@@ -22,6 +22,14 @@
       gap: 16px;
     }
     .biscuit-mosaic img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
+    /* Keep the "Tap to add photo" placeholders hidden on the public
+       site. Without this, the inline .biscuit-mosaic img rule above
+       overrides the global img[src*="_add-photo.svg"] { display: none }
+       rule in styles.css (same specificity, but the inline block wins
+       on source order), and Helen's unfilled slots leak into the live
+       page. The editor's own IFRAME_CSS injects display: block !important
+       so she can still see and tap them in the editor. */
+    .biscuit-mosaic img[src*="_add-photo.svg"] { display: none; }
     .biscuit-mosaic > *:nth-child(1) { grid-column: span 4; aspect-ratio: 4/3; }
     .biscuit-mosaic > *:nth-child(2) { grid-column: span 2; aspect-ratio: 3/4; grid-row: span 2; }
     .biscuit-mosaic > *:nth-child(3) { grid-column: span 2; aspect-ratio: 1/1; }
