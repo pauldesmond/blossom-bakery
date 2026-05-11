@@ -92,7 +92,7 @@ const IFRAME_CSS = `
 // Draft store — localStorage persistence
 // ──────────────────────────────────────────────────────────────────
 function loadDraft() {
-  const blank = { edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {}, deletedPages: [] };
+  const blank = { edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {}, deletedPages: [], mutations: {} };
   try { return { ...blank, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) }; }
   catch { return blank; }
 }
@@ -460,6 +460,41 @@ const IFRAME_INJECT = `
     document.execCommand('insertHTML', false, '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>');
   }
 
+  // Tags that can't legally contain a <ul> or <table>. Helen taps the
+  // List/Table button while editing one of these (a paragraph, a
+  // heading) and we insert the new block as a sibling AFTER the
+  // element instead of nesting. Persistence rides on draft.mutations.
+  const INLINE_PARENT_TAGS = new Set(['P','H1','H2','H3','H4','H5','H6','SPAN','A','EM','STRONG','SMALL','B','I','U']);
+
+  function buildListHTML() {
+    return '<ul><li>List item</li></ul>';
+  }
+  function buildTableHTML(cols) {
+    cols = Math.max(1, Math.min(3, cols | 0));
+    const head = '<tr>' + Array(cols).fill(0).map((_,i)=>'<th>Heading '+(i+1)+'</th>').join('') + '</tr>';
+    const body = Array(2).fill(0).map(() =>
+      '<tr>' + Array(cols).fill(0).map(()=>'<td>Cell</td>').join('') + '</tr>'
+    ).join('');
+    return '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+  }
+
+  // Insert the given HTML as a sibling AFTER the anchor, also notify the
+  // parent so it lands in draft.mutations. Returns true if it inserted.
+  function insertSiblingAfter(anchorEl, anchorSelector, html) {
+    if (!anchorEl || !anchorEl.parentNode) return false;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    const newEl = tmp.firstElementChild;
+    if (!newEl) return false;
+    anchorEl.parentNode.insertBefore(newEl, anchorEl.nextSibling);
+    window.parent.postMessage({
+      type: 'edit-insert-after',
+      anchorSelector,
+      html,
+    }, '*');
+    return true;
+  }
+
   window.addEventListener('message', (ev) => {
     const m = ev.data || {};
     if (m.type === 'editor-format') {
@@ -495,9 +530,27 @@ const IFRAME_INJECT = `
         return;
       }
       restoreCaret();
-      if (m.cmd === 'bulletList')       wrapAsList(activeEdit.el);
-      else if (m.cmd === 'insertTable') insertTableCols(m.value | 0);
-      else                              document.execCommand(m.cmd, false, m.value || null);
+      // For lists/tables on inline-only parents (<p>, headings, links),
+      // we can't legally nest the new block inside — so we insert it
+      // as a sibling after the element and persist via the mutations
+      // channel. For genuine block-capable elements we use the existing
+      // wrap-content behaviour.
+      const isInlineParent = activeEdit.el && INLINE_PARENT_TAGS.has(activeEdit.el.tagName);
+      if (m.cmd === 'bulletList') {
+        if (isInlineParent) {
+          insertSiblingAfter(activeEdit.el, activeEdit.sel, buildListHTML());
+        } else {
+          wrapAsList(activeEdit.el);
+        }
+      } else if (m.cmd === 'insertTable') {
+        if (isInlineParent) {
+          insertSiblingAfter(activeEdit.el, activeEdit.sel, buildTableHTML(m.value | 0));
+        } else {
+          insertTableCols(m.value | 0);
+        }
+      } else {
+        document.execCommand(m.cmd, false, m.value || null);
+      }
       const s2 = window.getSelection();
       if (s2.rangeCount) activeEdit.savedRange = s2.getRangeAt(0).cloneRange();
     }
@@ -621,10 +674,31 @@ const IFRAME_INJECT = `
     el.addEventListener('keydown', onKey);
   }, true);
 
+  function applyMutations(mutations) {
+    (mutations || []).forEach(function(mu) {
+      try {
+        if (mu.type !== 'insert-after') return;
+        const anchor = document.querySelector(mu.anchorSelector);
+        if (!anchor || !anchor.parentNode) return;
+        // Idempotency: avoid re-inserting on re-apply by checking if
+        // the next sibling already matches the first tag of the html.
+        const tmp = document.createElement('div');
+        tmp.innerHTML = mu.html;
+        const newEl = tmp.firstElementChild;
+        if (!newEl) return;
+        const next = anchor.nextElementSibling;
+        if (next && next.tagName === newEl.tagName && next.dataset.blossomMut === mu.id) return;
+        newEl.dataset.blossomMut = mu.id;
+        anchor.parentNode.insertBefore(newEl, anchor.nextSibling);
+      } catch (_e) {}
+    });
+  }
+
   window.__applyDraft = function(draft) {
     applyEdits(draft.edits);
     applyImages(draft.images, draft.imageDeletes);
     applyStyles(draft.styles);
+    applyMutations(draft.mutations);
   };
 
   window.parent.postMessage({ type: 'iframe-ready' }, '*');
@@ -702,11 +776,13 @@ function App() {
   const pageEdits = draft.edits[activePageId] || {};
   const pageImages = getPageImages(draft.images || {}, activePageId);
   const pageImageDeletes = getPageDeletes(draft.imageDeletes || [], activePageId);
+  const pageMutations = (draft.mutations || {})[activePageId] || [];
   const totalEditsCount = Object.values(draft.edits).reduce((s, e) => s + Object.keys(e).length, 0)
     + Object.keys(draft.images || {}).length
     + Object.values(draft.styles || {}).reduce((s, e) => s + Object.keys(e).length, 0)
     + (draft.deletedPages || []).length
-    + (draft.newPages || []).length;
+    + (draft.newPages || []).length
+    + Object.values(draft.mutations || {}).reduce((s, arr) => s + (arr || []).length, 0);
   const pageStyles = (draft.styles || {})[activePageId] || {};
 
   // Fine-tune font size in 1px steps. Reads the live computed size from
@@ -849,7 +925,7 @@ function App() {
       if (m.type === 'iframe-ready') {
         // Push current draft into iframe
         const win = iframeRef.current?.contentWindow;
-        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages, imageDeletes: pageImageDeletes, styles: pageStyles });
+        if (win && win.__applyDraft) win.__applyDraft({ edits: pageEdits, images: pageImages, imageDeletes: pageImageDeletes, styles: pageStyles, mutations: pageMutations });
       }
       if (m.type === 'edit-start') {
         const existing = (draft.styles?.[activePageId] || {})[m.selector] || {};
@@ -880,6 +956,19 @@ function App() {
       }
       if (m.type === 'edit-format-failed') {
         toast('Tap the text again, then the format button', 'warn');
+      }
+      if (m.type === 'edit-insert-after') {
+        // Helen tapped List/Table while editing a paragraph. The iframe
+        // already inserted the block visually; persist the mutation so
+        // it lands at publish time. Each mutation gets an id so we can
+        // dedupe / retract if Helen reverts the draft.
+        const id = 'mut-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+        setDraft(d => {
+          const pageMuts = [ ...((d.mutations || {})[activePageId] || []) ];
+          pageMuts.push({ id, anchorSelector: m.anchorSelector, type: 'insert-after', html: m.html });
+          return { ...d, mutations: { ...(d.mutations || {}), [activePageId]: pageMuts } };
+        });
+        toast('Added — tap the new block to type into it', 'success');
       }
       if (m.type === 'edit-end') {
         setSelection(null);
@@ -1060,7 +1149,7 @@ function App() {
       toast('Photo swapped (draft)', 'success');
       const win = iframeRef.current?.contentWindow;
       if (win && win.__applyDraft) {
-        win.__applyDraft({ edits: pageEdits, images: nextPageImages, imageDeletes: pageImageDeletes, styles: pageStyles });
+        win.__applyDraft({ edits: pageEdits, images: nextPageImages, imageDeletes: pageImageDeletes, styles: pageStyles, mutations: pageMutations });
       }
     } catch (err) {
       console.error('[Blossom] image swap failed:', err);
@@ -1077,7 +1166,7 @@ function App() {
     // and the user thinks Discard didn't work. Explicit removeItem
     // guarantees the storage slot is empty before any retries.
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    setDraft({ edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {}, deletedPages: [] });
+    setDraft({ edits: {}, images: {}, imageDeletes: [], pageStatus: {}, site: {}, newPages: [], styles: {}, deletedPages: [], mutations: {} });
     const win = iframeRef.current?.contentWindow;
     if (win) win.location.reload();
     toast('Drafts cleared', 'success');
@@ -1109,7 +1198,7 @@ function App() {
     toast('Photo removed (draft)', 'success');
     const win = iframeRef.current?.contentWindow;
     if (win && win.__applyDraft) {
-      win.__applyDraft({ edits: pageEdits, images: nextPageImages, imageDeletes: nextPageDeletes, styles: pageStyles });
+      win.__applyDraft({ edits: pageEdits, images: nextPageImages, imageDeletes: nextPageDeletes, styles: pageStyles, mutations: pageMutations });
     }
   }
 
@@ -1361,6 +1450,7 @@ function App() {
         deletedPages: draft.deletedPages || [],
         styles: draft.styles || {},
         imageDeletes: draft.imageDeletes || [],
+        mutations: draft.mutations || {},
         // Image swaps now point at already-uploaded files (string newSrc)
         // rather than inline data URLs. apply-draft.py special-cases string
         // values to skip save_image() and just rewrite refs.
@@ -1417,6 +1507,7 @@ function App() {
         styles: {},
         imageDeletes: [],
         images: {}, // image swaps now go through publish via _drafts/ staging
+        mutations: {},
       }));
       // Reload iframe after a short delay so Helen sees the live result.
       // Bumping iframeBust changes both the src query string AND the React
@@ -1584,17 +1675,15 @@ function App() {
                 <span className="fmt-sep"></span>
                 <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepFontSize(-1)} title="Smaller">A−</button>
                 <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepFontSize(1)} title="Larger">A+</button>
-                {selection.allowBlockFormat && (<>
-                  <span className="fmt-sep"></span>
-                  <button type="button" className={'fmt-btn' + (selection.fmt?.inList ? ' active' : '')} onClick={() => sendFormat('bulletList')} title="Bullet list">• List</button>
-                  <span className="fmt-sep"></span>
-                  <span className="fmt-label">Table:</span>
-                  <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 1)} title="Insert 1-column table">1</button>
-                  <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 2)} title="Insert 2-column table">2</button>
-                  <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 3)} title="Insert 3-column table">3</button>
-                </>)}
+                <span className="fmt-sep"></span>
+                <button type="button" className={'fmt-btn' + (selection.fmt?.inList ? ' active' : '')} onClick={() => sendFormat('bulletList')} title="Bullet list">• List</button>
+                <span className="fmt-sep"></span>
+                <span className="fmt-label">Table:</span>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 1)} title="Insert 1-column table">1</button>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 2)} title="Insert 2-column table">2</button>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => sendFormat('insertTable', 3)} title="Insert 3-column table">3</button>
               </div>
-              <div className="field__hint">Highlight text first for bold / italic / underline. {selection.allowBlockFormat ? 'Tables and lists act on the whole element.' : 'Tables and lists are only available on body text (not on headings or links).'}</div>
+              <div className="field__hint">Highlight text first for bold / italic / underline. {selection.allowBlockFormat ? 'Tables and lists act on the whole element.' : 'Tables and lists insert below this paragraph — type into the new block once it appears.'}</div>
             </div>
             <div className="field">
               <label className="field__label">Current value</label>

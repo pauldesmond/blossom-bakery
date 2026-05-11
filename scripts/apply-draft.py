@@ -700,6 +700,7 @@ def apply_draft(draft_path: Path) -> None:
     new_pages: list[dict] = draft.get("newPages", []) or []
     deleted_pages: list = draft.get("deletedPages", []) or []
     styles: dict[str, dict] = draft.get("styles", {}) or {}
+    mutations: dict[str, list[dict]] = draft.get("mutations", {}) or {}
 
     # ── 0. Materialise new pages (copy template HTML, register in pages.json)
     if new_pages:
@@ -871,6 +872,52 @@ def apply_draft(draft_path: Path) -> None:
         if n_ok:
             html_path.write_text(str(soup_styles), encoding="utf-8")
             print(f"  ✓ styles applied to /{file} ({n_ok} element{'s' if n_ok != 1 else ''})")
+
+    # ── 1c. Structural mutations (insert-after) ────────────────────
+    # Helen tapped List or Table while editing a paragraph or heading.
+    # Those tags can't legally nest a <ul> or <table>, so the editor
+    # inserts the new block as a sibling and stages the operation here
+    # for publish.
+    for page_id, page_muts in mutations.items():
+        if not page_muts:
+            continue
+        if page_id in deleted_pages:
+            continue
+        file = PAGE_FILES.get(page_id)
+        if not file:
+            print(f"! Unknown page id '{page_id}' for mutations — skipping {len(page_muts)} entries")
+            continue
+        html_path = SITE / file
+        if not html_path.exists():
+            print(f"! Missing /{file} for mutations — skipping {len(page_muts)} entries")
+            continue
+        soup_mut = BeautifulSoup(html_path.read_text(encoding="utf-8"), "html.parser")
+        applied = 0
+        for mu in page_muts:
+            if not isinstance(mu, dict):
+                continue
+            mtype = mu.get("type")
+            anchor_sel = mu.get("anchorSelector")
+            raw_html = mu.get("html", "")
+            if mtype != "insert-after" or not anchor_sel or not raw_html:
+                continue
+            anchor = find_by_selector(soup_mut, anchor_sel)
+            if anchor is None or anchor.parent is None:
+                print(f"  ! mutation skipped (anchor not found): {anchor_sel}")
+                continue
+            frag = _sanitise_fragment(raw_html)
+            if not frag.contents:
+                continue
+            # Insert after the anchor — work back-to-front so a chain of
+            # children inserts in source order.
+            for node in reversed(list(frag.contents)):
+                anchor.insert_after(node)
+            applied += 1
+        if applied:
+            html_path.write_text(str(soup_mut), encoding="utf-8")
+            print(f"  ✓ {applied} insertion(s) applied to /{file}")
+            summary.setdefault("mutations", 0)
+            summary["mutations"] += applied
 
     # ── 2. Image swaps ─────────────────────────────────────────────
     for entry_key, info in images.items():
