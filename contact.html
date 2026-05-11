@@ -272,7 +272,17 @@
     <div class="contact-grid">
 
       <!-- FORM -->
-      <form id="enquiryForm" class="enquiry-form">
+      <form id="enquiryForm" class="enquiry-form" action="https://formspree.io/f/mwvyaoqo" method="POST">
+        <!-- Formspree controls. _subject groups inbound enquiries in Helen's
+             Gmail under one thread-able subject line. _gotcha is a honeypot:
+             real users never see it (visually hidden + tabindex -1 + no
+             autocomplete) but spam bots fill in every visible-looking
+             input and trip the filter. Email field is named `email` so
+             Formspree auto-sets it as Reply-To — Helen hits Reply and it
+             goes to the customer, no copy/paste. -->
+        <input type="hidden" name="_subject" value="New enquiry — Blossom Bakery" />
+        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
         <p class="wedding-section__eyebrow" style="text-align:left;">Enquiry form</p>
         <h2 class="enquiry-form__heading">Tell me about it.</h2>
         <p class="intro-p" style="text-align:left; margin-top: 0;">Send the details below and your enquiry will go straight to Helen's inbox.</p>
@@ -321,6 +331,49 @@
           <button type="submit" class="btn">Send enquiry</button>
         </div>
       </form>
+
+      <!-- Shown after a successful AJAX submit. With JS off the form
+           does a native POST and Formspree shows its own thanks page,
+           so this panel only renders on the happy JS path. -->
+      <div id="enquiryThanks" class="enquiry-form" style="display:none;">
+        <p class="wedding-section__eyebrow" style="text-align:left;">Thank you</p>
+        <h2 class="enquiry-form__heading">Your enquiry's on its way.</h2>
+        <p style="line-height:1.7;">Helen will reply within 24 hrs (Mon–Sat). If it's something urgent, she's on <strong>07939 618787</strong>.</p>
+      </div>
+
+      <script>
+        (function() {
+          const form = document.getElementById('enquiryForm');
+          const thanks = document.getElementById('enquiryThanks');
+          if (!form || !thanks) return;
+          form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending…';
+            btn.disabled = true;
+            try {
+              const resp = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { Accept: 'application/json' },
+              });
+              if (resp.ok) {
+                form.style.display = 'none';
+                thanks.style.display = '';
+                window.scrollTo({ top: thanks.offsetTop - 60, behavior: 'smooth' });
+                return;
+              }
+              const data = await resp.json().catch(function() { return {}; });
+              alert("Sorry, couldn't send right now. " + (data && data.error ? data.error : 'Please try again, or email blossombakedgoods@gmail.com directly.'));
+            } catch (err) {
+              alert("Couldn't send — check your internet, or email blossombakedgoods@gmail.com directly.");
+            }
+            btn.textContent = originalText;
+            btn.disabled = false;
+          });
+        })();
+      </script>
 
       <!-- SIDEBAR -->
       <aside class="contact-aside">
