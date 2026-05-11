@@ -274,7 +274,7 @@ const IFRAME_INJECT = `
     return parts.join(' > ');
   }
 
-  const SELECTORS = 'h1, h2, h3, h4, p, li, span:not(:has(*)), a:not(:has(img)), small, em, strong, button, blockquote, div:not(:has(*))';
+  const SELECTORS = 'h1, h2, h3, h4, p, li, td, th, span:not(:has(*)), a:not(:has(img)), small, em, strong, button, blockquote, div:not(:has(*))';
 
   function isEditable(el) {
     if (!el || el.closest('[data-edit-skip]')) return false;
@@ -466,16 +466,26 @@ const IFRAME_INJECT = `
   // element instead of nesting. Persistence rides on draft.mutations.
   const INLINE_PARENT_TAGS = new Set(['P','H1','H2','H3','H4','H5','H6','SPAN','A','EM','STRONG','SMALL','B','I','U']);
 
+  // Inline styles on the inserted block: the site's CSS doesn't have a
+  // generic list/table style and the parent container Helen's editing
+  // in could be centred, narrow, or flush-left — self-contained styles
+  // keep the rendered block consistent everywhere. Colours match the
+  // site palette (rose-deep border, ink for text, cream backdrop).
   function buildListHTML() {
-    return '<ul><li>List item</li></ul>';
+    return '<ul style="max-width: 540px; margin: 16px auto; padding-left: 32px; text-align: left; line-height: 1.6;">'
+      + '<li>List item</li>'
+      + '</ul>';
   }
   function buildTableHTML(cols) {
     cols = Math.max(1, Math.min(3, cols | 0));
-    const head = '<tr>' + Array(cols).fill(0).map((_,i)=>'<th>Heading '+(i+1)+'</th>').join('') + '</tr>';
+    const thStyle = 'border: 1px solid #b56a78; padding: 10px 14px; text-align: left; font-weight: 600; background: #f5dbd9;';
+    const tdStyle = 'border: 1px solid #d9c9b5; padding: 10px 14px; min-width: 80px;';
+    const head = '<tr>' + Array(cols).fill(0).map((_,i)=>'<th style="' + thStyle + '">Heading '+(i+1)+'</th>').join('') + '</tr>';
     const body = Array(2).fill(0).map(() =>
-      '<tr>' + Array(cols).fill(0).map(()=>'<td>Cell</td>').join('') + '</tr>'
+      '<tr>' + Array(cols).fill(0).map(()=>'<td style="' + tdStyle + '">Cell</td>').join('') + '</tr>'
     ).join('');
-    return '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+    return '<table style="border-collapse: collapse; margin: 16px auto; width: 100%; max-width: 540px;">'
+      + '<thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
   }
 
   // Insert the given HTML as a sibling AFTER the anchor, also notify the

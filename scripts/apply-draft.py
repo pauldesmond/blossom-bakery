@@ -132,6 +132,29 @@ def _sanitise_fragment(html: str) -> BeautifulSoup:
     return frag
 
 
+# Canonical inline styles re-applied to inserted list/table blocks after
+# _sanitise_fragment has stripped any inline styles the editor sent.
+# Keeps the rendered block consistent across pages whose surrounding CSS
+# doesn't define a generic list/table style.
+INSERTED_BLOCK_STYLES = {
+    'ul':    'max-width: 540px; margin: 16px auto; padding-left: 32px; text-align: left; line-height: 1.6;',
+    'ol':    'max-width: 540px; margin: 16px auto; padding-left: 32px; text-align: left; line-height: 1.6;',
+    'table': 'border-collapse: collapse; margin: 16px auto; width: 100%; max-width: 540px;',
+    'th':    'border: 1px solid #b56a78; padding: 10px 14px; text-align: left; font-weight: 600; background: #f5dbd9;',
+    'td':    'border: 1px solid #d9c9b5; padding: 10px 14px; min-width: 80px;',
+}
+
+
+def _decorate_inserted_block(frag) -> None:
+    """Walk the fragment and stamp canonical styles onto recognised list/
+    table tags. Called from the mutation processor only; existing-page
+    edits go through replace_text which doesn't need decoration."""
+    for tag in frag.find_all(True):
+        canonical = INSERTED_BLOCK_STYLES.get(tag.name)
+        if canonical:
+            tag['style'] = canonical
+
+
 def _validate_font_size(size: str) -> bool:
     """Accept any 'Npx' string whose N is inside [MIN, MAX]."""
     m = re.fullmatch(r'(\d+(?:\.\d+)?)px', size.strip().lower())
@@ -908,6 +931,7 @@ def apply_draft(draft_path: Path) -> None:
             frag = _sanitise_fragment(raw_html)
             if not frag.contents:
                 continue
+            _decorate_inserted_block(frag)
             # Insert after the anchor — work back-to-front so a chain of
             # children inserts in source order.
             for node in reversed(list(frag.contents)):
