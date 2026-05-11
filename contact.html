@@ -263,7 +263,7 @@
   <div class="container container--narrow">
     <p class="eyebrow">Send a message</p>
     <h1>Let&#39;s bake<br/><em>something good.</em></h1>
-    <p class="page-hero__lede">Tell me what you have in mind — the date, the rough numbers, and any pictures or boards you&#39;ve been collecting. I&#39;ll be back within a day.</p>
+    <p class="page-hero__lede">Tell me what you have in mind, when you need it, rough guest numbers, and any inspiration you&#39;ve saved. I usually reply within a day, Monday to Saturday.</p>
   </div>
 </section>
 
@@ -275,6 +275,7 @@
       <form id="enquiryForm" class="enquiry-form">
         <p class="wedding-section__eyebrow" style="text-align:left;">Enquiry form</p>
         <h2 class="enquiry-form__heading">Tell me about it.</h2>
+        <p class="intro-p" style="text-align:left; margin-top: 0;">Send the details below and your enquiry will go straight to Helen's inbox.</p>
 
         <div class="field-row">
           <div class="field"><label>Your name</label><input type="text" name="name" required placeholder="Helen Smith"/></div>
@@ -310,8 +311,13 @@
           <textarea name="message" placeholder="Venue, flavours you love, colour scheme, Pinterest links — the more the better." required></textarea>
         </div>
 
+        <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none;" aria-hidden="true">
+          <label>Leave this empty</label>
+          <input type="text" name="website" tabindex="-1" autocomplete="off"/>
+        </div>
+
         <div class="enquiry-form__footer">
-          <small class="enquiry-form__note">Replies within 24 hrs · Mon–Sat</small>
+          <small class="enquiry-form__note">Sent direct to Helen · Replies within 24 hrs · Mon–Sat</small>
           <button type="submit" class="btn">Send enquiry</button>
         </div>
       </form>
@@ -366,9 +372,10 @@
 
 </main>
 
-<div id="toast">Thank you ✿ Helen will reply within a day.</div>
+<div id="toast" role="status" aria-live="polite">Thank you. Helen has your enquiry and will reply within a day.</div>
 
 <script>
+  const CONTACT_ENDPOINT = 'https://rvokskoevmcekkgiglpa.supabase.co/functions/v1/contact-enquiry';
   const FAQS = [
     ["How far in advance should I order a wedding cake?", "I usually take wedding bookings 4–9 months out for peak summer dates, but I'll always try to fit you in if I can — even short notice. For celebration cakes, 2–3 weeks is ideal."],
     ["Can you do gluten-free or vegan?", "Yes — most of my cakes can be adapted. Just mention it in the enquiry and I'll send the GF/V options for that design."],
@@ -387,10 +394,48 @@
 
   document.getElementById('enquiryForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
     const t = document.getElementById('toast');
-    t.classList.add('show');
-    e.target.reset();
-    setTimeout(() => t.classList.remove('show'), 4000);
+    const payload = {
+      name: String(data.get('name') || '').trim(),
+      email: String(data.get('email') || '').trim(),
+      phone: String(data.get('phone') || '').trim(),
+      date: String(data.get('date') || '').trim(),
+      type: String(data.get('type') || '').trim(),
+      guests: String(data.get('guests') || '').trim(),
+      message: String(data.get('message') || '').trim(),
+      website: String(data.get('website') || '').trim(),
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    fetch(CONTACT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(async (resp) => {
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok) {
+          throw new Error(json.error || `HTTP ${resp.status}`);
+        }
+        t.textContent = 'Thank you. Helen has your enquiry and will reply within a day.';
+        t.classList.add('show');
+        form.reset();
+      })
+      .catch((err) => {
+        console.error('[contact enquiry]', err);
+        t.textContent = "Sorry, something went wrong. Please email blossombakedgoods@gmail.com directly.";
+        t.classList.add('show');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send enquiry';
+        setTimeout(() => t.classList.remove('show'), 5000);
+      });
   });
 </script>
 

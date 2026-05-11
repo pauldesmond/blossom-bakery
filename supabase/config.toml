@@ -6,3 +6,6 @@
 
 [functions.publish-draft]
 verify_jwt = false
+
+[functions.contact-enquiry]
+verify_jwt = false
