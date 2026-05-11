@@ -201,6 +201,7 @@ section.alt { background: #fff; }
 @media (max-width: 600px) { .flavour-list { columns: 1; } }
 .flavour-list li { padding: 6px 0; list-style: none; break-inside: avoid; color: var(--muted); }
 .flavour-list li strong { color: var(--ink); font-weight: 600; }
+.flavour-list__tag { display: inline-block; margin-left: 6px; padding: 1px 8px; font-size: 0.75rem; letter-spacing: 0.04em; color: var(--rose-dark, #8c5a5a); border: 1px solid var(--border); border-radius: 999px; white-space: nowrap; vertical-align: middle; }
 
 /* Footer */
 .site-footer { background: var(--ink); color: #ddd; padding: 80px 0 36px; margin-top: 0; }
