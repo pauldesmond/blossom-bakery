@@ -558,6 +558,21 @@ function App() {
     + (draft.newPages || []).length;
   const pageStyles = (draft.styles || {})[activePageId] || {};
 
+  // Step font-size up/down through TEXT_SIZES (skipping the "default" slot).
+  // Driven by the A−/A+ buttons in the inspector format row — gives Helen
+  // a one-tap nudger instead of opening the full size palette below.
+  function stepFontSize(direction) {
+    if (!selection || selection.type !== 'text') return;
+    const cur = selection.fontSize || null;
+    const realSizes = TEXT_SIZES.filter(s => s.value !== null);
+    const idx = realSizes.findIndex(s => s.value === cur);
+    // If no explicit override yet, treat the current size as "Body" so
+    // pressing A+ jumps to Subhead, not to Display.
+    const baseIdx = idx === -1 ? realSizes.findIndex(s => s.id === 'md') : idx;
+    const next = Math.max(0, Math.min(realSizes.length - 1, baseIdx + direction));
+    setSelectionStyle('fontSize', realSizes[next].value);
+  }
+
   // Send a format command to the active edit inside the iframe. Used by
   // the inspector B/I/U/list/table buttons — Helen on iPad has no Cmd
   // keyboard shortcut, so all formatting routes through here. The iframe
@@ -1310,6 +1325,9 @@ function App() {
                 <button type="button" className={'fmt-btn' + (selection.fmt?.bold ? ' active' : '')} onClick={() => sendFormat('bold')} title="Bold"><b>B</b></button>
                 <button type="button" className={'fmt-btn' + (selection.fmt?.italic ? ' active' : '')} onClick={() => sendFormat('italic')} title="Italic"><i>I</i></button>
                 <button type="button" className={'fmt-btn' + (selection.fmt?.underline ? ' active' : '')} onClick={() => sendFormat('underline')} title="Underline"><u>U</u></button>
+                <span className="fmt-sep"></span>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepFontSize(-1)} title="Smaller">A−</button>
+                <button type="button" className="fmt-btn fmt-btn--mini" onClick={() => stepFontSize(1)} title="Larger">A+</button>
                 <span className="fmt-sep"></span>
                 <button type="button" className={'fmt-btn' + (selection.fmt?.inList ? ' active' : '')} onClick={() => sendFormat('bulletList')} title="Bullet list">• List</button>
                 <span className="fmt-sep"></span>
