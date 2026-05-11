@@ -35,6 +35,15 @@ on:
 permissions:
   contents: write
 
+# Serialise publishes. Two rapid clicks (or two concurrent _drafts/
+# stagings from the edge function) used to race: each workflow checked
+# out the same SHA, applied its draft, then only the first push won
+# — the loser got rejected with "fetch first" and silently dropped its
+# changes. Grouped runs queue and execute in order, last draft wins.
+concurrency:
+  group: apply-helen-draft
+  cancel-in-progress: false
+
 jobs:
   apply:
     if: ${{ inputs.revert_sha == '' }}
@@ -85,7 +94,16 @@ jobs:
           MSG="${{ inputs.message }}"
           [ -z "$MSG" ] && MSG="helen's edits"
           git commit -m "publish: $MSG"
-          git push
+          # Belt-and-braces against remote drift between checkout and push.
+          # Concurrency block above usually prevents this race, but other
+          # commit sources (linter auto-commits, manual pushes by Paul)
+          # could still move origin/main during a run. --rebase replays
+          # our publish commit on top of whatever landed in the meantime.
+          for attempt in 1 2 3; do
+            if git push; then break; fi
+            echo "push attempt $attempt rejected — rebasing on origin/main"
+            git pull --rebase origin main
+          done
 
   revert:
     if: ${{ inputs.revert_sha != '' }}
@@ -118,4 +136,10 @@ jobs:
             echo "::error::git revert failed. Probable conflict — needs manual resolution."
             exit 1
           fi
-          git push
+          # Same rebase-on-rejected pattern as the apply job — revert
+          # commits also need to survive concurrent main movement.
+          for attempt in 1 2 3; do
+            if git push; then break; fi
+            echo "push attempt $attempt rejected — rebasing on origin/main"
+            git pull --rebase origin main
+          done
