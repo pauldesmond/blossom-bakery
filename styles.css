@@ -976,3 +976,9 @@ img[src*="_add-photo.svg"] { display: none; }
 .review-card__author { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; border-top: 1px solid var(--border); }
 .review-card__author strong { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; font-size: 1.05rem; color: var(--ink); }
 .review-card__author span { font-size: 0.7rem; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); }
+/* Hide unfilled placeholder testimonial cards on the public site —
+   Helen sees and taps them inside the editor (the editor's IFRAME_CSS
+   override re-shows them via display: flex !important). Once she
+   types into the quote, :has(.review-card__quote:empty) stops
+   matching and the card becomes visible on the live page. */
+.review-card:has(.review-card__quote:empty) { display: none; }

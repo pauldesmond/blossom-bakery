@@ -86,6 +86,12 @@ const IFRAME_CSS = `
      real photo, the src changes and this rule no longer applies.
      Covers both gallery placeholders and in-prose ones. */
   img[src*="_add-photo.svg"] { display: block !important; }
+  /* Same pattern for empty testimonial cards on customer-reviews.html:
+     production CSS hides .review-card whose quote is empty, but the
+     editor must show them so Helen can tap and fill. Once she types
+     into the quote, :has(:empty) stops matching and both production
+     and editor render the card normally. */
+  .review-card:has(.review-card__quote:empty) { display: flex !important; }
 `;
 
 // ──────────────────────────────────────────────────────────────────
