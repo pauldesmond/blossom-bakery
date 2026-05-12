@@ -16,6 +16,12 @@
 <style>
     .wb-gallery { max-width: 1100px; margin: 32px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .wb-gallery img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; display: block; }
+    /* Keep "Tap to add photo" placeholders hidden on the public site —
+       without this the inline display:block above overrides the global
+       img[src*="_add-photo.svg"] { display: none } from styles.css (same
+       specificity, inline wins on source order). Editor's IFRAME_CSS
+       still injects display:block !important so Helen sees them in-editor. */
+    .wb-gallery img[src*="_add-photo.svg"] { display: none; }
     @media (max-width: 760px) { .wb-gallery { grid-template-columns: repeat(2, 1fr); } }
 
     .treat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 32px; max-width: 640px; margin: 32px auto 0; }
@@ -286,6 +292,8 @@
 <img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=wbakes-stand-1"/>
 <img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=wbakes-stand-2"/>
 <img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=wbakes-stand-3"/>
+<img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=wbakes-stand-4"/>
+<img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=wbakes-stand-5"/>
 </div>
 </div>
 </section>
