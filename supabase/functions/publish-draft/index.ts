@@ -131,7 +131,7 @@ serve(async (req) => {
     return json({ ok: true, newSrc: newPath });
   }
 
-  const inputs: Record<string, string> = { draft_path: "", message: "", revert_sha: "" };
+  const inputs: Record<string, string> = { draft_path: "", draft_sha: "", message: "", revert_sha: "" };
 
   if (body.revertSha) {
     if (!/^[0-9a-f]{7,40}$/i.test(body.revertSha)) {
@@ -180,7 +180,22 @@ serve(async (req) => {
       const text = await writeResp.text();
       return json({ ok: false, error: "Failed to stage draft.", details: text.slice(0, 500) }, 502);
     }
+    // Capture the stage commit SHA from the Contents API response so we
+    // can pin the workflow's wait-for-stage step to this exact commit.
+    // Without it the workflow falls back to file-existence polling on main,
+    // which works but is slightly slower; with it the workflow blocks on
+    // an `is-ancestor` check that resolves the moment GH's git replicas
+    // catch up. Defeats the replication-lag race that produced the
+    // "draft_path not found in repo" failures observed 11–12 May 2026.
+    let stageSha = "";
+    try {
+      const writeData = await writeResp.json();
+      stageSha = String(writeData?.commit?.sha ?? "");
+    } catch {
+      // Fall back to legacy main-polling path; the workflow handles it.
+    }
     inputs.draft_path = draftPath;
+    inputs.draft_sha = stageSha;
     inputs.message = String(body.message ?? "").slice(0, 200);
   }
 

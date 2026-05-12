@@ -19,6 +19,10 @@ on:
         description: 'Path to a staged draft JSON inside the repo'
         required: false
         default: ''
+      draft_sha:
+        description: 'Stage commit SHA — pin checkout to this commit to defeat GH replication-lag races'
+        required: false
+        default: ''
       draft_b64:
         description: 'Base64 of the draft JSON (legacy path)'
         required: false
@@ -58,12 +62,43 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install pyyaml beautifulsoup4
+      # Wait for the stage commit to be visible on main before reading
+      # the draft. The edge function commits the draft via the Contents
+      # API and dispatches this workflow ~milliseconds later; GitHub's
+      # internal replication can briefly leave the runner's git tier
+      # one SHA behind. Without this retry, the next step's file check
+      # races the replication and fails 1-3% of the time.
+      #
+      # When draft_sha is passed (post-2026-05-12 edge function): block
+      # until that exact commit is an ancestor of main. When it isn't
+      # passed (legacy): block until the named file appears.
+      - name: Wait for stage commit to land
+        if: ${{ inputs.draft_path != '' }}
+        run: |
+          for i in 1 2 3 4 5; do
+            if [ -n "${{ inputs.draft_sha }}" ]; then
+              if git merge-base --is-ancestor ${{ inputs.draft_sha }} HEAD 2>/dev/null; then
+                echo "stage commit ${{ inputs.draft_sha }} visible on main (attempt $i)"
+                break
+              fi
+              echo "stage commit not yet on main — fetching (attempt $i)"
+            else
+              if [ -f "${{ inputs.draft_path }}" ]; then
+                echo "draft visible on main (attempt $i)"
+                break
+              fi
+              echo "draft file not yet visible — fetching (attempt $i)"
+            fi
+            git fetch origin main
+            git reset --hard origin/main
+            sleep 3
+          done
       - name: Resolve draft (file path or base64 input)
         run: |
           mkdir -p /tmp/blossom
           if [ -n "${{ inputs.draft_path }}" ]; then
             if [ ! -f "${{ inputs.draft_path }}" ]; then
-              echo "::error::draft_path '${{ inputs.draft_path }}' not found in repo"
+              echo "::error::draft_path '${{ inputs.draft_path }}' not found in repo (after replication retry)"
               exit 1
             fi
             cp "${{ inputs.draft_path }}" /tmp/blossom/draft.json
