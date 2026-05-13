@@ -188,9 +188,10 @@ section.alt { background: #fff; }
 .photo-grid img:hover { transform: scale(1.02); }
 
 /* Product page (e.g. wedding cakes) */
-.page-hero { padding: 56px 0 32px; text-align: center; }
+.page-hero { padding: clamp(80px, 10vw, 140px) 0 clamp(48px, 6vw, 80px); text-align: center; }
 .page-hero .eyebrow { font-size: 0.78rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
-.page-hero h1 { font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 500; margin-top: 8px; }
+.page-hero .eyebrow:empty { display: none; }
+.page-hero h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: var(--fs-display); font-weight: 400; letter-spacing: -0.035em; line-height: 0.95; color: var(--ink); max-width: 14ch; margin: 8px auto 0; }
 .page-hero p.subtitle { font-size: 1.1rem; color: var(--muted); margin-top: 14px; max-width: 620px; margin-left: auto; margin-right: auto; }
 
 .feature-list { list-style: none; padding: 0; max-width: 620px; margin: 0 auto; }
@@ -321,8 +322,11 @@ section.alt { background: #fff; }
 .tea-card__thumbs { display: flex; gap: 6px; margin-top: 8px; }
 .tea-card__thumbs img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; }
 
-.intro-p { font-size: 1.02rem; color: var(--ink); line-height: 1.8; margin-bottom: 14px; }
+.intro-p { font-size: 1.25rem; color: var(--ink); line-height: 1.75; margin-bottom: 14px; max-width: 640px; margin-left: auto; margin-right: auto; text-align: center; }
 .intro-p:last-child { margin-bottom: 0; }
+.intro-p:empty { display: none; }
+/* Contact form intro is left-aligned + body-sized */
+.enquiry-form .intro-p { font-size: 1.02rem; text-align: left; max-width: none; margin-left: 0; margin-right: 0; }
 
 /* Everyday Cakes — twelve-flavour grid cards (speciality-and-everyday-cakes.html) */
 .cake-card__name { font-size: 28px; text-align: center; }
