@@ -422,9 +422,15 @@ def render_page(filename, title, eyebrow, intro, images):
       </div>
     </section>''')
         else:
+            # Split on blank lines so paragraph breaks in the YAML
+            # actually become separate <p> tags. Otherwise the whole
+            # intro renders as one wall of text and the \n\n inside
+            # is collapsed to whitespace by HTML.
+            paragraphs = [p.strip() for p in body.split('\n\n') if p.strip()]
+            ps = '\n        '.join(f'<p class="intro-p">{p}</p>' for p in paragraphs)
             blocks.append(f'''<section>
       <div class="container container--narrow">
-        <p class="intro-p">{body}</p>
+        {ps}
       </div>
     </section>''')
     if images:
