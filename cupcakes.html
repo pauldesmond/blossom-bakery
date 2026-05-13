@@ -248,15 +248,15 @@
 <div class="container">
 <p class="cup-eyebrow cup-eyebrow--center">Hand-piped boxes</p>
 <h1 class="cup-hero__title">Cupcakes<br/><em></em></h1>
+<img alt="Hand-piped cupcakes by Blossom Bakery, Chelmsford" loading="lazy" src="images/img_4411.jpeg" width="3024" height="4032" style="display:block; width:100%; max-width:620px; margin:32px auto 0; border-radius:8px; aspect-ratio:1/1; object-fit:cover"/>
 <p class="cup-hero__lede"></p>
-<div class="cup-hero__cta"><a class="cup-btn" href="#boxConfig">Build your box</a></div>
 </div>
 </section>
 <!-- INTRO + BOUQUETS -->
 <section class="cup-intro-section" style="padding: clamp(48px, 7vw, 96px) 0; background: var(--cream)">
 <div class="container container--narrow">
 <p style="max-width: 620px; margin: 0 auto 20px; text-align: center">Cupcakes are fantastic for all sorts of occasions and a lovely way to share some happiness around. Ideal as gifts for friends and family, and perfect for children's birthday parties. <br/><br/>Choose from our wide range of designs and delicious flavours — all our cupcakes can be made gluten-free or dairy-free on request, and selected designs are available for vegan diets.<br/><br/></p>
-<p style="font-size: 18px; line-height: 1.75; color: var(--ink); max-width: 620px; margin: 0 auto">All cupcakes come in gift boxes of six, twelve, eighteen or twenty-four. Prices start from <strong>£20</strong> for a box of six and rise with the design and detail.</p>
+<p style="font-size: 18px; line-height: 1.75; color: var(--ink); max-width: 620px; margin: 0 auto; text-align: center">All cupcakes come in gift boxes of six, twelve, eighteen or twenty-four. Prices start from <strong>£20</strong> for a box of six and increase in price according to the design and detail.</p>
 <div class="cup-section-head" style="margin-top: 56px; text-align: center">
 <div>
 <p class="cup-eyebrow cup-eyebrow--center"></p>
@@ -267,88 +267,6 @@
 <p style="text-align: center; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--ink); margin-top: 24px"><strong></strong> · <strong></strong></p>
 </div>
 </section>
-<!-- BOX BUILDER -->
-<section class="cup-builder-section">
-<div class="container">
-<div class="cup-builder" id="boxConfig">
-<div class="cup-builder__form">
-<p class="cup-eyebrow">Build your box</p>
-<h2 class="cup-builder__heading">Mix &amp; match.</h2>
-<p class="cup-builder__intro">Pick a size, a finish and a dietary option — we'll do the rest.</p>
-<div class="cup-builder__group">
-<div class="cup-builder__label">Box size</div>
-<div class="cup-chips" id="sizes">
-<button data-size="6">6</button>
-<button class="on" data-size="12">12</button>
-<button data-size="18">18</button>
-<button data-size="24">24</button>
-</div>
-</div>
-<div class="cup-builder__group">
-<div class="cup-builder__label">Finish</div>
-<div class="cup-chips" id="finish">
-<button class="on">Classic swirl</button>
-<button>Buttercream rose</button>
-<button>Iced topper</button>
-<button>Bouquet style</button>
-</div>
-</div>
-<div class="cup-builder__group">
-<div class="cup-builder__label">Dietary</div>
-<div class="cup-chips" id="diet">
-<button class="on">Standard</button>
-<button>Gluten-free</button>
-<button>Vegan</button>
-</div>
-</div>
-<div class="cup-builder__summary">
-<div>
-<div class="cup-builder__label">Your box</div>
-<div class="cup-builder__pick"><span id="summary"></span></div>
-</div>
-<a class="cup-btn cup-btn--rose" id="boxOrderBtn" href="contact.html">Send this enquiry</a>
-</div>
-</div>
-<div class="cup-builder__preview">
-<img alt="Cupcake box preview" id="boxPreview" src="images/img_4411.jpeg" width="3024" height="4032"/>
-</div>
-</div>
-</div>
-</section>
-<script>
-  (function(){
-    const BOX_IMAGES = {
-      "Classic swirl":   "images/img_4411.jpeg",
-      "Buttercream rose":"images/cupcake-877b.jpeg",
-      "Iced topper":     "images/cupcake-d34e.jpeg",
-      "Bouquet style":   "images/img_9856.jpeg",
-    };
-    let size = 12, finishLabel = "Classic swirl", dietLabel = "";
-    function calc(){
-      const parts = [size + ' cupcakes', finishLabel];
-      if (dietLabel && dietLabel !== "Standard") parts.push(dietLabel);
-      const summary = parts.join(' · ');
-      document.getElementById('summary').textContent = summary;
-      const img = BOX_IMAGES[finishLabel] || BOX_IMAGES["Classic swirl"];
-      document.getElementById('boxPreview').src = img;
-      const btn = document.getElementById('boxOrderBtn');
-      if (btn) btn.href = 'contact.html?box=' + encodeURIComponent(summary);
-    }
-    function wire(groupId, onPick){
-      const g = document.getElementById(groupId);
-      g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-        g.querySelectorAll('button').forEach(x => x.classList.remove('on'));
-        b.classList.add('on');
-        onPick(b);
-        calc();
-      }));
-    }
-    wire('sizes',  b => { size = parseInt(b.dataset.size); });
-    wire('finish', b => { finishLabel = b.textContent; });
-    wire('diet',   b => { dietLabel  = b.textContent; });
-    calc();
-  })();
-</script>
 <!-- GALLERY -->
 <section class="cup-gallery-section">
 <div class="container">
@@ -367,6 +285,9 @@
 <figure class="cup-card cup-card--small"><div class="cup-card__photo"><img alt="Cupcakes by Blossom Bakery, Chelmsford" loading="lazy" src="images/img_9911.jpeg" width="4032" height="3024"/></div></figure>
 <figure class="cup-card cup-card--small"><div class="cup-card__photo"><img alt="Cupcakes by Blossom Bakery, Chelmsford" loading="lazy" src="images/cupcake-5335.jpeg" width="3024" height="3780"/></div></figure>
 <figure class="cup-card cup-card--small"><div class="cup-card__photo"><img alt="Cupcakes by Blossom Bakery, Chelmsford" loading="lazy" src="images/img_1732.jpeg" width="3834" height="3024"/></div></figure>
+<figure class="cup-card cup-card--feature"><div class="cup-card__photo"><img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=cup-feature-4"/></div></figure>
+<figure class="cup-card cup-card--feature"><div class="cup-card__photo"><img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=cup-feature-5"/></div></figure>
+<figure class="cup-card cup-card--feature"><div class="cup-card__photo"><img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot=cup-feature-6"/></div></figure>
 </div>
 </div>
 </section>
@@ -418,6 +339,7 @@
 </ul>
 </div>
 <div>
+<h4>Additional Information</h4>
 <p><a href="mailto:blossombakedgoods@gmail.com">blossombakedgoods@gmail.com</a><br/>07939 618787</p>
 <p style="margin-top: 12px">Monday-Friday 9am-5pm<br/>Saturday 9am-12pm</p>
 <p style="margin-top: 12px"><a href="https://search.google.com/local/reviews?placeid=ChIJzcfuM0jp2EcRucu7NgmACCw" rel="noopener" target="_blank" style="color: inherit">★ Google reviews</a></p>
