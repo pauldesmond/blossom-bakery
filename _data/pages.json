@@ -213,12 +213,12 @@
     {
       "id": "two-tier-cakes",
       "file": "two-tier-cakes.html",
-      "label": "Two Tier Cakes",
+      "label": "Two-Tier Cakes",
       "published": true,
       "generated": false,
       "nav": {
         "section": "cakes",
-        "label": "Two Tier Cakes",
+        "label": "Two-Tier Cakes",
         "order": 60,
         "note": "Two-tier - celebration"
       }
