@@ -10,6 +10,9 @@
  */
 (function () {
   'use strict';
+  // Editor loads pages in an iframe; skip analytics + banner there so Helen
+  // isn't blocked by the consent dialog when adding photos.
+  try { if (window.self !== window.top) return; } catch (e) { return; }
   var GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; // TODO: replace with real GA4 ID
   var STORAGE_KEY = 'blossom-cookie-consent';
   var d = document;
