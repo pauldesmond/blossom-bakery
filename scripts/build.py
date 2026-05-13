@@ -182,6 +182,38 @@ HEADER_TPL = '''<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {{
+    "@context": "https://schema.org",
+    "@type": "Bakery",
+    "@id": "https://myblossombakery.co.uk/#bakery",
+    "name": "Blossom Bakery",
+    "alternateName": "Blossom Bakery Chelmsford",
+    "description": "Bespoke wedding cakes, celebration cakes, cupcakes, hand-iced biscuits, tray bakes and afternoon teas — handmade by Helen Desmond in Great Baddow, Chelmsford. Gluten-free, dairy-free and vegan options available.",
+    "url": "https://myblossombakery.co.uk/",
+    "image": "https://myblossombakery.co.uk/images/helen-portrait.webp",
+    "logo": "https://myblossombakery.co.uk/images/blossom_logo.png",
+    "telephone": "+44 7939 618787",
+    "email": "blossombakedgoods@gmail.com",
+    "address": {{ "@type": "PostalAddress", "addressLocality": "Great Baddow, Chelmsford", "addressRegion": "Essex", "postalCode": "CM2", "addressCountry": "GB" }},
+    "geo": {{ "@type": "GeoCoordinates", "latitude": 51.7138, "longitude": 0.4994 }},
+    "areaServed": [{{ "@type": "City", "name": "Chelmsford" }}, {{ "@type": "AdministrativeArea", "name": "Essex" }}],
+    "priceRange": "££",
+    "founder": {{ "@type": "Person", "@id": "https://myblossombakery.co.uk/about.html#helen", "name": "Helen Desmond", "jobTitle": "Founder & Baker", "image": "https://myblossombakery.co.uk/images/helen-portrait.webp" }},
+    "sameAs": ["https://www.instagram.com/blossombakery_chelmsford/", "https://www.facebook.com/blossombakedgoods"],
+    "aggregateRating": {{ "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "60", "bestRating": "5", "worstRating": "1" }}
+  }}
+  </script>
+  <script type="application/ld+json">
+  {{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://myblossombakery.co.uk/#website",
+    "url": "https://myblossombakery.co.uk/",
+    "name": "Blossom Bakery",
+    "publisher": {{ "@id": "https://myblossombakery.co.uk/#bakery" }}
+  }}
+  </script>{page_schema}
 </head>
 <body>
   <header class="site-header">
@@ -198,6 +230,41 @@ HEADER_TPL = '''<!DOCTYPE html>
   </header>
 
   <main>'''
+
+# Per-page schema injected by render_page. Empty by default; about/scones
+# get a richer block (Person for Helen on /about, Service on /scones).
+PAGE_SCHEMA_TPL = {
+    'about': '''
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": "https://myblossombakery.co.uk/about.html#profile",
+    "mainEntity": {
+      "@type": "Person",
+      "@id": "https://myblossombakery.co.uk/about.html#helen",
+      "name": "Helen Desmond",
+      "jobTitle": "Founder & Baker",
+      "worksFor": { "@id": "https://myblossombakery.co.uk/#bakery" },
+      "image": "https://myblossombakery.co.uk/images/helen-portrait.webp",
+      "sameAs": ["https://www.instagram.com/blossombakery_chelmsford/", "https://www.facebook.com/blossombakedgoods"],
+      "description": "Helen Desmond is the founder and baker behind Blossom Bakery in Great Baddow, Chelmsford. Specialises in bespoke wedding cakes, celebration cakes, hand-iced biscuits, cupcakes, tray bakes and afternoon teas, with gluten-free, dairy-free and vegan options available."
+    }
+  }
+  </script>''',
+    'scones': '''
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": "https://myblossombakery.co.uk/scones.html#service",
+    "serviceType": "Scones and cream tea bakes",
+    "name": "Scones",
+    "description": "Classic scones by Blossom Bakery in Chelmsford — plain and fruit, cream-tea ready. Made by Helen Desmond.",
+    "provider": { "@id": "https://myblossombakery.co.uk/#bakery" }
+  }
+  </script>''',
+}
 
 # Block-level tags from the rich-text allow-list. When intro markup
 # contains any of these we can't put it inside a <p>, because that
@@ -329,8 +396,11 @@ def _sanitise_intro(intro: str) -> str:
 def render_page(filename, title, eyebrow, intro, images):
     description = f'{title} from Blossom Bakery in Chelmsford. Homemade by Helen Desmond.'
     og_image = f'images/{images[0]}' if images else 'images/blossom_logo.png'
+    slug = filename.replace('.html', '')
+    page_schema = PAGE_SCHEMA_TPL.get(slug, '')
     head = HEADER_TPL.format(title=title, description=description, filename=filename,
-                             og_image=og_image, nav=render_nav(filename))
+                             og_image=og_image, nav=render_nav(filename),
+                             page_schema=page_schema)
     blocks = [hero_html(eyebrow, title)]
     if intro and len(intro.strip()) > 30:
         body = _sanitise_intro(intro)
