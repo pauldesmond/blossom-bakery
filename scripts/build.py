@@ -206,7 +206,7 @@ HEADER_TPL = '''<!DOCTYPE html>
     "areaServed": [{{ "@type": "City", "name": "Chelmsford" }}, {{ "@type": "AdministrativeArea", "name": "Essex" }}],
     "priceRange": "££",
     "founder": {{ "@type": "Person", "@id": "https://myblossombakery.co.uk/about.html#helen", "name": "Helen Desmond", "jobTitle": "Founder & Baker", "image": "https://myblossombakery.co.uk/images/helen-portrait.webp" }},
-    "sameAs": ["https://www.instagram.com/blossombakery_chelmsford/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
+    "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
     "aggregateRating": {{ "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "60", "bestRating": "5", "worstRating": "1" }}
   }}
   </script>
@@ -255,7 +255,7 @@ PAGE_SCHEMA_TPL = {
       "jobTitle": "Founder & Baker",
       "worksFor": { "@id": "https://myblossombakery.co.uk/#bakery" },
       "image": "https://myblossombakery.co.uk/images/helen-portrait.webp",
-      "sameAs": ["https://www.instagram.com/blossombakery_chelmsford/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
+      "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
       "description": "Helen Desmond is the founder and baker behind Blossom Bakery in Great Baddow, Chelmsford. Specialises in bespoke wedding cakes, celebration cakes, hand-iced biscuits, cupcakes, tray bakes and afternoon teas, with gluten-free, dairy-free and vegan options available."
     }
   }
