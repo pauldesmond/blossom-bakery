@@ -1,5 +1,5 @@
 {
-  "_comment": "Canonical page registry. Read by edit-blossom/editor-app.jsx (fetched at runtime), scripts/apply-draft.py (read at run), and scripts/build.py (renders the site nav from this file). When you add or rename a page, edit it HERE and only here. The 'generated' flag must match scripts/build.py's PAGE_META exactly. If you add a page to PAGE_META, also flip its generated flag to true here — and confirm the YAML's content reflects what's currently on the live HTML, or the next build will overwrite it. The 'nav' field controls site-nav placement: omit it to hide a page from the menu; topLevel=true puts it on the main bar; pages sharing a 'section' key form a dropdown, and the topLevel page within a section is the dropdown's parent link.",
+  "_comment": "Canonical page registry. Read by edit-blossom/editor-app.jsx (fetched at runtime), scripts/apply-draft.py (read at run), and scripts/build.py (renders the site nav from this file). When you add or rename a page, edit it HERE and only here. The 'generated' flag must match scripts/build.py's PAGE_META exactly. If you add a page to PAGE_META, also flip its generated flag to true here \u2014 and confirm the YAML's content reflects what's currently on the live HTML, or the next build will overwrite it. The 'nav' field controls site-nav placement: omit it to hide a page from the menu; topLevel=true puts it on the main bar; pages sharing a 'section' key form a dropdown, and the topLevel page within a section is the dropdown's parent link.",
   "pages": [
     {
       "id": "index",
@@ -40,7 +40,7 @@
       "nav": {
         "section": "cakes",
         "label": "Drip Cakes",
-        "note": "Modern · glossy",
+        "note": "Modern \u00b7 glossy",
         "order": 20
       }
     },
@@ -136,7 +136,7 @@
       "generated": false,
       "nav": {
         "section": "bakes",
-        "label": "Tray bakes",
+        "label": "Tray Bakes",
         "note": "Catering & sharing",
         "order": 20
       }
@@ -187,7 +187,7 @@
       "generated": false,
       "nav": {
         "topLevel": true,
-        "label": "Afternoon tea",
+        "label": "Afternoon Tea",
         "sectionOrder": 5
       }
     },
