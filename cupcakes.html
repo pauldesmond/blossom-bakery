@@ -250,7 +250,7 @@
 <p class="cup-eyebrow cup-eyebrow--center">Hand-piped boxes</p>
 <h1 class="cup-hero__title">Cupcakes<br/><em></em></h1>
 <p class="cup-hero__lede"></p>
-<div class="cup-hero__cta"><a class="cup-btn" href="contact.html">Order yours</a></div>
+<div class="cup-hero__cta"><a class="cup-btn" href="#boxConfig">Build your box</a></div>
 </div>
 </section>
 <!-- INTRO + BOUQUETS -->
@@ -307,6 +307,7 @@
 <div class="cup-builder__label">Your box</div>
 <div class="cup-builder__pick"><span id="summary"></span></div>
 </div>
+<a class="cup-btn cup-btn--rose" id="boxOrderBtn" href="contact.html">Send this enquiry</a>
 </div>
 </div>
 <div class="cup-builder__preview">
@@ -327,9 +328,12 @@
     function calc(){
       const parts = [size + ' cupcakes', finishLabel];
       if (dietLabel && dietLabel !== "Standard") parts.push(dietLabel);
-      document.getElementById('summary').textContent = parts.join(' · ');
+      const summary = parts.join(' · ');
+      document.getElementById('summary').textContent = summary;
       const img = BOX_IMAGES[finishLabel] || BOX_IMAGES["Classic swirl"];
       document.getElementById('boxPreview').src = img;
+      const btn = document.getElementById('boxOrderBtn');
+      if (btn) btn.href = 'contact.html?box=' + encodeURIComponent(summary);
     }
     function wire(groupId, onPick){
       const g = document.getElementById(groupId);

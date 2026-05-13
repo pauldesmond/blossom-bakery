@@ -372,6 +372,21 @@
           });
         })();
       </script>
+      <script>
+        // Prefill the message textarea if the user arrives from the cupcake
+        // configurator (?box=...) — keeps Helen's enquiry inbox tidy by
+        // making the customer's selection the first line of their message.
+        (function() {
+          const params = new URLSearchParams(window.location.search);
+          const box = params.get('box');
+          if (!box) return;
+          const ta = document.querySelector('#enquiryForm textarea[name="message"]');
+          if (!ta || ta.value) return;
+          ta.value = "I'd like to order: " + box + "\n\n";
+          ta.focus();
+          ta.setSelectionRange(ta.value.length, ta.value.length);
+        })();
+      </script>
 <!-- SIDEBAR -->
 <aside class="contact-aside">
 <div>
