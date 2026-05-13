@@ -159,15 +159,17 @@ img { max-width: 100%; height: auto; display: block; }
 section { padding: 56px 0; }
 section.alt { background: #fff; }
 
-/* Page rhythm — alternating cream (body default) / paper white to match
+/* Page rhythm — alternating cream (body default) / pure white to match
    the homepage's hero → categories → story cadence. Every other
-   .prose-section and .wedding-section instance flips to --paper. The
-   `body` prefix lifts specificity above section-type classes that
-   manage their own backgrounds (.cup-hero, .section-ink etc), so those
-   stay untouched. */
+   content section flips to #fff (matches the existing `.alt` treatment
+   so cream and white feel like the same brand pairing across the site).
+   The `body` prefix lifts specificity above section-type classes that
+   manage their own backgrounds (.cup-hero, .cup-ink-cta, .section-ink),
+   so those bespoke layouts stay untouched. */
 body main > .prose-section:nth-of-type(even),
-body main > .wedding-section:nth-of-type(even) {
-  background: var(--paper);
+body main > .wedding-section:nth-of-type(even),
+body main > section:not([class]):nth-of-type(even) {
+  background: #fff;
 }
 .section-eyebrow { text-align: center; font-size: 0.78rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
 .section-title { text-align: center; font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 500; margin-bottom: 12px; }
@@ -640,7 +642,7 @@ body main > .wedding-section:nth-of-type(even) {
   font-style: italic; font-weight: 500; color: var(--rose-dark);
 }
 .page-hero-v2__lede {
-  max-width: 480px;
+  max-width: 720px;
   margin: 32px auto 0;
   color: var(--muted);
   font-size: var(--fs-body);
