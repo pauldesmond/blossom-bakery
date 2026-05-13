@@ -420,7 +420,7 @@ def render_page(filename, title, eyebrow, intro, images):
         else:
             blocks.append(f'''<section>
       <div class="container container--narrow">
-        <p style="font-size: 1.05rem; color: var(--ink); line-height: 1.85;">{body}</p>
+        <p class="intro-p">{body}</p>
       </div>
     </section>''')
     if images:
