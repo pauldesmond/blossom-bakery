@@ -25,7 +25,6 @@ PAGE_META = {
     # currently on the live HTML, or the next CI build will overwrite it.
     # ---------------------------------------------------------------------
     'about':                           ('about.html',                         'Meet the baker'),
-    'scones':                          ('scones.html',                        'Classic'),
 }
 
 # ---------------------------------------------------------------------------
@@ -257,18 +256,6 @@ PAGE_SCHEMA_TPL = {
       "sameAs": ["https://www.instagram.com/blossombakery_chelmsford/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
       "description": "Helen Desmond is the founder and baker behind Blossom Bakery in Great Baddow, Chelmsford. Specialises in bespoke wedding cakes, celebration cakes, hand-iced biscuits, cupcakes, tray bakes and afternoon teas, with gluten-free, dairy-free and vegan options available."
     }
-  }
-  </script>''',
-    'scones': '''
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "@id": "https://myblossombakery.co.uk/scones.html#service",
-    "serviceType": "Scones and cream tea bakes",
-    "name": "Scones",
-    "description": "Classic scones by Blossom Bakery in Chelmsford — plain and fruit, cream-tea ready. Made by Helen Desmond.",
-    "provider": { "@id": "https://myblossombakery.co.uk/#bakery" }
   }
   </script>''',
 }
