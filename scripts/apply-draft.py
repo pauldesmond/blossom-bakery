@@ -664,6 +664,78 @@ def heal_empty_cat_card_imgs() -> int:
     return healed
 
 
+# Photo galleries that should always end with at least one empty placeholder
+# slot so Helen can keep adding photos. Each spec: (CSS class, placeholder HTML).
+_GALLERY_PLACEHOLDER_SPECS: list[tuple[str, str]] = [
+    ("photo-grid",  '\n<img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot={slot}"/>'),
+    ("wb-gallery",  '\n<img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot={slot}"/>'),
+    ("cup-gallery", '\n<figure class="cup-card cup-card--feature"><div class="cup-card__photo"><img alt="Add a photo" loading="lazy" src="images/_add-photo.svg?slot={slot}"/></div></figure>'),
+]
+
+
+def _matching_div_close(text: str, open_tag_start: int) -> int:
+    """Return the index of the </div> that balances the <div opening at
+    open_tag_start, or -1 if unbalanced. Walks nested divs explicitly."""
+    gt = text.find('>', open_tag_start)
+    if gt == -1:
+        return -1
+    depth = 1
+    i = gt + 1
+    while i < len(text):
+        nxt_open = text.find('<div', i)
+        nxt_close = text.find('</div>', i)
+        if nxt_close == -1:
+            return -1
+        if nxt_open != -1 and nxt_open < nxt_close:
+            depth += 1
+            i = nxt_open + 4
+        else:
+            depth -= 1
+            if depth == 0:
+                return nxt_close
+            i = nxt_close + 6
+    return -1
+
+
+def ensure_trailing_placeholder_in_galleries() -> int:
+    """For each known photo-gallery class on each page, append an empty
+    placeholder if the gallery has no `_add-photo.svg` slots — so Helen
+    always sees a "tap to add" cell after the last filled one. Idempotent:
+    galleries that already have at least one placeholder are skipped."""
+    added = 0
+    for html_path in sorted(SITE.glob("*.html")):
+        text = html_path.read_text(encoding="utf-8")
+        original = text
+        for cls, tmpl in _GALLERY_PLACEHOLDER_SPECS:
+            pat = re.compile(
+                r'<div\s+[^>]*class="[^"]*\b' + re.escape(cls) + r'\b[^"]*"[^>]*>',
+                re.IGNORECASE,
+            )
+            pos = 0
+            page_added = 0
+            while True:
+                m = pat.search(text, pos)
+                if not m:
+                    break
+                close_start = _matching_div_close(text, m.start())
+                if close_start == -1:
+                    pos = m.end()
+                    continue
+                body = text[m.end():close_start]
+                if "_add-photo.svg" not in body:
+                    slot = f"{cls}-{html_path.stem}-trailing-{added + page_added + 1}"
+                    insert = tmpl.format(slot=slot) + "\n"
+                    text = text[:close_start] + insert + text[close_start:]
+                    page_added += 1
+                    pos = close_start + len(insert) + 6
+                else:
+                    pos = close_start + 6
+            added += page_added
+        if text != original:
+            html_path.write_text(text, encoding="utf-8")
+    return added
+
+
 def sync_cat_grid_for_new_pages(new_page_entries: list[dict]) -> int:
     """Append a cat-card to index.html's .cat-grid for each new page.
     Existing cards are left alone — Paul's hand-crafted ordering wins.
@@ -1077,6 +1149,13 @@ def apply_draft(draft_path: Path) -> None:
     healed = heal_empty_cat_card_imgs()
     if healed:
         print(f"  ✓ homepage cat-grid: re-inserted placeholder on {healed} empty card(s)")
+
+    # After every publish, make sure each photo gallery still ends with an
+    # empty placeholder — if Helen filled the last one this run, append a
+    # new trailing slot so she's never stuck.
+    refilled = ensure_trailing_placeholder_in_galleries()
+    if refilled:
+        print(f"  ✓ galleries: appended {refilled} trailing placeholder(s)")
 
     # ── 3. Page status ─────────────────────────────────────────────
     for page_id, published in page_status.items():
