@@ -324,6 +324,12 @@ section.alt { background: #fff; }
 .intro-p { font-size: 1.02rem; color: var(--ink); line-height: 1.8; margin-bottom: 14px; }
 .intro-p:last-child { margin-bottom: 0; }
 
+/* Everyday Cakes — twelve-flavour grid cards (speciality-and-everyday-cakes.html) */
+.cake-card__name { font-size: 28px; text-align: center; }
+.cake-card__desc { text-align: center; }
+.cake-card__diet { font-size: 17px; }
+.cake-card__price { color: #4a423a; font-size: 28px; }
+
 /* Cupcakes page — box builder, editorial gallery, ordering steps, centred dark CTA */
 .page-hero h1 em { font-style: italic; color: var(--rose-dark); }
 .page-hero__lede { max-width: 560px; margin: 16px auto 24px; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
