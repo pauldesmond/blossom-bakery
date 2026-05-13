@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found — Blossom Bakery</title>
+  <meta name="robots" content="noindex,follow" />
+  <link rel="icon" type="image/png" href="/images/blossom_logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/blossom-analytics.js" defer></script>
+  <style>
+    .not-found { text-align: center; padding: clamp(80px, 12vw, 160px) 0; }
+    .not-found__num { font-family: 'Cormorant Garamond', serif; font-size: clamp(96px, 16vw, 200px); color: var(--rose-dark); line-height: 1; letter-spacing: -0.04em; font-style: italic; }
+    .not-found__title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 4vw, 44px); color: var(--ink); margin: 8px 0 16px; font-weight: 400; }
+    .not-found__lede { font-size: 1.05rem; color: var(--muted); max-width: 480px; margin: 0 auto 32px; line-height: 1.7; }
+    .not-found__back { display: inline-block; padding: 14px 28px; border-radius: 999px; background: var(--rose-dark); color: var(--cream); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.04em; text-decoration: none; transition: background 0.18s; }
+    .not-found__back:hover { background: #b85b5e; }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <div class="container">
+      <div class="site-header__inner">
+        <a href="/index.html" class="site-header__brand">
+          <div class="site-header__name">Blossom Bakery</div>
+          <div class="site-header__tagline">Chelmsford · Essex</div>
+        </a>
+        <a href="/contact.html" class="btn btn--outline btn--pill">Enquire</a>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <section class="not-found">
+      <div class="container container--narrow">
+        <div class="not-found__num">404</div>
+        <h1 class="not-found__title">The cake is in another oven.</h1>
+        <p class="not-found__lede">The page you're looking for has moved or never existed. Head back home and try a different door.</p>
+        <a href="/index.html" class="not-found__back">Back to the homepage</a>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container">
+      <p>© Blossom Bakery · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></p>
+    </div>
+  </footer>
+</body>
+</html>

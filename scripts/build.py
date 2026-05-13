@@ -173,6 +173,7 @@ HEADER_TPL = '''<!DOCTYPE html>
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://myblossombakery.co.uk/{filename}" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://myblossombakery.co.uk/{filename}" />
   <meta property="og:title" content="{title} — Blossom Bakery" />
@@ -214,8 +215,10 @@ HEADER_TPL = '''<!DOCTYPE html>
     "publisher": {{ "@id": "https://myblossombakery.co.uk/#bakery" }}
   }}
   </script>{page_schema}
+  <script src="blossom-analytics.js" defer></script>
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to content</a>
   <header class="site-header">
     <div class="container">
       <div class="site-header__inner">
@@ -229,7 +232,7 @@ HEADER_TPL = '''<!DOCTYPE html>
     </div>
   </header>
 
-  <main>'''
+  <main id="main">'''
 
 # Per-page schema injected by render_page. Empty by default; about/scones
 # get a richer block (Person for Helen on /about, Service on /scones).

@@ -1013,3 +1013,50 @@ img[src*="_add-photo.svg"] { display: none; }
    types into the quote, :has(.review-card__quote:empty) stops
    matching and the card becomes visible on the live page. */
 .review-card:has(.review-card__quote:empty) { display: none; }
+
+/* Skip-to-content link — accessibility nicety for keyboard / screen-reader
+   users. Visible only when focused. */
+.skip-link {
+  position: absolute; left: 0; top: -40px; z-index: 9999;
+  background: var(--ink); color: var(--cream);
+  padding: 10px 18px; border-radius: 0 0 4px 0;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
+  text-decoration: none; letter-spacing: 0.04em;
+  transition: top 0.18s;
+}
+.skip-link:focus { top: 0; outline: 2px solid var(--rose-dark); outline-offset: 2px; }
+
+/* Cookie consent banner — injected by blossom-analytics.js on first visit.
+   Sticky at the bottom on desktop, full-width sheet on mobile. */
+#cookie-banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px;
+  max-width: 720px; margin: 0 auto;
+  background: var(--ink); color: var(--cream);
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex; flex-wrap: wrap; gap: 12px 24px;
+  align-items: center; justify-content: space-between;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  font-family: 'Inter', sans-serif;
+  z-index: 9998;
+  animation: cookie-rise 0.32s ease-out;
+}
+@keyframes cookie-rise { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.cookie-banner__text { font-size: 14px; line-height: 1.55; margin: 0; flex: 1 1 320px; }
+.cookie-banner__text a { color: var(--cream); text-decoration: underline; }
+.cookie-banner__actions { display: flex; gap: 10px; flex-shrink: 0; }
+.cookie-banner__btn {
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  padding: 10px 20px; border-radius: 999px;
+  cursor: pointer; border: 1px solid transparent;
+  letter-spacing: 0.04em;
+  transition: background 0.18s, color 0.18s;
+}
+.cookie-banner__btn--reject { background: transparent; color: var(--cream); border-color: rgba(250,246,240,0.4); }
+.cookie-banner__btn--reject:hover { background: rgba(250,246,240,0.1); }
+.cookie-banner__btn--accept { background: var(--rose-dark); color: var(--cream); }
+.cookie-banner__btn--accept:hover { background: #b85b5e; }
+@media (max-width: 540px) {
+  #cookie-banner { left: 8px; right: 8px; bottom: 8px; padding: 14px 16px; }
+  .cookie-banner__actions { width: 100%; justify-content: flex-end; }
+}
