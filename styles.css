@@ -657,7 +657,25 @@ section.alt { background: #fff; }
 .prose-section__heading:empty,
 .cup-eyebrow:empty,
 .cup-section-head__title:empty,
-.cup-section-head__num:empty {
+.cup-section-head__num:empty,
+.cup-hero__lede:empty,
+.cup-builder__heading:empty,
+.cup-builder__intro:empty,
+.cup-builder__label:empty,
+.cup-step__num:empty,
+.tea-item__numeral:empty,
+.tea-item__name:empty,
+.tea-item__price:empty,
+.tea-item__desc:empty,
+.tea-item__serves:empty,
+.stat__label:empty,
+.stat__num:empty,
+.stat-strip__label:empty,
+.stat-strip__value:empty,
+.info-strip__label:empty,
+.info-strip__value:empty,
+.section-eyebrow:empty,
+.cat-card__meta:empty {
   display: none;
 }
 /* When BOTH children of a prose-section head are empty the head itself
