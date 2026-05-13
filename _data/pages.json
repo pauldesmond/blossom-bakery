@@ -155,6 +155,19 @@
       }
     },
     {
+      "id": "scones",
+      "file": "scones.html",
+      "label": "Scones",
+      "published": true,
+      "generated": true,
+      "nav": {
+        "section": "bakes",
+        "label": "Scones",
+        "note": "Cream-tea ready",
+        "order": 40
+      }
+    },
+    {
       "id": "cupcakes",
       "file": "cupcakes.html",
       "label": "Cupcakes",

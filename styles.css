@@ -644,7 +644,10 @@ section.alt { background: #fff; }
 .page-hero-v2__numeral:empty,
 .page-hero-v2__lede:empty,
 .eyebrow-v2:empty,
-.prose-section__heading:empty {
+.prose-section__heading:empty,
+.cup-eyebrow:empty,
+.cup-section-head__title:empty,
+.cup-section-head__num:empty {
   display: none;
 }
 /* When BOTH children of a prose-section head are empty the head itself
