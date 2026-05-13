@@ -23,11 +23,12 @@
 <style>
     /* Cake cards — flavour grid for the everyday-cakes menu */
     .cake-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1100px; margin: 0 auto; }
-    .cake-card { display: flex; flex-direction: column; gap: 8px; }
+    .cake-grid { align-items: stretch; }
+    .cake-card { display: flex; flex-direction: column; gap: 8px; height: 100%; }
     .cake-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; display: block; }
     .cake-card__name { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 500; color: var(--ink); margin: 8px 0 0; letter-spacing: -0.01em; line-height: 1.2; }
-    .cake-card__desc { font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 0; }
-    .cake-card__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; font-size: 12px; margin: 4px 0 0; line-height: 1.4; }
+    .cake-card__desc { font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 0; flex: 1; }
+    .cake-card__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; font-size: 12px; margin: 8px 0 0; padding-top: 10px; line-height: 1.4; border-top: 1px solid var(--border); }
     .cake-card__diet { font-family: 'Inter', sans-serif; letter-spacing: 0.04em; color: var(--muted); }
     .cake-card__price { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--rose-dark); }
     @media (max-width: 880px) { .cake-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
