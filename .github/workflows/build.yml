@@ -49,7 +49,17 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             git commit -m "build: regenerate HTML from content [skip ci]"
-            git push
+            # Belt-and-braces against remote drift between checkout and
+            # push — busy editing sessions land multiple commits on main
+            # during a single build, so plain `git push` gets rejected
+            # with "fetch first" and the build-failure email goes out
+            # for no real reason. --rebase replays our build commit on
+            # top of whatever landed in the meantime.
+            for attempt in 1 2 3; do
+              if git push; then break; fi
+              echo "push attempt $attempt rejected — rebasing on origin/main"
+              git pull --rebase origin main
+            done
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
