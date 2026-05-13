@@ -621,12 +621,12 @@ body main > section:not([class]):nth-of-type(even) {
   text-align: center;
 }
 .page-hero-v2__numeral {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic; font-weight: 400;
-  font-size: clamp(14px, 1.4vw, 18px);
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  margin-bottom: 28px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
 }
 .page-hero-v2 h1 {
   font-family: 'Cormorant Garamond', Georgia, serif;
