@@ -154,7 +154,7 @@ FOOTER = '''<footer class="site-footer">
         <div>
           <h4>Contact</h4>
           <p>blossombakedgoods@gmail.com<br />07939 618787</p>
-          <p style="margin-top: 12px;">Monday-Friday 9am-5pm<br />Saturday 9am-2pm</p>
+          <p style="margin-top: 12px;">Monday-Friday 9am-5pm<br />Saturday 9am-12pm</p>
         </div>
       </div>
       <div class="site-footer__bottom">
@@ -314,7 +314,7 @@ CTA = '''<section class="alt">
         <p class="section-eyebrow">Order yours</p>
         <h2 class="section-title">Let's bake something for you</h2>
         <p style="margin: 24px 0 8px;"><strong>blossombakedgoods@gmail.com</strong></p>
-        <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-2pm</p>
+        <p style="color: var(--muted);">Mobile: 07939 618787 · Mon-Fri 9am-5pm · Sat 9am-12pm</p>
         <a href="contact.html" class="btn" style="margin-top: 24px;">Send a message</a>
       </div>
     </section>'''
