@@ -442,6 +442,34 @@ def render_page(filename, title, eyebrow, intro, images):
   </main>
 
   {FOOTER}
+  <script>
+  (function(){{
+    document.addEventListener('DOMContentLoaded', function() {{
+      var toggle = document.querySelector('.mobile-toggle');
+      var nav = document.querySelector('.site-nav');
+      if (toggle && nav) {{
+        nav.id = nav.id || 'primaryNav';
+        toggle.addEventListener('click', function() {{
+          var open = nav.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }});
+      }}
+      document.querySelectorAll('.site-nav__item.has-dropdown > a').forEach(function(a) {{
+        a.addEventListener('click', function(e) {{
+          if (window.innerWidth <= 880) {{
+            e.preventDefault();
+            var li = a.parentElement;
+            var wasOpen = li.classList.contains('is-open');
+            document.querySelectorAll('.site-nav__item.has-dropdown.is-open').forEach(function(o){{
+              o.classList.remove('is-open');
+            }});
+            if (!wasOpen) li.classList.add('is-open');
+          }}
+        }});
+      }});
+    }});
+  }})();
+  </script>
 </body>
 </html>
 """
