@@ -863,10 +863,20 @@ body main > section:not([class]):nth-of-type(even) {
 }
 .steps-v2 {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 48px 40px;
   max-width: 1100px;
   margin: 0 auto;
+}
+/* Five-step variant: row 1 = 1·2·3, row 2 = 4·empty·5 so the bottom
+   row spans the full width like the top, leaving the centre cell
+   open (a deliberate breath between Final balance and Delivery). */
+.steps-v2 .step-v2:nth-child(4) { grid-column: 1; }
+.steps-v2 .step-v2:nth-child(5) { grid-column: 3; }
+@media (max-width: 720px) {
+  .steps-v2 { grid-template-columns: 1fr; }
+  .steps-v2 .step-v2:nth-child(4),
+  .steps-v2 .step-v2:nth-child(5) { grid-column: auto; }
 }
 .step-v2__num {
   font-family: 'Cormorant Garamond', serif;
