@@ -401,6 +401,14 @@ def render_page(filename, title, eyebrow, intro, images):
                              og_image=og_image, nav=render_nav(filename),
                              page_schema=page_schema)
     blocks = [hero_html(eyebrow, title)]
+    # About Helen wants her photo right under the title, not buried in a
+    # gallery at the foot of the page. For that one page only, render
+    # the images block early; every other page keeps the legacy
+    # below-intro position.
+    images_rendered_early = False
+    if filename == 'about.html' and images:
+        blocks.append(gallery_html(images))
+        images_rendered_early = True
     if intro and len(intro.strip()) > 30:
         body = _sanitise_intro(intro)
         # If the intro is plain text or just inline tags, wrap in a <p>
@@ -428,7 +436,7 @@ def render_page(filename, title, eyebrow, intro, images):
         {ps}
       </div>
     </section>''')
-    if images:
+    if images and not images_rendered_early:
         blocks.append(gallery_html(images))
     if filename != 'contact.html':
         blocks.append(CTA)
