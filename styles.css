@@ -60,6 +60,10 @@ body::before {
 @media (max-width: 720px) {
   body::before { display: none; }
 }
+/* Homepage already has the full-size hero logo; the watermark
+   doubles up visually and reads as duplication rather than identity.
+   Suppress on home only — every other page keeps the watermark. */
+body.is-home::before { display: none; }
 /* Ensure normal content sits above the watermark layer. */
 body > * { position: relative; z-index: 1; }
 
@@ -247,7 +251,7 @@ body main > section:not([class]):nth-of-type(even) {
   max-width: 760px;
   margin: 0 auto;
   padding: 32px 40px;
-  background: color-mix(in oklab, var(--paper) 92%, var(--rose-soft));
+  background: rgba(255, 251, 248, 0.65);
   border: 1px solid var(--border);
   border-radius: 14px;
   list-style: none;
@@ -340,7 +344,7 @@ body main > section:not([class]):nth-of-type(even) {
 .wedding-photo-grid img { aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; }
 
 /* Price table — Lambeth cake sizes */
-.price-table { width: 100%; max-width: 720px; margin: 32px auto; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.price-table { width: 100%; max-width: 720px; margin: 32px auto; border-collapse: collapse; background: rgba(255, 255, 255, 0.65); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .price-table caption { caption-side: top; font-size: 0.72rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); padding-bottom: 12px; text-align: left; padding-left: 4px; }
 .price-table thead { background: var(--cream); }
 .price-table th { text-align: left; font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; font-weight: 600; color: var(--ink); padding: 14px 20px; letter-spacing: 0.3px; }
