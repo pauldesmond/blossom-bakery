@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Helen Desmond — Founder and Baker at Blossom Bakery">
+  <defs>
+    <radialGradient id="warm" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#fffdfb"/>
+      <stop offset="100%" stop-color="#f3ece2"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#warm)"/>
+
+  <!-- Soft rose corner accents -->
+  <circle cx="120" cy="120" r="62" fill="#e8c5c4" opacity="0.35"/>
+  <circle cx="220" cy="200" r="28" fill="#e8c5c4" opacity="0.45"/>
+  <circle cx="1490" cy="760" r="80" fill="#e8c5c4" opacity="0.35"/>
+  <circle cx="1380" cy="830" r="34" fill="#e8c5c4" opacity="0.5"/>
+
+  <!-- Hairline divider -->
+  <line x1="600" y1="600" x2="1000" y2="600" stroke="#b8676a" stroke-width="1" opacity="0.5"/>
+
+  <!-- Eyebrow -->
+  <text x="800" y="320" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" letter-spacing="8" fill="#9a8b80" text-anchor="middle" font-weight="500" text-rendering="geometricPrecision">MEET THE BAKER</text>
+
+  <!-- Name in script -->
+  <text x="800" y="500" font-family="Cormorant Garamond, Playfair Display, Georgia, serif" font-style="italic" font-size="148" fill="#b8676a" text-anchor="middle" font-weight="500" text-rendering="geometricPrecision">Helen Desmond</text>
+
+  <!-- Role -->
+  <text x="800" y="650" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" letter-spacing="6" fill="#4a423a" text-anchor="middle" font-weight="500" text-rendering="geometricPrecision">FOUNDER · BLOSSOM BAKERY · CHELMSFORD</text>
+</svg>
