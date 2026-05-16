@@ -245,8 +245,22 @@ body main > section:not([class]):nth-of-type(even) {
    title. Helen fills it via the editor with a portrait or kitchen
    image. Aspect ratio 16:9 reads as a magazine masthead rather than
    a square selfie. */
-.about-hero-photo { padding: 0 0 clamp(32px, 5vw, 56px); }
-.about-hero-photo__img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; }
+/* About-Helen hero photo — single centred image sat directly under
+   the page-hero title. Preserves the photo's native aspect ratio,
+   sized big enough to anchor the page but never wider than the
+   container--narrow text column underneath. */
+.about-hero-photo { padding: 0 0 clamp(32px, 5vw, 56px); text-align: center; }
+.about-hero-photo__img {
+  display: block;
+  margin: 0 auto;
+  max-width: 640px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+@media (max-width: 540px) {
+  .about-hero-photo__img { max-width: 100%; }
+}
 
 .feature-list { list-style: none; padding: 0; max-width: 620px; margin: 0 auto; }
 .feature-list li { padding: 10px 0; padding-left: 28px; position: relative; color: var(--ink); }

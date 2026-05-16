@@ -401,13 +401,18 @@ def render_page(filename, title, eyebrow, intro, images):
                              og_image=og_image, nav=render_nav(filename),
                              page_schema=page_schema)
     blocks = [hero_html(eyebrow, title)]
-    # About Helen wants her photo right under the title, not buried in a
-    # gallery at the foot of the page. For that one page only, render
-    # the images block early; every other page keeps the legacy
-    # below-intro position.
+    # About Helen wants her photo right under the title — centered,
+    # larger, native aspect (not the 1:1-cropped square the gallery
+    # grid forces on every other page). Bespoke render for about.html
+    # only; every other page keeps the legacy gallery below the intro.
     images_rendered_early = False
     if filename == 'about.html' and images:
-        blocks.append(gallery_html(images))
+        first = images[0]
+        blocks.append(f'''<section class="about-hero-photo">
+      <div class="container container--narrow">
+        <img class="about-hero-photo__img" src="images/{first}" alt="Helen Desmond, founder of Blossom Bakery" loading="eager" />
+      </div>
+    </section>''')
         images_rendered_early = True
     if intro and len(intro.strip()) > 30:
         body = _sanitise_intro(intro)
