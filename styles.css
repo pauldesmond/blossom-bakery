@@ -241,6 +241,13 @@ body main > section:not([class]):nth-of-type(even) {
 .page-hero h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: var(--fs-display); font-weight: 400; letter-spacing: -0.035em; line-height: 0.95; color: var(--ink); max-width: 14ch; margin: 8px auto 0; }
 .page-hero p.subtitle { font-size: 1.1rem; color: var(--muted); margin-top: 14px; max-width: 620px; margin-left: auto; margin-right: auto; }
 
+/* About-Helen hero photo — wide placeholder slot below the page-hero
+   title. Helen fills it via the editor with a portrait or kitchen
+   image. Aspect ratio 16:9 reads as a magazine masthead rather than
+   a square selfie. */
+.about-hero-photo { padding: 0 0 clamp(32px, 5vw, 56px); }
+.about-hero-photo__img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; }
+
 .feature-list { list-style: none; padding: 0; max-width: 620px; margin: 0 auto; }
 .feature-list li { padding: 10px 0; padding-left: 28px; position: relative; color: var(--ink); }
 .feature-list li::before { content: '✓'; position: absolute; left: 0; color: var(--sage); font-weight: 700; }
