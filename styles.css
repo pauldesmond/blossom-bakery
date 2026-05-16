@@ -264,26 +264,10 @@ body main > section:not([class]):nth-of-type(even) {
 /* Footer */
 .site-footer { background: var(--ink); color: #ddd; padding: 80px 0 36px; margin-top: 0; position: relative; overflow: hidden; }
 
-/* Footer watermark — uses the clean circular logo (not the painterly
-   wash version) and inverts it to white so it reads as a soft mark on
-   the dark footer block. Works on mobile too (unlike the body
-   watermark which would crowd a phone viewport). */
-.site-footer::before {
-  content: '';
-  position: absolute;
-  bottom: -8%;
-  right: -4%;
-  width: clamp(220px, 32vw, 380px);
-  aspect-ratio: 1 / 1;
-  background: url('images/blossom-bakery-logo-large.png') no-repeat center / contain;
-  /* brightness(0) flattens the source image to pure black; invert(1)
-     flips it to pure white. Result: a clean white-on-dark watermark
-     regardless of the source PNG having a cream or coloured ground. */
-  filter: brightness(0) invert(1);
-  opacity: 0.14;
-  pointer-events: none;
-  z-index: 0;
-}
+/* Footer watermark disabled pending visual direction. Two prior
+   attempts (painterly transparent at 12%, then clean circle inverted
+   to white at 14%) both fell short visually. Reinstate only with a
+   concrete brief on what the footer mark should look like. */
 .site-footer > * { position: relative; z-index: 1; }
 .site-footer a { color: rgba(250, 246, 240, 0.88); transition: color 0.18s; }
 .site-footer a:hover { color: #faf6f0; }
