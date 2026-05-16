@@ -258,7 +258,25 @@ body main > section:not([class]):nth-of-type(even) {
 .flavour-list__tag { display: inline-block; margin-left: 6px; padding: 1px 8px; font-size: 0.72rem; letter-spacing: 0.04em; color: var(--rose-dark, #8c5a5a); background: var(--cream); border: 1px solid var(--border); border-radius: 999px; white-space: nowrap; vertical-align: middle; }
 
 /* Footer */
-.site-footer { background: var(--ink); color: #ddd; padding: 80px 0 36px; margin-top: 0; }
+.site-footer { background: var(--ink); color: #ddd; padding: 80px 0 36px; margin-top: 0; position: relative; overflow: hidden; }
+
+/* Footer watermark — Helen's logo anchored to the right of the dark
+   footer block. Works on mobile too (unlike the body watermark which
+   would crowd a phone viewport), and the pink/cream of the logo against
+   the ink background gives a true watermark feel rather than a wash. */
+.site-footer::before {
+  content: '';
+  position: absolute;
+  bottom: -12%;
+  right: -6%;
+  width: clamp(220px, 38vw, 460px);
+  aspect-ratio: 1538 / 1044;
+  background: url('images/blossom_logo_transparent.png') no-repeat center / contain;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+.site-footer > * { position: relative; z-index: 1; }
 .site-footer a { color: rgba(250, 246, 240, 0.65); transition: color 0.18s; }
 .site-footer a:hover { color: #faf6f0; }
 .site-footer__links { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
