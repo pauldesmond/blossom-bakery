@@ -282,6 +282,17 @@ body main > section:not([class]):nth-of-type(even) {
   pointer-events: none;
   z-index: 0;
 }
+/* On mobile the footer stacks vertically and the watermark at -8%
+   bottom overlaps the © / "Under the same roof" credit rows. Lift it
+   up so its bottom sits just above the credits while keeping the
+   right-edge cut-off Paul likes. */
+@media (max-width: 720px) {
+  .site-footer::before {
+    bottom: 96px;
+    right: -10%;
+    width: clamp(180px, 60vw, 320px);
+  }
+}
 .site-footer > * { position: relative; z-index: 1; }
 .site-footer a { color: rgba(250, 246, 240, 0.88); transition: color 0.18s; }
 .site-footer a:hover { color: #faf6f0; }
