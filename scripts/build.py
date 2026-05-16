@@ -210,7 +210,7 @@ HEADER_TPL = '''<!DOCTYPE html>
     "priceRange": "££",
     "founder": {{ "@type": "Person", "@id": "https://myblossombakery.co.uk/about.html#helen", "name": "Helen Desmond", "jobTitle": "Founder & Baker", "image": "https://myblossombakery.co.uk/images/helen-portrait.webp" }},
     "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
-    "aggregateRating": {{ "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "60", "bestRating": "5", "worstRating": "1" }}
+    "aggregateRating": {{ "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "150", "bestRating": "5", "worstRating": "1" }}
   }}
   </script>
   <script type="application/ld+json">
