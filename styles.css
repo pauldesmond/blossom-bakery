@@ -187,7 +187,7 @@ section { padding: 56px 0; }
 /* .alt sections are translucent so the body watermark bleeds through
    them. The cream show-through is barely perceptible against pure
    white, but lets the centered logo register at the page level. */
-section.alt { background: rgba(255, 255, 255, 0.86); }
+section.alt { background: rgba(255, 255, 255, 0.65); }
 
 /* Page rhythm — alternating cream (body default) / pure white to match
    the homepage's hero → categories → story cadence. Every other
@@ -199,7 +199,7 @@ section.alt { background: rgba(255, 255, 255, 0.86); }
 body main > .prose-section:nth-of-type(even),
 body main > .wedding-section:nth-of-type(even),
 body main > section:not([class]):nth-of-type(even) {
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.65);
 }
 .section-eyebrow { text-align: center; font-size: 0.78rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
 .section-title { text-align: center; font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 500; line-height: 1.1; margin-bottom: 12px; }
