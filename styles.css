@@ -264,31 +264,35 @@ body main > section:not([class]):nth-of-type(even) {
 /* Footer */
 .site-footer { background: var(--ink); color: #ddd; padding: 80px 0 36px; margin-top: 0; position: relative; overflow: hidden; }
 
-/* Footer watermark — Helen's logo anchored to the right of the dark
-   footer block. Works on mobile too (unlike the body watermark which
-   would crowd a phone viewport), and the pink/cream of the logo against
-   the ink background gives a true watermark feel rather than a wash. */
+/* Footer watermark — uses the clean circular logo (not the painterly
+   wash version) and inverts it to white so it reads as a soft mark on
+   the dark footer block. Works on mobile too (unlike the body
+   watermark which would crowd a phone viewport). */
 .site-footer::before {
   content: '';
   position: absolute;
-  bottom: -12%;
-  right: -6%;
-  width: clamp(220px, 38vw, 460px);
-  aspect-ratio: 1538 / 1044;
-  background: url('images/blossom_logo_transparent.png') no-repeat center / contain;
-  opacity: 0.12;
+  bottom: -8%;
+  right: -4%;
+  width: clamp(220px, 32vw, 380px);
+  aspect-ratio: 1 / 1;
+  background: url('images/blossom-bakery-logo-large.png') no-repeat center / contain;
+  /* brightness(0) flattens the source image to pure black; invert(1)
+     flips it to pure white. Result: a clean white-on-dark watermark
+     regardless of the source PNG having a cream or coloured ground. */
+  filter: brightness(0) invert(1);
+  opacity: 0.14;
   pointer-events: none;
   z-index: 0;
 }
 .site-footer > * { position: relative; z-index: 1; }
-.site-footer a { color: rgba(250, 246, 240, 0.65); transition: color 0.18s; }
+.site-footer a { color: rgba(250, 246, 240, 0.88); transition: color 0.18s; }
 .site-footer a:hover { color: #faf6f0; }
 .site-footer__links { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
 .site-footer__grid { display: grid; grid-template-columns: 1.6fr 1fr 1.2fr; gap: clamp(48px, 8vw, 120px); margin-bottom: 64px; }
 @media (max-width: 880px) { .site-footer__grid { grid-template-columns: 1fr 1fr; gap: 56px; } }
 @media (max-width: 540px) { .site-footer__grid { grid-template-columns: 1fr; gap: 40px; } }
 .site-footer h4 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.3rem; font-weight: 500; margin-bottom: 16px; color: var(--cream); }
-.site-footer p, .site-footer li { font-size: 14px; color: rgba(250, 246, 240, 0.65); line-height: 1.8; }
+.site-footer p, .site-footer li { font-size: 14px; color: rgba(250, 246, 240, 0.88); line-height: 1.8; }
 .site-footer ul { list-style: none; padding: 0; }
 .site-footer__bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.14em; color: rgba(250,246,240,0.4); text-align: center; }
 
