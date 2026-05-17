@@ -30,7 +30,9 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-# Decap CMS admin shell — not for indexing.
+# Admin / editor scaffolding — not for indexing.
 Disallow: /admin/
+Disallow: /edit-blossom/
+Disallow: /v2/
 
 Sitemap: https://myblossombakery.com/sitemap.xml
