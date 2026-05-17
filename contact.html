@@ -313,9 +313,9 @@
              Gmail under one thread-able subject line. _gotcha is a honeypot:
              real users never see it (visually hidden + tabindex -1 + no
              autocomplete) but spam bots fill in every visible-looking
-             input and trip the filter. Email field is named `email` so
-             Formspree auto-sets it as Reply-To — Helen hits Reply and it
-             goes to the customer, no copy/paste. -->
+             input and trip the filter. Email field is named `_replyto` —
+             Formspree's explicit Reply-To magic field, so Helen hits Reply
+             in Gmail and it goes straight to the customer. -->
 <input name="_subject" type="hidden" value="New enquiry — Blossom Bakery"/>
 <input aria-hidden="true" autocomplete="off" name="_gotcha" style="display:none" tabindex="-1" type="text"/>
 <p class="wedding-section__eyebrow" style="text-align:left">Enquiry form</p>
@@ -323,7 +323,7 @@
 <p class="intro-p" style="text-align:left; margin-top: 0">Send the details below and your enquiry will go straight to Helen's inbox.</p>
 <div class="field-row">
 <div class="field"><label>Your name</label><input name="name" placeholder="Helen Smith" required="" type="text"/></div>
-<div class="field"><label>Email</label><input name="email" placeholder="you@example.com" required="" type="email"/></div>
+<div class="field"><label>Email</label><input name="_replyto" placeholder="you@example.com" required="" type="email"/></div>
 </div>
 <div class="field-row">
 <div class="field"><label>Phone (optional)</label><input name="phone" placeholder="07…" type="tel"/></div>
