@@ -308,22 +308,25 @@
 <div class="container">
 <div class="contact-grid">
 <!-- FORM -->
-<form action="https://formspree.io/f/mwvyaoqo" class="enquiry-form" id="enquiryForm" method="POST">
-<!-- Formspree controls. _subject groups inbound enquiries in Helen's
-             Gmail under one thread-able subject line. _gotcha is a honeypot:
-             real users never see it (visually hidden + tabindex -1 + no
-             autocomplete) but spam bots fill in every visible-looking
-             input and trip the filter. Email field is named `_replyto` —
-             Formspree's explicit Reply-To magic field, so Helen hits Reply
-             in Gmail and it goes straight to the customer. -->
-<input name="_subject" type="hidden" value="New enquiry — Blossom Bakery"/>
-<input aria-hidden="true" autocomplete="off" name="_gotcha" style="display:none" tabindex="-1" type="text"/>
+<form action="https://api.web3forms.com/submit" class="enquiry-form" id="enquiryForm" method="POST">
+<!-- Web3Forms controls. access_key authenticates this form. subject groups
+             inbound enquiries in Helen's inbox under one thread-able subject.
+             botcheck is a honeypot — real users never see it (visually hidden
+             + tabindex -1 + no autocomplete) but spam bots fill in every
+             visible-looking input and trip the filter. Email field is named
+             `email` — Web3Forms auto-sets it as Reply-To header so Helen
+             hits Reply in iOS Mail and it goes straight to the customer.
+             Migrated 2026-05-17 from Formspree (iOS Mail couldn't action
+             reply on Formspree's email format). -->
+<input name="access_key" type="hidden" value="0d80071b-52a5-4338-b35c-59d1efca46db"/>
+<input name="subject" type="hidden" value="New enquiry — Blossom Bakery"/>
+<input aria-hidden="true" autocomplete="off" name="botcheck" style="display:none" tabindex="-1" type="text"/>
 <p class="wedding-section__eyebrow" style="text-align:left">Enquiry form</p>
 <h2 class="enquiry-form__heading">Tell me about it.</h2>
 <p class="intro-p" style="text-align:left; margin-top: 0">Send the details below and your enquiry will go straight to Helen's inbox.</p>
 <div class="field-row">
 <div class="field"><label>Your name</label><input name="name" placeholder="Helen Smith" required="" type="text"/></div>
-<div class="field"><label>Email</label><input name="_replyto" placeholder="you@example.com" required="" type="email"/></div>
+<div class="field"><label>Email</label><input name="email" placeholder="you@example.com" required="" type="email"/></div>
 </div>
 <div class="field-row">
 <div class="field"><label>Phone (optional)</label><input name="phone" placeholder="07…" type="tel"/></div>
@@ -360,7 +363,7 @@
 </div>
 </form>
 <!-- Shown after a successful AJAX submit. With JS off the form
-           does a native POST and Formspree shows its own thanks page,
+           does a native POST and Web3Forms shows its own thanks page,
            so this panel only renders on the happy JS path. -->
 <div class="enquiry-form" id="enquiryThanks" style="display:none">
 <p class="wedding-section__eyebrow" style="text-align:left">Thank you</p>
@@ -462,13 +465,13 @@
 </section>
 </main>
 <script>
-  // Form submission is handled higher up in the file via Formspree
+  // Form submission is handled higher up in the file via Web3Forms
   // (the AJAX block right after the form). The CONTACT_ENDPOINT path
   // below was a legacy Supabase edge-function approach that was never
   // deployed — when both handlers fired together, the legacy one's
-  // failure toast clobbered the successful Formspree submission and
-  // surfaced "Sorry, something went wrong" even though the email DID
-  // arrive in Helen's inbox. Keep only the FAQ accordion rendering.
+  // failure toast clobbered the successful submission and surfaced
+  // "Sorry, something went wrong" even though the email DID arrive in
+  // Helen's inbox. Keep only the FAQ accordion rendering.
   const FAQS = [
     ["How far in advance should I order a wedding cake?", "I usually take wedding bookings 4–9 months out for peak summer dates, but I'll always try to fit you in if I can — even short notice. For celebration cakes, 2–3 weeks is ideal."],
     ["Can you do gluten-free or vegan?", "Yes — most of my cakes can be adapted. Just mention it in the enquiry and I'll send the GF/V options for that design."],
