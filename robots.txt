@@ -1,4 +1,4 @@
-# Blossom Bakery — myblossombakery.co.uk
+# Blossom Bakery — myblossombakery.com
 # Allow all search engines and AI assistants to index the site.
 
 # Content Signals (contentsignals.org) — declared per User-agent block below.
@@ -33,4 +33,4 @@ Allow: /
 # Decap CMS admin shell — not for indexing.
 Disallow: /admin/
 
-Sitemap: https://myblossombakery.co.uk/sitemap.xml
+Sitemap: https://myblossombakery.com/sitemap.xml

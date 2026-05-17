@@ -467,8 +467,8 @@ def rewrite_image_refs(old_src: str, new_src: str, page_file: str | None = None)
     Returns number of files changed.
     """
     n = 0
-    abs_url = f"https://myblossombakery.co.uk/{old_src}"
-    new_abs = f"https://myblossombakery.co.uk/{new_src}"
+    abs_url = f"https://myblossombakery.com/{old_src}"
+    new_abs = f"https://myblossombakery.com/{new_src}"
     for html in SITE.glob("*.html"):
         if "edit-blossom" in html.parts:
             continue  # don't touch the editor itself

@@ -9,7 +9,7 @@
 # batch JSON urlList submissions as suboptimal — streaming gives faster
 # reflection and lower server overhead.
 #
-# Key file lives at myblossombakery.co.uk/dd9a1d12954e66976fda393be7069391.txt and must stay in the
+# Key file lives at myblossombakery.com/dd9a1d12954e66976fda393be7069391.txt and must stay in the
 # repo root for IndexNow to trust this host.
 
 set -euo pipefail
@@ -25,7 +25,7 @@ import sys, re, time, urllib.request, urllib.error, urllib.parse
 from pathlib import Path
 
 KEY = "dd9a1d12954e66976fda393be7069391"
-HOST = "myblossombakery.co.uk"
+HOST = "myblossombakery.com"
 
 args = sys.argv[1:]
 if args == ["--all"]:

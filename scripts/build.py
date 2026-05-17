@@ -179,14 +179,14 @@ HEADER_TPL = '''<!DOCTYPE html>
   <title>{title} — Blossom Bakery, Chelmsford</title>
   <meta name="description" content="{description}" />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://myblossombakery.co.uk/{filename}" />
+  <link rel="canonical" href="https://myblossombakery.com/{filename}" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://myblossombakery.co.uk/{filename}" />
+  <meta property="og:url" content="https://myblossombakery.com/{filename}" />
   <meta property="og:title" content="{title} — Blossom Bakery" />
   <meta property="og:description" content="{description}" />
-  <meta property="og:image" content="https://myblossombakery.co.uk/{og_image}" />
+  <meta property="og:image" content="https://myblossombakery.com/{og_image}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -195,20 +195,20 @@ HEADER_TPL = '''<!DOCTYPE html>
   {{
     "@context": "https://schema.org",
     "@type": "Bakery",
-    "@id": "https://myblossombakery.co.uk/#bakery",
+    "@id": "https://myblossombakery.com/#bakery",
     "name": "Blossom Bakery",
     "alternateName": "Blossom Bakery Chelmsford",
     "description": "Bespoke wedding cakes, celebration cakes, cupcakes, hand-iced biscuits, tray bakes and afternoon teas — handmade by Helen Desmond in Great Baddow, Chelmsford. Gluten-free, dairy-free and vegan options available.",
-    "url": "https://myblossombakery.co.uk/",
-    "image": "https://myblossombakery.co.uk/images/helen-portrait.webp",
-    "logo": "https://myblossombakery.co.uk/images/blossom_logo.png",
+    "url": "https://myblossombakery.com/",
+    "image": "https://myblossombakery.com/images/helen-portrait.webp",
+    "logo": "https://myblossombakery.com/images/blossom_logo.png",
     "telephone": "+44 7939 618787",
     "email": "blossombakedgoods@gmail.com",
     "address": {{ "@type": "PostalAddress", "addressLocality": "Great Baddow, Chelmsford", "addressRegion": "Essex", "postalCode": "CM2", "addressCountry": "GB" }},
     "geo": {{ "@type": "GeoCoordinates", "latitude": 51.7138, "longitude": 0.4994 }},
     "areaServed": [{{ "@type": "City", "name": "Chelmsford" }}, {{ "@type": "AdministrativeArea", "name": "Essex" }}],
     "priceRange": "££",
-    "founder": {{ "@type": "Person", "@id": "https://myblossombakery.co.uk/about.html#helen", "name": "Helen Desmond", "jobTitle": "Founder & Baker", "image": "https://myblossombakery.co.uk/images/helen-portrait.webp" }},
+    "founder": {{ "@type": "Person", "@id": "https://myblossombakery.com/about.html#helen", "name": "Helen Desmond", "jobTitle": "Founder & Baker", "image": "https://myblossombakery.com/images/helen-portrait.webp" }},
     "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
     "aggregateRating": {{ "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "150", "bestRating": "5", "worstRating": "1" }}
   }}
@@ -217,10 +217,10 @@ HEADER_TPL = '''<!DOCTYPE html>
   {{
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": "https://myblossombakery.co.uk/#website",
-    "url": "https://myblossombakery.co.uk/",
+    "@id": "https://myblossombakery.com/#website",
+    "url": "https://myblossombakery.com/",
     "name": "Blossom Bakery",
-    "publisher": {{ "@id": "https://myblossombakery.co.uk/#bakery" }}
+    "publisher": {{ "@id": "https://myblossombakery.com/#bakery" }}
   }}
   </script>{page_schema}
   <script src="blossom-analytics.js" defer></script>
@@ -250,14 +250,14 @@ PAGE_SCHEMA_TPL = {
   {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    "@id": "https://myblossombakery.co.uk/about.html#profile",
+    "@id": "https://myblossombakery.com/about.html#profile",
     "mainEntity": {
       "@type": "Person",
-      "@id": "https://myblossombakery.co.uk/about.html#helen",
+      "@id": "https://myblossombakery.com/about.html#helen",
       "name": "Helen Desmond",
       "jobTitle": "Founder & Baker",
-      "worksFor": { "@id": "https://myblossombakery.co.uk/#bakery" },
-      "image": "https://myblossombakery.co.uk/images/helen-portrait.webp",
+      "worksFor": { "@id": "https://myblossombakery.com/#bakery" },
+      "image": "https://myblossombakery.com/images/helen-portrait.webp",
       "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
       "description": "Helen Desmond is the founder and baker behind Blossom Bakery in Great Baddow, Chelmsford. Specialises in bespoke wedding cakes, celebration cakes, hand-iced biscuits, cupcakes, tray bakes and afternoon teas, with gluten-free, dairy-free and vegan options available."
     }

@@ -159,13 +159,13 @@ PAGE_TPL = '''<!DOCTYPE html>
   <title>{title} — Blossom Bakery, Chelmsford</title>
   <meta name="description" content="{description}" />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://myblossombakery.co.uk/{filename}" />
+  <link rel="canonical" href="https://myblossombakery.com/{filename}" />
   <link rel="icon" type="image/png" href="images/blossom_logo.png" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://myblossombakery.co.uk/{filename}" />
+  <meta property="og:url" content="https://myblossombakery.com/{filename}" />
   <meta property="og:title" content="{title} — Blossom Bakery" />
   <meta property="og:description" content="{description}" />
-  <meta property="og:image" content="https://myblossombakery.co.uk/{og_image}" />
+  <meta property="og:image" content="https://myblossombakery.com/{og_image}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..700,30..100&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
