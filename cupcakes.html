@@ -92,7 +92,7 @@
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "5.0",
-    "reviewCount": "150",
+    "reviewCount": 150,
     "bestRating": "5",
     "worstRating": "1"
   },
@@ -185,10 +185,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://myblossombakery.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Cupcakes", "item": "https://myblossombakery.com/cupcakes.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "Product",
   "@id": "https://myblossombakery.com/cupcakes.html#product",
   "name": "Hand-Decorated Cupcake Boxes",
   "description": "Hand-piped, freshly baked cupcakes in boxes of 6, 12, 18 or 24. Classic swirl, buttercream rose, iced topper or bouquet style. Gluten-free and vegan options available.",
+  "dateModified": "2026-05-17",
+  "image": "https://myblossombakery.com/images/img_4411.jpeg",
   "brand": {
     "@id": "https://myblossombakery.com/#bakery"
   },
@@ -196,16 +208,96 @@
   "offers": {
     "@type": "AggregateOffer",
     "lowPrice": "20",
+    "highPrice": "80",
     "priceCurrency": "GBP",
     "offerCount": 4,
     "availability": "https://schema.org/InStock",
     "seller": {
       "@id": "https://myblossombakery.com/#bakery"
     }
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "reviewCount": 150,
+    "bestRating": "5",
+    "worstRating": "1"
   }
 }
 </script>
   <script src="blossom-analytics.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://myblossombakery.com/cupcakes.html#faq",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      ".faq__q",
+      ".faq__a"
+    ]
+  },
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How far in advance should I order a celebration cake?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For celebration cakes, 2–3 weeks' notice is ideal, though I'll always try to accommodate short notice if I can."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can you do gluten-free or vegan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — most of my cakes and bakes can be adapted. Just mention it in your enquiry and I'll send the GF, DF or vegan options for that design."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you deliver?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "I deliver wedding cakes across Essex and surrounding counties — quoted by venue distance. Cupcakes, traybakes and afternoon teas for two people or more can be delivered locally in CM2."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What about allergens?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All bakes are made in a domestic kitchen that handles wheat, gluten, dairy, eggs, nuts and soy. I take allergens seriously — flag them on enquiry and I'll confirm whether I can safely accommodate that order."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What box sizes do your cupcakes come in?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Boxes of 6, 12, 18 or 24. Classic swirl, buttercream rose, iced topper or bouquet styles — mix and match flavours within a box."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can you do cupcakes for weddings or corporate events?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — cupcake towers are a popular alternative to a tiered wedding cake, and corporate event boxes (with branded toppers if you'd like) are a regular order. Get in touch with numbers and style and I'll quote."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long do your cupcakes stay fresh?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Best on the day of pickup, very good for 24 hours and still good for 48 hours kept in a cool, airtight container. Freshness is the reason orders need 48 hours' minimum notice."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -365,6 +457,8 @@
 <li><a href="cupcakes.html">Cupcakes</a></li>
 <li><a href="customer-reviews.html">Testimonials</a></li>
 <li><a href="wedding-cakes.html">Weddings</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="terms.html">Terms</a></li>
 </ul>
 </div>
 <div>
@@ -378,6 +472,9 @@
 <div class="site-footer__bottom">
         © 2026 Blossom Bakery · Helen Desmond · Chelmsford
       </div>
+<div class="site-footer__bottom" style="margin-top: 4px; opacity: 0.45; font-size: 0.85em;">
+Last updated: <time datetime="2026-05-17">17 May 2026</time>
+</div>
 <div class="site-footer__bottom" style="margin-top: 6px; opacity: 0.55;">
 Under the same roof: <a href="https://pintpoint.co.uk" rel="noopener" target="_blank" style="color: inherit; text-decoration: underline">PINtPOINT</a>, the pub finder
 </div>

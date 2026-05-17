@@ -37,7 +37,7 @@
     "priceRange": "££",
     "founder": { "@type": "Person", "@id": "https://myblossombakery.com/about.html#helen", "name": "Helen Desmond", "jobTitle": "Founder & Baker", "image": "https://myblossombakery.com/images/helen-portrait.webp" },
     "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
-    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "150", "bestRating": "5", "worstRating": "1" }
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": 150, "bestRating": "5", "worstRating": "1" }
   }
   </script>
   <script type="application/ld+json">
@@ -53,8 +53,23 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://myblossombakery.com/" },
+      { "@type": "ListItem", "position": 2, "name": "About", "item": "https://myblossombakery.com/about.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
     "@type": "ProfilePage",
     "@id": "https://myblossombakery.com/about.html#profile",
+    "dateModified": "2026-05-17",
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": [".intro-p"]
+    },
     "mainEntity": {
       "@type": "Person",
       "@id": "https://myblossombakery.com/about.html#helen",
@@ -62,8 +77,29 @@
       "jobTitle": "Founder & Baker",
       "worksFor": { "@id": "https://myblossombakery.com/#bakery" },
       "image": "https://myblossombakery.com/images/helen-portrait.webp",
-      "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"],
-      "description": "Helen Desmond is the founder and baker behind Blossom Bakery in Great Baddow, Chelmsford. Specialises in bespoke wedding cakes, celebration cakes, hand-iced biscuits, cupcakes, tray bakes and afternoon teas, with gluten-free, dairy-free and vegan options available."
+      "description": "Helen Desmond founded Blossom Bakery in Great Baddow, Chelmsford in 2018. A former visual merchandiser for a major UK fashion retailer based in central London, she trained in art and design from age 16 and turned full-time to baking after working in a Chelmsford tea room from 2016. Blossom Bakery holds a five-star food hygiene rating from Chelmsford City Council and specialises in bespoke wedding cakes, hand-iced biscuits, cupcakes and afternoon teas, with gluten-free, dairy-free and vegan options available.",
+      "knowsAbout": [
+        "Wedding cakes",
+        "Buttercream piping",
+        "Lambeth piping",
+        "Hand-iced biscuits",
+        "Afternoon tea catering",
+        "Gluten-free baking",
+        "Vegan baking",
+        "Cake design",
+        "Visual merchandising"
+      ],
+      "hasCredential": {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "certification",
+        "name": "Five-star Food Hygiene Rating",
+        "recognizedBy": {
+          "@type": "GovernmentOrganization",
+          "name": "Chelmsford City Council",
+          "url": "https://www.food.gov.uk/safety-hygiene/food-hygiene-rating-scheme"
+        }
+      },
+      "sameAs": ["https://www.instagram.com/blossombakedgoods/", "https://www.facebook.com/blossombakedgoods", "https://www.google.com/maps/place/?q=place_id:ChIJzcfuM0jp2EcRucu7NgmACCw"]
     }
   }
   </script>
@@ -190,6 +226,9 @@ It’s the best job and I get so much lovely feedback from my clients.</p>
       <div class="site-footer__bottom">
         © 2026 Blossom Bakery · Helen Desmond · Chelmsford
       </div>
+<div class="site-footer__bottom" style="margin-top: 4px; opacity: 0.45; font-size: 0.85em;">
+Last updated: <time datetime="2026-05-17">17 May 2026</time>
+</div>
       <div class="site-footer__bottom" style="margin-top: 6px; opacity: 0.55;">
         Under the same roof: <a href="https://pintpoint.co.uk" rel="noopener" target="_blank" style="color: inherit; text-decoration: underline">PINtPOINT</a>, the pub finder
       </div>

@@ -133,7 +133,7 @@
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "5.0",
-    "reviewCount": "150",
+    "reviewCount": 150,
     "bestRating": "5",
     "worstRating": "1"
   },
@@ -226,17 +226,107 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://myblossombakery.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Bakes", "item": "https://myblossombakery.com/handmade-biscuits.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "Service",
   "@id": "https://myblossombakery.com/handmade-biscuits.html#service",
   "serviceType": "Handmade biscuits",
   "name": "Handmade Biscuits",
   "description": "All-butter handmade biscuits \u2014 vanilla, mild-spiced or seasonal, individually heat-sealed. Personalised iced biscuits for weddings, baby showers, birthdays, anniversaries and corporate gifting.",
+  "dateModified": "2026-05-17",
   "provider": {
     "@id": "https://myblossombakery.com/#bakery"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "reviewCount": 150,
+    "bestRating": "5",
+    "worstRating": "1"
   }
 }
 </script>
   <script src="blossom-analytics.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://myblossombakery.com/handmade-biscuits.html#faq",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      ".faq__q",
+      ".faq__a"
+    ]
+  },
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How far in advance should I order a celebration cake?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For celebration cakes, 2–3 weeks' notice is ideal, though I'll always try to accommodate short notice if I can."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can you do gluten-free or vegan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — most of my cakes and bakes can be adapted. Just mention it in your enquiry and I'll send the GF, DF or vegan options for that design."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you deliver?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "I deliver wedding cakes across Essex and surrounding counties — quoted by venue distance. Cupcakes, traybakes and afternoon teas for two people or more can be delivered locally in CM2."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What about allergens?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All bakes are made in a domestic kitchen that handles wheat, gluten, dairy, eggs, nuts and soy. I take allergens seriously — flag them on enquiry and I'll confirm whether I can safely accommodate that order."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can biscuits be personalised with a name, logo or photo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — every biscuit is hand-iced to order. Names, dates, monograms, simple logos and even photo-printed icing toppers are all possible. Send your design or brief on enquiry."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you do wedding favour biscuits?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — wedding favour biscuits (including individually bagged and tagged) are a regular order. Lead times are similar to wedding cakes — 4–8 weeks for peak summer dates."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long do hand-iced biscuits stay fresh?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sealed in their bag or packaging, two to three weeks at room temperature. Great for sending in the post or holding for an event."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -360,6 +450,8 @@
 <li><a href="cupcakes.html">Cupcakes</a></li>
 <li><a href="customer-reviews.html">Testimonials</a></li>
 <li><a href="wedding-cakes.html">Weddings</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="terms.html">Terms</a></li>
 </ul>
 </div>
 <div>
@@ -373,6 +465,9 @@
 <div class="site-footer__bottom">
         © 2026 Blossom Bakery · Helen Desmond · Chelmsford
       </div>
+<div class="site-footer__bottom" style="margin-top: 4px; opacity: 0.45; font-size: 0.85em;">
+Last updated: <time datetime="2026-05-17">17 May 2026</time>
+</div>
 <div class="site-footer__bottom" style="margin-top: 6px; opacity: 0.55;">
 Under the same roof: <a href="https://pintpoint.co.uk" rel="noopener" target="_blank" style="color: inherit; text-decoration: underline">PINtPOINT</a>, the pub finder
 </div>

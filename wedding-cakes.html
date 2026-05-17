@@ -91,7 +91,7 @@
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "5.0",
-    "reviewCount": "150",
+    "reviewCount": 150,
     "bestRating": "5",
     "worstRating": "1"
   },
@@ -184,11 +184,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://myblossombakery.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Weddings", "item": "https://myblossombakery.com/wedding-cakes.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "Service",
   "@id": "https://myblossombakery.com/wedding-cakes.html#service",
   "serviceType": "Wedding Cakes",
   "name": "Bespoke Wedding Cakes",
   "description": "Bespoke wedding cakes designed and baked by Helen Desmond at Blossom Bakery, Chelmsford. Buttercream, drip, Lambeth, fresh-floral and dessert-table options. Delivered across Essex and surrounding counties.",
+  "dateModified": "2026-05-17",
   "provider": {
     "@id": "https://myblossombakery.com/#bakery"
   },
@@ -198,6 +209,13 @@
       "name": "Essex"
     }
   ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "reviewCount": 150,
+    "bestRating": "5",
+    "worstRating": "1"
+  },
   "hasOfferCatalog": {
     "@type": "OfferCatalog",
     "name": "Wedding cake size tiers",
@@ -237,6 +255,86 @@
 }
 </script>
 <script defer="" src="blossom-analytics.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://myblossombakery.com/wedding-cakes.html#faq",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      ".faq__q",
+      ".faq__a"
+    ]
+  },
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How far in advance should I order a wedding cake?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "I usually take wedding bookings 4–9 months out for peak summer dates, but I'll always try to fit you in if I can — even short notice. For celebration cakes, 2–3 weeks is ideal."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a tasting?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — I do tasting boxes for wedding cakes (sponges + fillings) so you can decide flavours with confidence. Included for confirmed weddings; available separately on enquiry."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you deliver?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "I deliver wedding cakes across Essex and surrounding counties — quoted by venue distance. Cupcakes, traybakes and afternoon teas for two people or more can be delivered locally in CM2."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can you do gluten-free or vegan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — most of my cakes and bakes can be adapted. Just mention it in your enquiry and I'll send the GF, DF or vegan options for that design."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What about allergens?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All bakes are made in a domestic kitchen that handles wheat, gluten, dairy, eggs, nuts and soy. I take allergens seriously — flag them on enquiry and I'll confirm whether I can safely accommodate that order."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does a wedding cake cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Wedding cakes start from around £350 for a two-tier and rise with size, design intricacy and finish. The full pricing tier list is on the wedding cakes page; bespoke quotes are sent after enquiry."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many servings do I need?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As a rough guide: two-tier ~50 servings, three-tier ~80, four-tier ~120, five-tier ~150+. Cutting style affects this — I'll confirm exact servings for your numbers when quoting."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which venues have you delivered to?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Recent venues include Gosfield Hall, Hylands House, Crondon Park, Leez Priory, Maiden's Barn, Roslin Beach Hotel, Apton Hall, Baddow Park, Channels and Braxted Park. I'm Crondon Park's recommended cake supplier."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -536,6 +634,8 @@
 <li><a href="cupcakes.html">Cupcakes</a></li>
 <li><a href="customer-reviews.html">Testimonials</a></li>
 <li><a href="wedding-cakes.html">Weddings</a></li>
+<li><a href="privacy.html">Privacy</a></li>
+<li><a href="terms.html">Terms</a></li>
 </ul>
 </div>
 <div>
@@ -549,6 +649,9 @@
 <div class="site-footer__bottom">
         © 2026 Blossom Bakery · Helen Desmond · Chelmsford
       </div>
+<div class="site-footer__bottom" style="margin-top: 4px; opacity: 0.45; font-size: 0.85em;">
+Last updated: <time datetime="2026-05-17">17 May 2026</time>
+</div>
 <div class="site-footer__bottom" style="margin-top: 6px; opacity: 0.55;">
 Under the same roof: <a href="https://pintpoint.co.uk" rel="noopener" style="color: inherit; text-decoration: underline" target="_blank">PINtPOINT</a>, the pub finder
 </div>
