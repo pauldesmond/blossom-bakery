@@ -320,6 +320,7 @@
              reply on Formspree's email format). -->
 <input name="access_key" type="hidden" value="0d80071b-52a5-4338-b35c-59d1efca46db"/>
 <input name="subject" type="hidden" value="New enquiry — Blossom Bakery"/>
+<input name="from_name" type="hidden" value="Blossom Bakery enquiry"/>
 <input aria-hidden="true" autocomplete="off" name="botcheck" style="display:none" tabindex="-1" type="text"/>
 <p class="wedding-section__eyebrow" style="text-align:left">Enquiry form</p>
 <h2 class="enquiry-form__heading">Tell me about it.</h2>
@@ -381,17 +382,24 @@
             const originalText = btn.textContent;
             btn.textContent = 'Sending…';
             btn.disabled = true;
-            // Customise the email subject so Helen's inbox shows customer name +
-            // cake type at a glance — no need to open the email to triage who's
-            // asking for what. Falls back gracefully if either field is empty.
+            // Customise the email's sender NAME + subject so Helen's iOS
+            // Mail inbox shows the customer's name as the apparent sender
+            // (matching the old WordPress contact-form behaviour where she
+            // could just hit Reply). The actual sending address stays
+            // web3forms.com (deliverability), but the visible From-name is
+            // the customer's, and Reply-To routes the reply back to them.
             const nameInput = form.querySelector('input[name="name"]');
             const typeInput = form.querySelector('select[name="type"]');
             const subjectInput = form.querySelector('input[name="subject"]');
+            const fromNameInput = form.querySelector('input[name="from_name"]');
+            const name = (nameInput && nameInput.value || '').trim();
+            const type = (typeInput && typeInput.value || '').trim();
             if (subjectInput) {
-              const name = (nameInput && nameInput.value || '').trim();
-              const type = (typeInput && typeInput.value || '').trim();
               if (name && type) subjectInput.value = `${type} enquiry — ${name}`;
               else if (name) subjectInput.value = `New enquiry — ${name}`;
+            }
+            if (fromNameInput && name) {
+              fromNameInput.value = name;
             }
             try {
               const resp = await fetch(form.action, {
