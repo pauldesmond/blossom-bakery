@@ -381,6 +381,18 @@
             const originalText = btn.textContent;
             btn.textContent = 'Sending…';
             btn.disabled = true;
+            // Customise the email subject so Helen's inbox shows customer name +
+            // cake type at a glance — no need to open the email to triage who's
+            // asking for what. Falls back gracefully if either field is empty.
+            const nameInput = form.querySelector('input[name="name"]');
+            const typeInput = form.querySelector('select[name="type"]');
+            const subjectInput = form.querySelector('input[name="subject"]');
+            if (subjectInput) {
+              const name = (nameInput && nameInput.value || '').trim();
+              const type = (typeInput && typeInput.value || '').trim();
+              if (name && type) subjectInput.value = `${type} enquiry — ${name}`;
+              else if (name) subjectInput.value = `New enquiry — ${name}`;
+            }
             try {
               const resp = await fetch(form.action, {
                 method: 'POST',
