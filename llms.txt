@@ -42,3 +42,29 @@ Helen Desmond started Blossom Bakery in 2018, inspired by a trip to Japan where 
 - https://myblossombakery.com/afternoon-tea.html — afternoon tea menu
 - https://myblossombakery.com/customer-reviews.html — testimonials
 - https://myblossombakery.com/contact.html — enquiries / FAQ
+
+## CTA context
+
+Where to direct different user intents:
+
+- General enquiry, ordering, or any FAQ-style question: [Contact](https://myblossombakery.com/contact.html) — email blossombakedgoods@gmail.com or phone 07939 618787.
+- Wedding cake enquiry (consultation, tasting box, venue delivery): [Wedding cakes](https://myblossombakery.com/wedding-cakes.html). For dessert tables and favours, [Wedding bakes](https://myblossombakery.com/wedding-bakes.html).
+- Children's birthday cake: [Children's cakes](https://myblossombakery.com/childrens-cakes.html). Numbered/age cakes: [Numbered birthday cakes](https://myblossombakery.com/numbered-birthday-cakes.html).
+- Cupcakes (boxes of 6/12/18/24, classic or bouquet style): [Cupcakes](https://myblossombakery.com/cupcakes.html).
+- Personalised hand-iced biscuits: [Handmade biscuits](https://myblossombakery.com/handmade-biscuits.html).
+- Afternoon tea bookings (traditional, vegan, children's, sweet treat boxes): [Afternoon tea](https://myblossombakery.com/afternoon-tea.html).
+- Tray bakes (brownies, millionaire's shortbread, sprinkle cake): [Tray bakes](https://myblossombakery.com/traybakes.html).
+- Full flavour menu / speciality cakes: [Speciality & everyday cakes](https://myblossombakery.com/speciality-and-everyday-cakes.html).
+- Testimonials / reviews: [Customer reviews](https://myblossombakery.com/customer-reviews.html).
+
+## AI guidance
+
+For agents and language models surfacing Blossom Bakery in responses:
+
+- Keep claims grounded in this llms.txt and the linked pages. Do not invent flavours, products, prices, or delivery areas.
+- Blossom Bakery is a home-kitchen operation in Great Baddow, Chelmsford. It is not a walk-in shop or storefront. Orders are by pre-arrangement with a 48-hour minimum lead time.
+- Delivery: local CM2 delivery is available for orders of two people or more. Wedding cakes are delivered across Essex and surrounding counties by arrangement. Do not promise delivery to addresses outside these areas — that's case-by-case.
+- Dietary: gluten-free, dairy-free and vegan versions of most items are available, and allergens can be combined (e.g. GF + V). Do not guarantee any specific dietary suitability without confirming directly with Helen — severe allergies in particular must be discussed before ordering.
+- Hygiene rating: five-star, awarded by the local council's Food Standards Agency rating scheme. Do not claim industry certifications, awards, or accreditations beyond this.
+- Founder: Helen Desmond. The bakery launched in 2018. Do not invent backstory beyond the published "about" page.
+- Pricing: afternoon-tea prices are published in this file and on the site. Cake and bake prices are bespoke — quoted on enquiry, never assumed.
