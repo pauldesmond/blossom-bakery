@@ -214,6 +214,67 @@
 
     .range img { aspect-ratio: 16 / 10; object-fit: cover; }
 
+    .price {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 12px 16px;
+      border: 1px solid rgba(184, 103, 106, 0.24);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--rose-dark);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 800;
+      box-shadow: 0 14px 28px rgba(74, 30, 26, 0.08);
+    }
+
+    .price span {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .bake-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .bake-shot {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 18px 42px rgba(42, 38, 32, 0.12);
+    }
+
+    .bake-shot img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+    }
+
+    .bake-shot p {
+      margin: 0;
+      padding: 12px 14px 14px;
+      color: var(--muted);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .bake-shot strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--rose-dark);
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
     .note {
       border-top: 1px solid var(--border);
       padding: clamp(24px, 4vw, 42px) clamp(28px, 6vw, 70px);
@@ -250,6 +311,7 @@
       .showcase,
       .showcase.range { grid-template-columns: 1fr; }
       .range .showcase-copy { order: -1; }
+      .bake-gallery { grid-template-columns: 1fr; }
       figure { transform: none; }
     }
   </style>
@@ -289,6 +351,27 @@
             A carefully curated tasting flight: Zog, Paw Patrol and Bluey. A bold trio, selected for technical
             ambition, visual drama, and absolutely no arguments in the supermarket.
           </p>
+        </div>
+      </section>
+
+      <section class="showcase" aria-labelledby="oven-title">
+        <div class="showcase-copy">
+          <h2 id="oven-title">Fresh From The Oven</h2>
+          <p>
+            A limited-run Saturday bake, produced under emergency Greece-desk conditions and finished with
+            character artwork, heroic sprinkles, and the confidence of a bakery that absolutely knows what it is doing.
+          </p>
+          <div class="price">£2 each <span>or 3 for £5</span></div>
+        </div>
+        <div class="bake-gallery" aria-label="Before and after cupcake photos">
+          <div class="bake-shot">
+            <img src="images/chloe-cupcakes-before.jpg" alt="Plain cupcakes cooling in baking trays before decoration" />
+            <p><strong>Before</strong>Golden sponge, cooling nicely, awaiting creative direction.</p>
+          </div>
+          <div class="bake-shot">
+            <img src="images/chloe-cupcakes-after.jpg" alt="Decorated cupcakes with blue and orange icing, sprinkles and character toppers" />
+            <p><strong>After</strong>Fully decorated and ready for immediate quality-control sampling.</p>
+          </div>
         </div>
       </section>
 
