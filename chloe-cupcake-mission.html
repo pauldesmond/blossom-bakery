@@ -166,6 +166,54 @@
       text-align: center;
     }
 
+    figcaption strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--rose-dark);
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .showcase {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: clamp(22px, 4vw, 42px);
+      align-items: center;
+      border-top: 1px solid var(--border);
+      padding: clamp(26px, 5vw, 54px) clamp(28px, 6vw, 70px);
+      background: rgba(255, 253, 251, 0.58);
+    }
+
+    .showcase h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 5vw, 4.1rem);
+      font-style: italic;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+    }
+
+    .showcase p {
+      margin-top: 14px;
+      color: var(--ink-soft);
+      font-size: 1.06rem;
+    }
+
+    .showcase img {
+      width: 100%;
+      border: 10px solid #fff;
+      border-radius: 24px;
+      box-shadow: 0 20px 48px rgba(42, 38, 32, 0.14);
+    }
+
+    .showcase.range {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      background: color-mix(in oklab, var(--cream) 76%, white);
+    }
+
+    .range img { aspect-ratio: 16 / 10; object-fit: cover; }
+
     .note {
       border-top: 1px solid var(--border);
       padding: clamp(24px, 4vw, 42px) clamp(28px, 6vw, 70px);
@@ -199,6 +247,9 @@
       body { padding: 16px; }
       .hero { grid-template-columns: 1fr; }
       .mission { grid-template-columns: 1fr; }
+      .showcase,
+      .showcase.range { grid-template-columns: 1fr; }
+      .range .showcase-copy { order: -1; }
       figure { transform: none; }
     }
   </style>
@@ -225,10 +276,21 @@
         </div>
 
         <figure>
-          <img src="images/cupcakes-easter.jpeg" alt="A box of pastel Blossom Bakery cupcakes" />
-          <figcaption>Artist's impression of the expected level of excellence.</figcaption>
+          <img src="images/chloe-meet-the-chefs.jpg" alt="Chloe and Dad wearing Blossom Bakery aprons in the kitchen" />
+          <figcaption><strong>Meet The Chefs</strong>Calm, prepared, and taking the flour situation very seriously.</figcaption>
         </figure>
       </div>
+
+      <section class="showcase range" aria-labelledby="range-title">
+        <img src="images/chloe-cupcake-range.jpg" alt="Three cupcake kits ready to be baked: Zog, Paw Patrol and Bluey" />
+        <div class="showcase-copy">
+          <h2 id="range-title">Our Range</h2>
+          <p>
+            A carefully curated tasting flight: Zog, Paw Patrol and Bluey. A bold trio, selected for technical
+            ambition, visual drama, and absolutely no arguments in the supermarket.
+          </p>
+        </div>
+      </section>
 
       <div class="note">
         <p>
