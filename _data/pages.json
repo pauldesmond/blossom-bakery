@@ -209,6 +209,19 @@
         "order": 60,
         "note": "Two-tier - celebration"
       }
+    },
+    {
+      "id": "bespoke-cakes",
+      "file": "bespoke-cakes.html",
+      "label": "Bespoke Cakes",
+      "published": true,
+      "generated": false,
+      "nav": {
+        "section": "cakes",
+        "label": "Bespoke Cakes",
+        "note": "Made to order",
+        "order": 5
+      }
     }
   ]
 }

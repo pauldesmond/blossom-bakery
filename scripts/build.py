@@ -147,6 +147,7 @@ FOOTER = '''<footer class="site-footer">
             <li><a href="about.html">About Helen</a></li>
             <li><a href="afternoon-tea.html">Afternoon Tea</a></li>
             <li><a href="handmade-biscuits.html">Bakes</a></li>
+            <li><a href="bespoke-cakes.html">Bespoke Cakes</a></li>
             <li><a href="cakes.html">Cakes</a></li>
             <li><a href="contact.html">Contact Us</a></li>
             <li><a href="cupcakes.html">Cupcakes</a></li>
