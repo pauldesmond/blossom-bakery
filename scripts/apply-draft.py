@@ -1188,6 +1188,12 @@ def apply_draft(draft_path: Path) -> None:
             print(f"    _pages/{page_id}.yml  was: \"{orig[:40]}…\"  →  \"{new_val[:40]}…\"")
     print("─" * 56)
     print()
+    if summary["text_skipped"]:
+        # A successful workflow would delete the staged draft even when every
+        # requested text change missed its selector. Keep it for diagnosis.
+        print("ERROR: text edits were skipped; refusing to publish.", file=sys.stderr)
+        sys.exit(1)
+
     print("Next: review the diff with `git diff`, commit, and push.")
 
 
