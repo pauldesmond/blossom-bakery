@@ -620,6 +620,17 @@ const IFRAME_INJECT = `
     }
   }, true);
 
+  // Safari can turn Enter inside an editable <p> into a temporary <div>.
+  // A later tap then records a selector for that div, which does not exist
+  // in the source HTML and silently misses at publish time. Keep line
+  // breaks inside the original paragraph so its selector remains stable.
+  document.addEventListener('beforeinput', (e) => {
+    if (e.inputType !== 'insertParagraph' || !activeEdit || activeEdit.el.tagName !== 'P') return;
+    if (!activeEdit.el.contains(e.target)) return;
+    e.preventDefault();
+    document.execCommand('insertLineBreak', false, null);
+  }, true);
+
   document.addEventListener('click', (e) => {
     // Image click → swap
     if (e.target.tagName === 'IMG' && !e.target.closest('header, footer, .lb, nav, .site-dropdown')) {
